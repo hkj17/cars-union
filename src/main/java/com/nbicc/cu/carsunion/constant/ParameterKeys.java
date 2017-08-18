@@ -6,4 +6,8 @@ package com.nbicc.cu.carsunion.constant;
 public class ParameterKeys {
 
     public static final String STATE = "state";
+
+    public static final int REQUEST_SUCCESS = 0;
+
+    public static final int REQUEST_FAIL = 1;
 }

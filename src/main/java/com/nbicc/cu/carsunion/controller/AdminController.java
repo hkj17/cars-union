@@ -1,9 +1,11 @@
 package com.nbicc.cu.carsunion.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.service.AdminService;
+import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,19 +26,17 @@ public class AdminController {
     AdminService adminService;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Map<String, Object> login(HttpServletRequest request,
-                                     @RequestParam(value = "username") String username,
-                                     @RequestParam(value = "password") String password) {
+    public JSONObject login(HttpServletRequest request,
+                            @RequestParam(value = "username") String username,
+                            @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
         try {
             Admin admin = adminService.getAdminByUserName(username);
             adminService.validatePassword(admin, password);
             if (admin == null) {
-                res.put(ParameterKeys.STATE, 1);
-                return res;
+                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"用户名不存在");
             }
-
-            admin.setUserPasswd("");
+            admin.setUserPasswd(null);
             request.getSession().setAttribute("user", admin);
             res.put("admin", admin);
             if (admin.getAuthority() == 1) {
@@ -47,13 +47,11 @@ public class AdminController {
             } else {
 
             }
-            res.put(ParameterKeys.STATE, 0);
         } catch (Exception e) {
             e.printStackTrace();
-            res.put(ParameterKeys.STATE, 1);
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"Wrong");
         }
-
-        return res;
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)

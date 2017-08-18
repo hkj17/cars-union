@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.util;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Collection;
 import java.util.UUID;
 
@@ -7,6 +9,14 @@ import java.util.UUID;
  * Created by bigmao on 2017/8/18.
  */
 public class CommonUtil {
+
+    public static JSONObject response(int code, Object object){
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("result_code", code);
+        jsonObject.put("data", object);
+        return jsonObject;
+    }
+
     public static boolean isNullOrEmpty(Collection<?> collection) {
         return (collection == null || collection.isEmpty());
     }
