@@ -32,24 +32,30 @@ public class AdminController {
         Map<String, Object> res = new HashMap<String, Object>();
         try {
             Admin admin = adminService.getAdminByUserName(username);
-            adminService.validatePassword(admin, password);
-            if (admin == null) {
-                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"用户名不存在");
+            Admin validatedAdmin = adminService.validatePassword(admin, password);
+            if (validatedAdmin == null) {
+                request.getSession().removeAttribute("user");
+                res.put("login_status", 1);
+                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
+            }else{
+                res.put("login_status", 0);
             }
-            admin.setUserPasswd(null);
-            request.getSession().setAttribute("user", admin);
-            res.put("admin", admin);
-            if (admin.getAuthority() == 1) {
-                Merchant merchant = adminService.getMerchantById(admin.getId());
+
+            validatedAdmin.setUserPasswd(null);
+            request.getSession().setAttribute("user", validatedAdmin);
+            res.put("admin", validatedAdmin);
+            if (validatedAdmin.getAuthority() == 1) {
+                Merchant merchant = adminService.getMerchantById(validatedAdmin.getId());
                 res.put("merchant", merchant);
-            } else if (admin.getAuthority() == 2) {
+            } else if (validatedAdmin.getAuthority() == 2) {
 
             } else {
 
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"Wrong");
+            res.put("login_status", 1);
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
         }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }

@@ -23,13 +23,15 @@ public class AdminService {
         return adminDao.findByUserName(userName);
     }
 
-    public void validatePassword(Admin admin, String password) {
+    public Admin validatePassword(Admin admin, String password) {
         if (admin == null) {
-            return;
+            return null;
         }
         String md5 = MessageDigestUtil.MD5Encode(password, null);
         if (md5 == null || !md5.equals(admin.getUserPasswd())) {
-            admin = null;
+            return null;
+        }else{
+            return admin;
         }
     }
 
