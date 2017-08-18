@@ -27,7 +27,6 @@ public class AdminService {
         if (admin == null) {
             return;
         }
-
         String md5 = MessageDigestUtil.MD5Encode(password, null);
         if (md5 == null || !md5.equals(admin.getUserPasswd())) {
             admin = null;
