@@ -31,14 +31,12 @@ public class CommonUtil {
 
     public static String generateUUID16() {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        int first = uuid.substring(0, 11).hashCode();
-        int second = uuid.substring(11, 22).hashCode();
-        int third = uuid.substring(22).hashCode();
-        String hex = String.format("%08x", first) + String.format("%08x", second) + String.format("%08x", third);
-        return hexToBase64(hex);
+        int first = uuid.substring(0, 16).hashCode();
+        int second = uuid.substring(16).hashCode();
+        return String.format("%08x", first) + String.format("%08x", second);
     }
 
-    private static String hexToBase64(String hexString) {
+    public static String hexToBase64(String hexString) {
         String ret = "";
         for (int i = 0; i < hexString.length(); i += 3) {
             int curr = Integer.parseInt(hexString.substring(i, i + 3), 16) & 0xfff;
@@ -52,8 +50,4 @@ public class CommonUtil {
             'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
             'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
             'U', 'V', 'W', 'X', 'Y', 'Z', '+', '/'};
-
-    public static void main(String[] args) {
-        System.out.println(generateUUID16());
-    }
 }
