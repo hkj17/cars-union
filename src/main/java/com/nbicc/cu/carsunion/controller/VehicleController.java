@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/vehicle")
 public class VehicleController {
 
     @Autowired
@@ -69,7 +70,7 @@ public class VehicleController {
 
     @RequestMapping(value = "/getFullName", method = RequestMethod.POST)
     public JSONObject getFullName(@RequestParam(value = "id") String id,
-                                           @RequestParam(value = "path", required = false) String path){
+                                  @RequestParam(value = "path", required = false) String path){
         Map<String, Object> res = new HashMap<String, Object>();
         try {
             List<String> nameList = vehicleService.getFullName(path, id);
