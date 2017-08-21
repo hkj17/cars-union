@@ -2,6 +2,7 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -31,23 +32,15 @@ public class ProductController {
                                       @RequestParam(value = "name") String name,
                                       @RequestParam(value = "level", required = false) Integer level){
         boolean state = productService.addProductClass(pid,path,name,level);
-        if(state == true){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"wrong");
-        }
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
     }
 
     //删除商品类别,包括它的子节点
     @RequestMapping(value = "deleteProductClass",method = RequestMethod.POST)
     public JSONObject deleteProductClass(@RequestParam(value = "id", required = false) String id,
                                          @RequestParam(value = "path",required = false) String path){
-        boolean state = productService.deleteProductClass(id,path);
-        if(state == true){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"wrong");
-        }
+        productService.deleteProductClass(id,path);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
     }
 
     //获取商品品类列表
@@ -58,4 +51,50 @@ public class ProductController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
     }
 
+    //添加商品
+    @RequestMapping(value = "addProduct", method = RequestMethod.POST)
+    public JSONObject addProduct(
+            @RequestParam(value = "classId") String classId,
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "price") String price,
+            @RequestParam(value = "specification") String specification,
+            @RequestParam(value = "feature") String feature){
+        String result = productService.addProduct(classId,name,price,specification,feature);
+        if("ok".equals(result)){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,result);
+        }
+    }
+
+    //编辑商品
+    @RequestMapping(value = "editProduct", method = RequestMethod.POST)
+    public JSONObject editProduct(
+            @RequestParam(value = "productId") String productId,
+            @RequestParam(value = "classId") String classId,
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "price") String price,
+            @RequestParam(value = "specification") String specification,
+            @RequestParam(value = "feature") String feature){
+        String result = productService.editProduct(productId,classId,name,price,specification,feature);
+        if("ok".equals(result)){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,result);
+        }
+    }
+
+    //根据类别，获取商品
+    @RequestMapping(value = "getProductByClassId", method = RequestMethod.POST)
+    public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId){
+        List<Product> lists = productService.getProductByClassId(classId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
+    }
+
+    //删除商品
+    @RequestMapping(value = "deleteProduct",method = RequestMethod.POST)
+    public JSONObject deleteProductClass(@RequestParam(value = "productId") String productId){
+        productService.deleteProduct(productId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+    }
 }

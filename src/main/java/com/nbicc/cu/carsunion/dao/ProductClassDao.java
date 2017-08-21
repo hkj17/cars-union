@@ -24,4 +24,6 @@ public interface ProductClassDao extends JpaRepository<ProductClass,String>{
     @Query("delete from ProductClass p where p.path like ?1")
     void deleteByPathLike(String path);
 
+    ProductClass getById(String id);
+
 }
