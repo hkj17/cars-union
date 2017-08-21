@@ -25,6 +25,10 @@ public class CommonUtil {
         return str == null || str.isEmpty();
     }
 
+    public static boolean isNullOrEmpty(Object str) {
+        return str == null;
+    }
+
     public static String generateUUID32() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
