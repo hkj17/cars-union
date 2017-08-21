@@ -55,7 +55,6 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             res.put("login_status", 1);
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
         }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
