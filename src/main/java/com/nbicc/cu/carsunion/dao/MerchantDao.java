@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MerchantDao extends JpaRepository<Merchant,String> {
 
     Merchant findById(String id);
+
+    Merchant findByContact(String contact);
 }
