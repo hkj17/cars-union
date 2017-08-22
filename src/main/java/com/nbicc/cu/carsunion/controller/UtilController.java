@@ -1,14 +1,24 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
+import com.taobao.api.ApiException;
+import com.taobao.api.DefaultTaobaoClient;
+import com.taobao.api.TaobaoClient;
+import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
+import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
+import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.nbicc.cu.carsunion.constant.ParameterValues.accessKey;
-import static com.nbicc.cu.carsunion.constant.ParameterValues.secretKey;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 
 /**
  * Created by bigmao on 2017/8/21.
@@ -16,6 +26,7 @@ import static com.nbicc.cu.carsunion.constant.ParameterValues.secretKey;
 @RestController
 @RequestMapping("/util")
 public class UtilController {
+    private static final Logger logger = Logger.getLogger(UtilController.class);
 
     //给js提供七牛的uptoken，option为1表示私密上传。
     @RequestMapping(value = "getUptoken",method = RequestMethod.GET)
@@ -28,42 +39,48 @@ public class UtilController {
         String upToken = auth.uploadToken(bucket);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("uptoken",upToken);
-        return jsonObject;
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,jsonObject);
     }
 
-//    @RequestMapping(value = "uploadPhoto",method = RequestMethod.GET)
-//    public JSONObject uploadPhoto(@RequestParam(value = "option")int option){
-//        Configuration cfg = new Configuration(Zone.zone0());
-//        UploadManager uploadManager = new UploadManager(cfg);
-//        String bucket;
-//        if(option == 0) {
-//            bucket = "photo";
-//        }else{
-//            bucket = "private";
-//        }
-//        String localFilePath = "/Users/bigmao/Downloads/bd_logo1.jpg";
-//        String key = "test_bd_photo.jpg";
-//        Auth auth = Auth.create(accessKey,secretKey);
-//        String upToken = auth.uploadToken(bucket);
-//        JSONObject json = new JSONObject();
-//
-//        try{
-//            Response response = uploadManager.put(localFilePath,key,upToken);
-//            DefaultPutRet putRet = new Gson().fromJson(response.bodyString(),DefaultPutRet.class);
-//            if(option == 0) {
-//                json.put("url", QiniuUtil.photoUrlForPublic(putRet.key));
-//            }else{
-//                json.put("private url",QiniuUtil.photoUrlForPrivate(putRet.key));
-//            }
-//        }catch (QiniuException ex){
-//            Response r = ex.response;
-//            System.err.println(r.toString());
-//            try{
-//                System.err.println(r.bodyString());
-//            }catch (QiniuException ex2){
-//
-//            }
-//        }
-//        return json;
-//    }
+    //短信
+    @RequestMapping(value = "message",method = RequestMethod.POST)
+    public JSONObject message(HttpServletRequest request,
+                              @RequestParam(value = "phone",required = false)String phone)
+            throws ApiException {
+        int num = (int) (Math.random() * 9000 + 1000);
+        String message = String.valueOf(num);
+        HttpSession session = request.getSession();
+        session.setMaxInactiveInterval(10 * 60); //10min
+        session.setAttribute("verify"+phone, message);
+        TaobaoClient client = new DefaultTaobaoClient(ALI_DAYU_URL, ALI_DAYU_APPKEY, ALI_DAYU_SECRET);
+        AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
+        req.setExtend("123456");
+        req.setSmsType("normal");
+        req.setSmsFreeSignName("nbicc开发者中心");
+        String json = "{\"number\":\""+ message + "\"}";
+        req.setSmsParamString(json);
+        req.setRecNum(phone);
+        req.setSmsTemplateCode("SMS_85130007");
+        logger.info("----send message to : " + phone + "   vertify code is : " + message);
+        try{
+            AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
+            logger.info("----send result : " + rsp.getBody());
+            if(rsp==null){
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+            }
+            if(rsp.getResult()==null){
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+            }
+            if (rsp.getResult().getSuccess()) {
+                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,null);
+            } else {
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+            }
+        }catch(Exception e){
+
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
