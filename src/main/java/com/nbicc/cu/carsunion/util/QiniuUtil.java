@@ -5,8 +5,8 @@ import com.qiniu.util.Auth;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import static com.nbicc.cu.carsunion.constant.ParameterKeys.accessKey;
-import static com.nbicc.cu.carsunion.constant.ParameterKeys.secretKey;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.accessKey;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.secretKey;
 
 /**
  * Created by bigmao on 2017/8/22.

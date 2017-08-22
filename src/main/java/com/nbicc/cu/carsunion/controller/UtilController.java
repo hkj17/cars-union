@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.nbicc.cu.carsunion.constant.ParameterKeys.accessKey;
-import static com.nbicc.cu.carsunion.constant.ParameterKeys.secretKey;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.accessKey;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.secretKey;
 
 /**
  * Created by bigmao on 2017/8/21.
