@@ -6,9 +6,7 @@ import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.http.data.RegionalInfo;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 
-import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class RegionalInfoHttpRequest extends HttpRequest {
