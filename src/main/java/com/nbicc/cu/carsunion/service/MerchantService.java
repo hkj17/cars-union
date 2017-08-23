@@ -3,9 +3,6 @@ package com.nbicc.cu.carsunion.service;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
-import com.nbicc.cu.carsunion.http.HttpRequest;
-import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
-import com.nbicc.cu.carsunion.http.data.RegionalInfo;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -13,7 +10,6 @@ import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.plaf.synth.Region;
 import java.sql.Timestamp;
 import java.util.List;
 
