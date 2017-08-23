@@ -3,6 +3,7 @@ package com.nbicc.cu.carsunion.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.sql.Timestamp;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -33,6 +34,9 @@ public class Merchant {
 
     @Column(name = "reg_status")
     private int regStatus;
+
+    @Column(name = "reg_time")
+    private Timestamp regTime;
 
     @Column(name = "idcard_front")
     private String idcardFront;
@@ -105,6 +109,14 @@ public class Merchant {
 
     public void setRegStatus(int regStatus) {
         this.regStatus = regStatus;
+    }
+
+    public Timestamp getRegTime(){
+        return regTime;
+    }
+
+    public void setRegTime(Timestamp regTime){
+        this.regTime = regTime;
     }
 
     public String getIdcardFront() {
