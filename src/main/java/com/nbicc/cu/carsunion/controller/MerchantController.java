@@ -6,6 +6,7 @@ import com.nbicc.cu.carsunion.model.Merchant;
 
 import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +46,11 @@ public class MerchantController {
     @RequestMapping(value = "/admin/getRegInProcessList", method = RequestMethod.GET)
     public JSONObject getRegInProcessList(){
         List<Merchant> merchantList = merchantService.getRegInProcessList();
+        for(Merchant m: merchantList){
+            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
+            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
+            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
+        }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
     }
 

@@ -51,7 +51,7 @@ public class UtilController {
     }
 
     //短信
-    @RequestMapping(value = "getSmsCode",method = RequestMethod.POST)
+    @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
     public JSONObject getSmsCode(HttpServletRequest request,
                               @RequestParam(value = "phone",required = false) String phone)
             throws ApiException {
@@ -74,10 +74,10 @@ public class UtilController {
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             logger.info("----send result : " + rsp.getBody());
             if(rsp==null){
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
             }
             if(rsp.getResult()==null){
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
             }
             if (rsp.getResult().getSuccess()) {
                 return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");

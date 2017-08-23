@@ -30,15 +30,11 @@ public class AdminController {
                             @RequestParam(value = "username") String username,
                             @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
-        try {
             Admin admin = adminService.getAdminByUserName(username);
             Admin validatedAdmin = adminService.validatePassword(admin, password);
             if (validatedAdmin == null) {
                 request.getSession().removeAttribute("user");
-                res.put("login_status", 1);
-                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
-            }else{
-                res.put("login_status", 0);
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
             }
 
             validatedAdmin.setUserPasswd(null);
@@ -52,10 +48,6 @@ public class AdminController {
             } else {
 
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            res.put("login_status", 1);
-        }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
 
@@ -63,6 +55,5 @@ public class AdminController {
     public void logout(HttpServletRequest request) {
         request.getSession().invalidate();
     }
-
 
 }
