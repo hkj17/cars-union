@@ -40,7 +40,11 @@ public class ProductService {
     @Transactional
     public void deleteProductClass(String id, String path) {
         productClassDao.deleteById(id);
-        productClassDao.deleteByPathLike(path+","+id+"%");
+        if(CommonUtil.isNullOrEmpty(path)){
+            productClassDao.deleteByPathLike(id + "%");
+        }else{
+            productClassDao.deleteByPathLike(path+","+id+"%");
+        }
     }
 
 
@@ -92,5 +96,10 @@ public class ProductService {
 
     public void deleteProduct(String productId) {
         productDao.delete(productId);
+    }
+
+    public Product getProductById(String id) {
+        Product product = productDao.findOne(id);
+        return product;
     }
 }

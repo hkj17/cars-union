@@ -37,7 +37,7 @@ public class ProductController {
 
     //删除商品类别,包括它的子节点
     @RequestMapping(value = "deleteProductClass",method = RequestMethod.POST)
-    public JSONObject deleteProductClass(@RequestParam(value = "id", required = false) String id,
+    public JSONObject deleteProductClass(@RequestParam(value = "id") String id,
                                          @RequestParam(value = "path",required = false) String path){
         productService.deleteProductClass(id,path);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
@@ -89,6 +89,13 @@ public class ProductController {
     public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId){
         List<Product> lists = productService.getProductByClassId(classId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
+    }
+
+    //根据id获取商品
+    @RequestMapping(value = "getProductById", method = RequestMethod.POST)
+    public JSONObject getProductByid(@RequestParam(value = "productId") String id){
+        Product product = productService.getProductById(id);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,product);
     }
 
     //删除商品
