@@ -1,5 +1,6 @@
 package com.nbicc.cu.carsunion.service;
 
+import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
@@ -10,6 +11,7 @@ import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -22,14 +24,17 @@ public class MerchantService {
     @Autowired
     MerchantDao merchantDao;
 
-    public boolean merchantRegister(String name, String address, String region, String contact,
-                                    String longitude, String latitude, String idcardFront, String idcardBack,
-                                    String license){
+    public int merchantRegister(HttpServletRequest request, String name, String address, String region, String contact,
+                                    String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
         Merchant m = merchantDao.findByContact(contact);
         if(CommonUtil.isNullOrEmpty(m)){
             m = new Merchant();
             m.setId(CommonUtil.generateUUID32());
             m.setContact(contact);
+        }
+        String sms = (String) request.getSession().getAttribute("verify"+contact);
+        if(CommonUtil.isNullOrEmpty(sms) || !sms.equals(smsCode)){
+            return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         m.setName(name);
         m.setAddress(address);
@@ -41,7 +46,7 @@ public class MerchantService {
         m.setIdcardBack(idcardBack);
         m.setLicensePath(license);
         merchantDao.save(m);
-        return true;
+        return ParameterKeys.REQUEST_SUCCESS;
     }
 
     public boolean passRegistration(String contact){

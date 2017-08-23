@@ -51,11 +51,11 @@ public class UtilController {
     }
 
     //短信
-    @RequestMapping(value = "message",method = RequestMethod.POST)
-    public JSONObject message(HttpServletRequest request,
-                              @RequestParam(value = "phone",required = false)String phone)
+    @RequestMapping(value = "getSmsCode",method = RequestMethod.POST)
+    public JSONObject getSmsCode(HttpServletRequest request,
+                              @RequestParam(value = "phone",required = false) String phone)
             throws ApiException {
-        int num = (int) (Math.random() * 9000 + 1000);
+        int num = (int) (Math.random() * 900000 + 100000);
         String message = String.valueOf(num);
         HttpSession session = request.getSession();
         session.setMaxInactiveInterval(10 * 60); //10min
@@ -69,7 +69,7 @@ public class UtilController {
         req.setSmsParamString(json);
         req.setRecNum(phone);
         req.setSmsTemplateCode("SMS_85130007");
-        logger.info("----send message to : " + phone + "   vertify code is : " + message);
+        logger.info("----send message to : " + phone + ", verification code is : " + message);
         try{
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             logger.info("----send result : " + rsp.getBody());
@@ -80,12 +80,11 @@ public class UtilController {
                 return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
             }
             if (rsp.getResult().getSuccess()) {
-                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,null);
+                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
             } else {
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
             }
         }catch(Exception e){
-
             e.printStackTrace();
         }
         return null;
