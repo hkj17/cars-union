@@ -134,9 +134,4 @@ public class HttpRequestUtil {
         }
         return result;
     }
-
-    public static void main(String[] args){
-        RegionalInfoHttpRequest httpRequest = new RegionalInfoHttpRequest();
-        System.out.println(httpRequest.getDistricts("浙江省","宁波市",null));
-    }
 }

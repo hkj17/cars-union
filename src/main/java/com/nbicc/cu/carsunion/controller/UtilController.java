@@ -2,10 +2,18 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
+
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.http.data.RegionalInfo;
+
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
+import com.taobao.api.ApiException;
+import com.taobao.api.DefaultTaobaoClient;
+import com.taobao.api.TaobaoClient;
+import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
+import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
+import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,8 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.nbicc.cu.carsunion.constant.ParameterKeys.accessKey;
-import static com.nbicc.cu.carsunion.constant.ParameterKeys.secretKey;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 
 /**
  * Created by bigmao on 2017/8/21.
@@ -22,6 +32,7 @@ import static com.nbicc.cu.carsunion.constant.ParameterKeys.secretKey;
 @RestController
 @RequestMapping("/util")
 public class UtilController {
+    private static final Logger logger = Logger.getLogger(UtilController.class);
 
     RegionalInfoHttpRequest httpRequest = new RegionalInfoHttpRequest();
 
@@ -36,7 +47,48 @@ public class UtilController {
         String upToken = auth.uploadToken(bucket);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("uptoken",upToken);
-        return jsonObject;
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,jsonObject);
+    }
+
+    //短信
+    @RequestMapping(value = "message",method = RequestMethod.POST)
+    public JSONObject message(HttpServletRequest request,
+                              @RequestParam(value = "phone",required = false)String phone)
+            throws ApiException {
+        int num = (int) (Math.random() * 9000 + 1000);
+        String message = String.valueOf(num);
+        HttpSession session = request.getSession();
+        session.setMaxInactiveInterval(10 * 60); //10min
+        session.setAttribute("verify"+phone, message);
+        TaobaoClient client = new DefaultTaobaoClient(ALI_DAYU_URL, ALI_DAYU_APPKEY, ALI_DAYU_SECRET);
+        AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
+        req.setExtend("123456");
+        req.setSmsType("normal");
+        req.setSmsFreeSignName("nbicc开发者中心");
+        String json = "{\"number\":\""+ message + "\"}";
+        req.setSmsParamString(json);
+        req.setRecNum(phone);
+        req.setSmsTemplateCode("SMS_85130007");
+        logger.info("----send message to : " + phone + "   vertify code is : " + message);
+        try{
+            AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
+            logger.info("----send result : " + rsp.getBody());
+            if(rsp==null){
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+            }
+            if(rsp.getResult()==null){
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+            }
+            if (rsp.getResult().getSuccess()) {
+                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,null);
+            } else {
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,null);
+            }
+        }catch(Exception e){
+
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @RequestMapping(value = "/getRegion", method = RequestMethod.POST)
