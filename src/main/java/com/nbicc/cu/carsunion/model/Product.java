@@ -3,6 +3,7 @@ package com.nbicc.cu.carsunion.model;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by bigmao on 2017/8/21.
@@ -35,6 +36,10 @@ public class Product {
 
     @Column(name = "created_by")
     private String admin;
+
+    @ManyToMany
+    @JoinTable(name = "vehicle_product_relationship", joinColumns = @JoinColumn(name = "vehicle_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
+    private Set<Vehicle> vehicles;
 
     public Product() {
     }
@@ -112,5 +117,13 @@ public class Product {
 
     public void setAdmin(String admin) {
         this.admin = admin;
+    }
+
+    public Set<Vehicle> getVehicles() {
+        return vehicles;
+    }
+
+    public void setVehicles(Set<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 }

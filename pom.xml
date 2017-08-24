@@ -5,7 +5,7 @@
 
 	<groupId>com.nbicc.cu</groupId>
 	<artifactId>cars-union</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>war</packaging>
 
 	<name>cars-union</name>
@@ -72,6 +72,11 @@
 			<groupId>com.taobao</groupId>
 			<artifactId>taobao</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
     </dependencies>
 
