@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -188,5 +189,36 @@ public class ProductService {
         }
         vehicleProductRelationshipDao.delete(relationship);
         return "ok";
+    }
+
+    public List<VehicleProductRelationship> getVehicleRelationship(String productId) {
+        Product product = productDao.findOne(productId);
+        if(CommonUtil.isNullOrEmpty(product)){
+            return null;
+        }
+        List<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByProduct(product);
+        if(lists != null && lists.size() > 0){
+            for(VehicleProductRelationship vp : lists){
+                vp.getVehicle().setName(getFullName(vp.getVehicle().getPath(),vp.getVehicle().getId()));
+            }
+        }
+        return lists;
+    }
+
+    private String getFullName(String path, String id) {
+        List<String> idList = new ArrayList<String>();
+        if(!CommonUtil.isNullOrEmpty(path)) {
+            String[] idArr = path.split(",");
+            for (String currId:idArr) {
+                idList.add(currId);
+            }
+        }
+        idList.add(id);
+        List<String> strings = vehicleDao.findVehicleFullName(idList);
+        StringBuilder sb = new StringBuilder();
+        for(String s : strings){
+            sb.append(s + " ");
+        }
+        return sb.toString();
     }
 }

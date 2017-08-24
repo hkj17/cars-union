@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -119,6 +121,7 @@ public class Product {
         this.admin = admin;
     }
 
+    @JsonIgnore
     public Set<Vehicle> getVehicles() {
         return vehicles;
     }

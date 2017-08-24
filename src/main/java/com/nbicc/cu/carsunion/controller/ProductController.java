@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
+import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,17 +103,13 @@ public class ProductController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
     }
 
-    //添加商品适用车型
-//    @RequestMapping(value = "addVehicleRelationship",method = RequestMethod.POST)
-//    public JSONObject addVehicleRelationship(@RequestParam(value = "productId")String productId,
-//                                             @RequestParam(value = "vehicleId")String vehicleId){
-//        String result = productService.addVehicleRelationship(productId,vehicleId);
-//        if("ok".equals(result)) {
-//            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
-//        }else{
-//            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
-//        }
-//    }
+
+    //查看商品适用车型
+    @RequestMapping(value = "getVehicleRelationship",method = RequestMethod.POST)
+    public JSONObject getVehicleRelationship(@RequestParam(value = "productId")String productId){
+        List<VehicleProductRelationship> list = productService.getVehicleRelationship(productId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
+    }
 
     //批量添加商品适用车型
     @RequestMapping(value = "addVehicleRelationship",method = RequestMethod.POST)
