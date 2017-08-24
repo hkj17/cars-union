@@ -3,6 +3,8 @@ package com.nbicc.cu.carsunion.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import java.util.Set;
 
 @Entity(name = "Vehicle")
 public class Vehicle {
@@ -25,6 +27,9 @@ public class Vehicle {
 
     @Column(name = "pinyin")
     private String pinyin;
+
+    @ManyToMany(mappedBy = "vehicles")
+    private Set<Product> products;
 
     public String getId() {
         return id;
@@ -72,5 +77,13 @@ public class Vehicle {
 
     public void setPinyin(String pinyin) {
         this.pinyin = pinyin;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
     }
 }

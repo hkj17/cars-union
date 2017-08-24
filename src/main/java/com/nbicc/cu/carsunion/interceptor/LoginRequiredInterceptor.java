@@ -21,7 +21,7 @@ public class LoginRequiredInterceptor implements HandlerInterceptor {
         Admin admin = (Admin) request.getSession().getAttribute("user");
         if(admin == null) {
             PrintWriter pw = response.getWriter();
-            pw.write(CommonUtil.response(ParameterKeys.REQUEST_FAIL,"请登陆!").toString());
+            pw.write(CommonUtil.response(ParameterKeys.NOT_AUTHORIZED,"请登陆!").toString());
             return false;
         }
         return true;
