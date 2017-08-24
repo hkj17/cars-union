@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -79,6 +81,7 @@ public class Vehicle {
         this.pinyin = pinyin;
     }
 
+    @JsonIgnore
     public Set<Product> getProducts() {
         return products;
     }

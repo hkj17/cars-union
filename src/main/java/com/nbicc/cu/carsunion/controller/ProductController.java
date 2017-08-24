@@ -7,10 +7,7 @@ import com.nbicc.cu.carsunion.model.ProductClass;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -103,5 +100,53 @@ public class ProductController {
     public JSONObject deleteProductClass(@RequestParam(value = "productId") String productId){
         productService.deleteProduct(productId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+    }
+
+    //添加商品适用车型
+//    @RequestMapping(value = "addVehicleRelationship",method = RequestMethod.POST)
+//    public JSONObject addVehicleRelationship(@RequestParam(value = "productId")String productId,
+//                                             @RequestParam(value = "vehicleId")String vehicleId){
+//        String result = productService.addVehicleRelationship(productId,vehicleId);
+//        if("ok".equals(result)) {
+//            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+//        }else{
+//            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+//        }
+//    }
+
+    //批量添加商品适用车型
+    @RequestMapping(value = "addVehicleRelationship",method = RequestMethod.POST)
+    public JSONObject addVehicleRelationship(@RequestBody JSONObject json){
+        String productId = json.getString("productId");
+        String result;
+        List<String> vehicles = json.getObject("vehicles",List.class);
+        try {
+            result = productService.addVehicleRelationshipBatch(productId, vehicles);
+        }catch (RuntimeException e){
+            result = "add wrong";
+        }
+        if("ok".equals(result)) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+        }
+    }
+
+    //批量删除商品适用车型
+    @RequestMapping(value = "deleteVehicleRelationship",method = RequestMethod.POST)
+    public JSONObject deleteVehicleRelationship(@RequestBody JSONObject json){
+        String productId = json.getString("productId");
+        String result;
+        List<String> vehicles = json.getObject("vehicles",List.class);
+        try {
+            result = productService.deleteVehicleRelationshipBatch(productId, vehicles);
+        }catch (RuntimeException e){
+            result = "delete wrong";
+        }
+        if("ok".equals(result)) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+        }
     }
 }
