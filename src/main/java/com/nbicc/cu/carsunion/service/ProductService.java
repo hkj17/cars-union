@@ -80,7 +80,7 @@ public class ProductService {
             return "product class not exist.";
         }
         String id = UUID.randomUUID().toString().replace("-","");
-        Product product = new Product(id,productClass,name,new BigDecimal(price),specification,feature,new Date(),"admin");
+        Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin");
         productDao.save(product);
         return "ok";
     }
@@ -92,7 +92,7 @@ public class ProductService {
             logger.info("product class not exist.");
             return "product class not exist.";
         }else{
-            product.setProductClass(productClass);
+            product.setClassId(productClass.getPath()+","+productClass.getId());
         }
         product.setName(name);
         product.setPrice(new BigDecimal(price));
@@ -104,10 +104,14 @@ public class ProductService {
 
     public List<Product> getProductByClassId(String classId) {
         List<Product> products;
-        if(CommonUtil.isNullOrEmpty(classId)){
+        if (CommonUtil.isNullOrEmpty(classId)) {
             products = productDao.findAll();
-        }else{
-            products = productDao.findByProductClass_Id(classId);
+        }else {
+            ProductClass productClass = productClassDao.getById(classId);
+            if (CommonUtil.isNullOrEmpty(productClass)) {
+                return null;
+            }
+            products = productDao.findByClassIdLike("%" + classId + "%");
         }
         if(products.isEmpty()){
             return products;

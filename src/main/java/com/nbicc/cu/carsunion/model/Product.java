@@ -17,9 +17,8 @@ public class Product {
     @Column(name = "id")
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "class_id")
-    private ProductClass productClass;
+    @Column(name = "class_id")
+    private String classId;
 
     @Column(name = "name")
     private String name;
@@ -46,9 +45,9 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, ProductClass productClass, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin) {
+    public Product(String id, String classId, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin) {
         this.id = id;
-        this.productClass = productClass;
+        this.classId = classId;
         this.name = name;
         this.price = price;
         this.specification = specification;
@@ -65,12 +64,12 @@ public class Product {
         this.id = id;
     }
 
-    public ProductClass getProductClass() {
-        return productClass;
+    public String getClassId() {
+        return classId;
     }
 
-    public void setProductClass(ProductClass productClass) {
-        this.productClass = productClass;
+    public void setClassId(String classId) {
+        this.classId = classId;
     }
 
     public String getName() {
