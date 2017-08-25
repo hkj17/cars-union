@@ -8,8 +8,10 @@ import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
+import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
@@ -27,13 +29,17 @@ public class MerchantService {
     public int merchantRegister(HttpServletRequest request, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
         Merchant m = merchantDao.findByContact(contact);
+        if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1){
+            //已通过注册，请登录
+            return ParameterKeys.REQUEST_FAIL;
+        }
+
         if(CommonUtil.isNullOrEmpty(m)){
             m = new Merchant();
             m.setId(CommonUtil.generateUUID32());
             m.setContact(contact);
         }
-        String sms = (String) request.getSession().getAttribute("verify"+contact);
-        if(CommonUtil.isNullOrEmpty(sms) || !sms.equals(smsCode)){
+        if(!SmsUtil.verifySmsCode(request,contact,smsCode)){
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         m.setName(name);
@@ -49,6 +55,7 @@ public class MerchantService {
         return ParameterKeys.REQUEST_SUCCESS;
     }
 
+    @Transactional
     public boolean passRegistration(String contact){
         Merchant m = merchantDao.findByContact(contact);
         if(CommonUtil.isNullOrEmpty(m)){

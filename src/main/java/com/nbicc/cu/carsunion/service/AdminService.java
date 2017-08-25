@@ -2,8 +2,10 @@ package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
+import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
+import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,15 @@ public class AdminService {
 
     @Autowired
     private AdminDao adminDao;
+
     @Autowired
     private MerchantDao merchantDao;
 
-    public Admin getAdminByUserName(String userName) {
-        return adminDao.findByUserName(userName);
+    @Autowired
+    private UserDao userDao;
+
+    public Admin getAdminByUserNameAndAuthority(String userName, int authority) {
+        return adminDao.findByUserNameAndAuthority(userName, authority);
     }
 
     public Admin validatePassword(Admin admin, String password) {
@@ -39,4 +45,7 @@ public class AdminService {
         return merchantDao.findById(id);
     }
 
+    public User getUserById(String id){
+        return userDao.findById(id);
+    }
 }
