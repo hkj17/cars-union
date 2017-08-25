@@ -8,17 +8,17 @@ public class ErrorInfo<T> {
     public static final Integer OK = 0;
     public static final Integer ERROR = 10;
 
-    private Integer code;
+    private Integer result_code;
     private String message;
     private String url;
     private T data;
 
-    public Integer getCode() {
-        return code;
+    public Integer getResult_code() {
+        return result_code;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setResult_code(Integer result_code) {
+        this.result_code = result_code;
     }
 
     public String getMessage() {

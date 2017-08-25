@@ -10,6 +10,7 @@ import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.QiniuUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,9 @@ import java.util.UUID;
  */
 @Service
 public class ProductService {
+
+    private Logger logger = Logger.getLogger(ProductService.class);
+
     @Autowired
     private ProductClassDao productClassDao;
     @Autowired
@@ -72,7 +76,8 @@ public class ProductService {
     public String addProduct(String classId, String name, String price, String specification, String feature) {
         ProductClass productClass = productClassDao.getById(classId);
         if(CommonUtil.isNullOrEmpty(productClass)){
-            return "product class wrong.";
+            logger.info("product class not exist.");
+            return "product class not exist.";
         }
         String id = UUID.randomUUID().toString().replace("-","");
         Product product = new Product(id,productClass,name,new BigDecimal(price),specification,feature,new Date(),"admin");
@@ -84,7 +89,8 @@ public class ProductService {
         Product product = productDao.getOne(productId);
         ProductClass productClass = productClassDao.getById(classId);
         if(CommonUtil.isNullOrEmpty(productClass)){
-            return "product class wrong.";
+            logger.info("product class not exist.");
+            return "product class not exist.";
         }else{
             product.setProductClass(productClass);
         }
@@ -139,13 +145,16 @@ public class ProductService {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
         Product product = productDao.findOne(productId);
         if(CommonUtil.isNullOrEmpty(product)){
+            logger.info("when add vehicleRelationship, product is not exist.");
             return "product is not exist.";
         }
         if(CommonUtil.isNullOrEmpty(vehicle)){
+            logger.info("when add vehicleRelationship, vehicle is not exist.");
             return "vehicle is not exist.";
         }
         VehicleProductRelationship relationship = vehicleProductRelationshipDao.findByVehicleAndProduct(vehicle,product);
         if(!CommonUtil.isNullOrEmpty(relationship)){
+            logger.info("when add vehicleRelationship, alreadly add.");
             return "alreadly add.";
         }
         vehicleProductRelationshipDao.save(new VehicleProductRelationship(vehicle,product));
@@ -178,13 +187,16 @@ public class ProductService {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
         Product product = productDao.findOne(productId);
         if(CommonUtil.isNullOrEmpty(product)){
+            logger.info("when delete vehicleRelationship, product is not exist.");
             return "product is not exist.";
         }
         if(CommonUtil.isNullOrEmpty(vehicle)){
+            logger.info("when delete vehicleRelationship, vehicle is not exist.");
             return "vehicle is not exist.";
         }
         VehicleProductRelationship relationship = vehicleProductRelationshipDao.findByVehicleAndProduct(vehicle,product);
         if(CommonUtil.isNullOrEmpty(relationship)){
+            logger.info("when delete vehicleRelationship, alreadly delete.");
             return "alreadly delete.";
         }
         vehicleProductRelationshipDao.delete(relationship);
