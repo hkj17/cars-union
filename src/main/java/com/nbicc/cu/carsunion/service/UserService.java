@@ -3,9 +3,11 @@ package com.nbicc.cu.carsunion.service;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.dao.AddressDao;
 import com.nbicc.cu.carsunion.dao.AdminDao;
+import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.model.Address;
 import com.nbicc.cu.carsunion.model.Admin;
+import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
@@ -14,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -26,6 +31,18 @@ public class UserService {
 
     @Autowired
     AddressDao addressDao;
+
+    @Autowired
+    TokenDao tokenDao;
+
+    public String validateToken(String tokenString){
+        Token token = tokenDao.findByToken(tokenString);
+        if(CommonUtil.isNullOrEmpty(token)){
+            return null;
+        }
+        Timestamp expiresAt = token.getExpiresAt();
+        return new Timestamp(System.currentTimeMillis()).before(expiresAt) ? token.getId():null;
+    }
 
     @Transactional
     public int userRegister(HttpServletRequest request, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode){
@@ -99,18 +116,56 @@ public class UserService {
         return ParameterKeys.REQUEST_SUCCESS;
     }
 
-    public boolean addAddress(String userId, String addr){
+    @Transactional
+    public boolean addAddress(String userId, String addr, Boolean isDefault){
         User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return false;
+        }
         Address address =  new Address();
         address.setUser(user);
         address.setAddress(addr);
         address.setId(CommonUtil.generateUUID32());
-        address.setIsDefault(false);
+        if(isDefault){
+            Address defaultAddr = addressDao.findByUserAndIsDefault(user,true);
+            if(!CommonUtil.isNullOrEmpty(defaultAddr)){
+                defaultAddr.setIsDefault(false);
+                addressDao.save(defaultAddr);
+            }
+            address.setIsDefault(true);
+        }else{
+            address.setIsDefault(false);
+        }
         addressDao.save(address);
         return true;
     }
 
-    public boolean setDefaultAddress(){
-        return false;
+    @Transactional
+    public boolean setDefaultAddress(String userId, String addressId){
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return false;
+        }
+        Address address = addressDao.findById(addressId);
+        if(CommonUtil.isNullOrEmpty(address)){
+            return false;
+        }
+        Address defaultAddr = addressDao.findByUserAndIsDefault(user,true);
+        if(!CommonUtil.isNullOrEmpty(defaultAddr)){
+            defaultAddr.setIsDefault(false);
+            addressDao.save(defaultAddr);
+        }
+        address.setIsDefault(true);
+        addressDao.save(address);
+        return true;
+    }
+
+    public List<Address> getAddressList(String userId){
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return new ArrayList<Address>();
+        }else{
+            return user.getAddressList();
+        }
     }
 }
