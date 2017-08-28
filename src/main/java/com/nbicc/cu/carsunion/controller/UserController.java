@@ -5,6 +5,7 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.model.Address;
 import com.nbicc.cu.carsunion.model.Token;
+import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -103,6 +105,47 @@ public class UserController {
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
         }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+        }
+    }
+
+    @RequestMapping(value = "/addVehicle",  method = RequestMethod.POST)
+    public JSONObject addVehicle(@RequestParam(value = "vehicleId") String vehicleId,
+                                 @RequestParam(value = "token") String tokenString,
+                                 @RequestParam(value = "default") Boolean isDefault){
+        String userId = userService.validateToken(tokenString);
+        if(userId == null){
+            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
+        }
+        boolean state = userService.addVehicle(userId,vehicleId,isDefault);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        }else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+        }
+    }
+
+    @RequestMapping(value = "/getVehicles",  method = RequestMethod.POST)
+    public JSONObject getVehicles(@RequestParam(value = "token") String tokenString){
+        String userId = userService.validateToken(tokenString);
+        if(userId == null){
+            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
+        }
+        Set<Vehicle> vehicles = userService.getVehicleList(userId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vehicles);
+    }
+
+    @RequestMapping(value = "/setDefaultVehicle",  method = RequestMethod.POST)
+    public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId,
+                                         @RequestParam(value = "token") String tokenString){
+        String userId = userService.validateToken(tokenString);
+        if(userId == null){
+            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
+        }
+        boolean state = userService.setDefaultVehicle(userId, vehicleId);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        }else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }

@@ -33,6 +33,9 @@ public class Vehicle {
     @ManyToMany(mappedBy = "vehicles")
     private Set<Product> products;
 
+    @ManyToMany(mappedBy = "vehicles")
+    private Set<User> users;
+
     public String getId() {
         return id;
     }
@@ -88,5 +91,14 @@ public class Vehicle {
 
     public void setProducts(Set<Product> products) {
         this.products = products;
+    }
+
+    @JsonIgnore
+    public Set<User> getUsers(){
+        return users;
+    }
+
+    public void setUsers(Set<User> users){
+        this.users = users;
     }
 }

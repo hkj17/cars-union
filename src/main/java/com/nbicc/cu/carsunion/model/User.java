@@ -1,7 +1,10 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -31,6 +34,10 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Address> addressList;
+
+    @ManyToMany
+    @JoinTable(name = "user_vehicle_relationship", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
+    private Set<Vehicle> vehicles;
 
     public String getId() {
         return id;
@@ -94,5 +101,14 @@ public class User {
 
     public void setAddressList(List<Address> addressList){
         this.addressList = addressList;
+    }
+
+    @JsonIgnore
+    public Set<Vehicle> getVehicles(){
+        return vehicles;
+    }
+
+    public void setVehicles(Set<Vehicle> vehicles){
+        this.vehicles = vehicles;
     }
 }

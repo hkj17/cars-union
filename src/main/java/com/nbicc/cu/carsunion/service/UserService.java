@@ -1,14 +1,8 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.dao.AddressDao;
-import com.nbicc.cu.carsunion.dao.AdminDao;
-import com.nbicc.cu.carsunion.dao.TokenDao;
-import com.nbicc.cu.carsunion.dao.UserDao;
-import com.nbicc.cu.carsunion.model.Address;
-import com.nbicc.cu.carsunion.model.Admin;
-import com.nbicc.cu.carsunion.model.Token;
-import com.nbicc.cu.carsunion.model.User;
+import com.nbicc.cu.carsunion.dao.*;
+import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -28,6 +24,12 @@ public class UserService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    UserVehicleRelationshipDao userVehicleRelationshipDao;
+
+    @Autowired
+    VehicleDao vehicleDao;
 
     @Autowired
     AddressDao addressDao;
@@ -167,5 +169,67 @@ public class UserService {
         }else{
             return user.getAddressList();
         }
+    }
+
+    public Set<Vehicle> getVehicleList(String userId){
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return new HashSet<Vehicle>();
+        }else{
+            return user.getVehicles();
+        }
+    }
+
+    @Transactional
+    public boolean addVehicle(String userId, String vehicleId, Boolean isDefault){
+        User user = userDao.findById(userId);
+        Vehicle vehicle = vehicleDao.findById(vehicleId);
+        if(user == null || vehicle == null){
+            return false;
+        }
+
+        UserVehicleRelationship userVehicleRelationship = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
+        if(userVehicleRelationship != null){
+            return false;
+        }
+
+        userVehicleRelationship = new UserVehicleRelationship();
+        userVehicleRelationship.setUser(user);
+        userVehicleRelationship.setVehicle(vehicle);
+        if(isDefault){
+            UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
+            if(uvr != null){
+                uvr.setIsDefault(false);
+                userVehicleRelationshipDao.save(uvr);
+            }
+            userVehicleRelationship.setIsDefault(true);
+        }else {
+            userVehicleRelationship.setIsDefault(false);
+        }
+        userVehicleRelationshipDao.save(userVehicleRelationship);
+        return true;
+    }
+
+    @Transactional
+    public boolean setDefaultVehicle(String userId, String vehicleId){
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return false;
+        }
+        Vehicle vehicle = vehicleDao.findById(vehicleId);
+        if(CommonUtil.isNullOrEmpty(vehicle)){
+            return false;
+        }
+
+        UserVehicleRelationship uvr_old = userVehicleRelationshipDao.findByUserAndIsDefault(user,true);
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
+        if(uvr == null){
+            return false;
+        }
+        uvr.setIsDefault(true);
+        uvr_old.setIsDefault(false);
+        userVehicleRelationshipDao.save(uvr);
+        userVehicleRelationshipDao.save(uvr_old);
+        return true;
     }
 }
