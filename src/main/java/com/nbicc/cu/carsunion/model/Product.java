@@ -1,10 +1,12 @@
 package com.nbicc.cu.carsunion.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by bigmao on 2017/8/21.
@@ -16,9 +18,8 @@ public class Product {
     @Column(name = "id")
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "class_id")
-    private ProductClass productClass;
+    @Column(name = "class_id")
+    private String classId;
 
     @Column(name = "name")
     private String name;
@@ -39,12 +40,16 @@ public class Product {
     @Column(name = "created_by")
     private String admin;
 
+    @ManyToMany
+    @JoinTable(name = "vehicle_product_relationship", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
+    private Set<Vehicle> vehicles;
+
     public Product() {
     }
 
-    public Product(String id, ProductClass productClass, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin) {
+    public Product(String id, String classId, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin) {
         this.id = id;
-        this.productClass = productClass;
+        this.classId = classId;
         this.name = name;
         this.price = price;
         this.specification = specification;
@@ -61,12 +66,12 @@ public class Product {
         this.id = id;
     }
 
-    public ProductClass getProductClass() {
-        return productClass;
+    public String getClassId() {
+        return classId;
     }
 
-    public void setProductClass(ProductClass productClass) {
-        this.productClass = productClass;
+    public void setClassId(String classId) {
+        this.classId = classId;
     }
 
     public String getName() {
@@ -115,5 +120,14 @@ public class Product {
 
     public void setAdmin(String admin) {
         this.admin = admin;
+    }
+
+    @JsonIgnore
+    public Set<Vehicle> getVehicles() {
+        return vehicles;
+    }
+
+    public void setVehicles(Set<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 }

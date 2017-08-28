@@ -2,10 +2,8 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.http.data.RegionalInfo;
-
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
 import com.taobao.api.ApiException;
@@ -19,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 
@@ -97,4 +94,5 @@ public class UtilController {
         List<RegionalInfo> regionalInfoList = httpRequest.getDistricts(province,city,district);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
     }
+
 }

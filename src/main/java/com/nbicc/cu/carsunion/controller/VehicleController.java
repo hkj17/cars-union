@@ -58,4 +58,5 @@ public class VehicleController {
         List<String> nameList = vehicleService.getFullName(path, id);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,nameList);
     }
+
 }

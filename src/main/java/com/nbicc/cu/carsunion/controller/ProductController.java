@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
+import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class ProductController {
 
     //删除商品类别,包括它的子节点
     @RequestMapping(value = "deleteProductClass",method = RequestMethod.POST)
-    public JSONObject deleteProductClass(@RequestParam(value = "id", required = false) String id,
+    public JSONObject deleteProductClass(@RequestParam(value = "id") String id,
                                          @RequestParam(value = "path",required = false) String path){
         productService.deleteProductClass(id,path);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
@@ -91,10 +89,61 @@ public class ProductController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
     }
 
+    //根据id获取商品
+    @RequestMapping(value = "getProductById", method = RequestMethod.POST)
+    public JSONObject getProductByid(@RequestParam(value = "productId") String id){
+        Product product = productService.getProductById(id);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,product);
+    }
+
     //删除商品
     @RequestMapping(value = "deleteProduct",method = RequestMethod.POST)
     public JSONObject deleteProductClass(@RequestParam(value = "productId") String productId){
         productService.deleteProduct(productId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+    }
+
+
+    //查看商品适用车型
+    @RequestMapping(value = "getVehicleRelationship",method = RequestMethod.POST)
+    public JSONObject getVehicleRelationship(@RequestParam(value = "productId")String productId){
+        List<VehicleProductRelationship> list = productService.getVehicleRelationship(productId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
+    }
+
+    //批量添加商品适用车型
+    @RequestMapping(value = "addVehicleRelationship",method = RequestMethod.POST)
+    public JSONObject addVehicleRelationship(@RequestBody JSONObject json){
+        String productId = json.getString("productId");
+        String result;
+        List<String> vehicles = json.getObject("vehicles",List.class);
+        try {
+            result = productService.addVehicleRelationshipBatch(productId, vehicles);
+        }catch (RuntimeException e){
+            result = "add wrong";
+        }
+        if("ok".equals(result)) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+        }
+    }
+
+    //批量删除商品适用车型
+    @RequestMapping(value = "deleteVehicleRelationship",method = RequestMethod.POST)
+    public JSONObject deleteVehicleRelationship(@RequestBody JSONObject json){
+        String productId = json.getString("productId");
+        String result;
+        List<String> vehicles = json.getObject("vehicles",List.class);
+        try {
+            result = productService.deleteVehicleRelationshipBatch(productId, vehicles);
+        }catch (RuntimeException e){
+            result = "delete wrong";
+        }
+        if("ok".equals(result)) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+        }
     }
 }
