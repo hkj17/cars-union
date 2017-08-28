@@ -1,8 +1,10 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.dao.AddressDao;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
+import com.nbicc.cu.carsunion.model.Address;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -21,6 +23,9 @@ public class UserService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    AddressDao addressDao;
 
     @Transactional
     public int userRegister(HttpServletRequest request, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode){
@@ -53,6 +58,7 @@ public class UserService {
         if(!CommonUtil.isNullOrEmpty(recommend)){
             user.setRecommend(recommend);
         }
+        user.setCredit(0);
         userDao.save(user);
         Admin admin = new Admin();
         admin.setUserName(contact);
@@ -91,5 +97,20 @@ public class UserService {
         }
         userDao.save(user);
         return ParameterKeys.REQUEST_SUCCESS;
+    }
+
+    public boolean addAddress(String userId, String addr){
+        User user = userDao.findById(userId);
+        Address address =  new Address();
+        address.setUser(user);
+        address.setAddress(addr);
+        address.setId(CommonUtil.generateUUID32());
+        address.setIsDefault(false);
+        addressDao.save(address);
+        return true;
+    }
+
+    public boolean setDefaultAddress(){
+        return false;
     }
 }

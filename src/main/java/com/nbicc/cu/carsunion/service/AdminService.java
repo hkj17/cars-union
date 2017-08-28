@@ -2,13 +2,18 @@ package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
+import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
+import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.User;
+import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -25,6 +30,9 @@ public class AdminService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private TokenDao tokenDao;
+
     public Admin getAdminByUserNameAndAuthority(String userName, int authority) {
         return adminDao.findByUserNameAndAuthority(userName, authority);
     }
@@ -39,6 +47,19 @@ public class AdminService {
         }else{
             return admin;
         }
+    }
+
+    public Token updateToken(String id){
+        Token token = tokenDao.findById(id);
+        if(CommonUtil.isNullOrEmpty(token)){
+            token = new Token();
+            token.setId(id);
+        }
+        token.setToken(CommonUtil.generateUUID16());
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis() + 2 * 3600 * 1000);
+        token.setExpiresAt(timestamp);
+        tokenDao.save(token);
+        return token;
     }
 
     public Merchant getMerchantById(String id) {

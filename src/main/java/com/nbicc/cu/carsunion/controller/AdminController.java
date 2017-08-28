@@ -2,7 +2,7 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.http.data.Token;
+import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.model.User;
@@ -78,10 +78,8 @@ public class AdminController {
 
         User user = adminService.getUserById(admin.getId());
         res.put("user", user);
-        Token token = new Token();
-        token.setToken(CommonUtil.generateUUID16());
-        token.setExpiresAt(System.currentTimeMillis() + 2 * 3600 * 1000);
-        res.put("token", token);
+        Token token = adminService.updateToken(admin.getId());
+        res.put("token", token.getToken());
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
 

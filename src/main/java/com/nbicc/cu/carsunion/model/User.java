@@ -1,8 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class User {
@@ -28,6 +27,10 @@ public class User {
 
     @Column(name = "recommend")
     private String recommend;
+
+
+    @OneToMany(mappedBy = "user")
+    private List<Address> addressList;
 
     public String getId() {
         return id;
@@ -83,5 +86,13 @@ public class User {
 
     public void setRecommend(String recommend){
         this.recommend = recommend;
+    }
+
+    public List<Address> getAddressList(){
+        return addressList;
+    }
+
+    public void setAddressList(List<Address> addressList){
+        this.addressList = addressList;
     }
 }

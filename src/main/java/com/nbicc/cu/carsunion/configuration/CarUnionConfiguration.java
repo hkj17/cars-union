@@ -16,8 +16,8 @@ public class CarUnionConfiguration extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginRequiredInterceptor).
-                addPathPatterns("/user/*");
+        //registry.addInterceptor(loginRequiredInterceptor).
+        //        addPathPatterns("/user/*");
         super.addInterceptors(registry);
     }
 
