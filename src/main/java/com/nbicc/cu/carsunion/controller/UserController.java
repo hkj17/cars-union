@@ -6,6 +6,7 @@ import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.model.Address;
 import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.Vehicle;
+import com.nbicc.cu.carsunion.model.VipLevel;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,5 +149,15 @@ public class UserController {
         }else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
+    }
+
+    @RequestMapping(value = "/getVipLevel",  method = RequestMethod.POST)
+    public JSONObject getVipLevel(@RequestParam(value = "token") String tokenString){
+        String userId = userService.validateToken(tokenString);
+        if(userId == null){
+            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
+        }
+        VipLevel vipLevel = userService.getVipLevelByUser(userId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vipLevel);
     }
 }

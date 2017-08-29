@@ -37,6 +37,9 @@ public class UserService {
     @Autowired
     TokenDao tokenDao;
 
+    @Autowired
+    VipLevelDao vipLevelDao;
+
     public String validateToken(String tokenString){
         Token token = tokenDao.findByToken(tokenString);
         if(CommonUtil.isNullOrEmpty(token)){
@@ -231,5 +234,14 @@ public class UserService {
         userVehicleRelationshipDao.save(uvr);
         userVehicleRelationshipDao.save(uvr_old);
         return true;
+    }
+
+    public VipLevel getVipLevelByUser(String userId){
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return null;
+        }else{
+            return vipLevelDao.findVipLevelByRange(user.getCredit());
+        }
     }
 }
