@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Merchant;
 
+import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.service.MerchantService;
+import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ public class MerchantController {
 
     @Autowired
     MerchantService merchantService;
+    @Autowired
+    OrderService orderService;
 
     @RequestMapping(value = "/merchant/merchantRegister", method = RequestMethod.POST)
     public JSONObject merchantRegister(HttpServletRequest request,
@@ -72,5 +76,11 @@ public class MerchantController {
         }else{
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
+    }
+
+    @RequestMapping(value = "/merchant/getOrderListByMerchantId", method = RequestMethod.POST)
+    public JSONObject getOrderListByMerchantId(@RequestParam(value = "merchantId")String merchantId){
+        List<Order> orders = orderService.getOrderListByUserId(merchantId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 }

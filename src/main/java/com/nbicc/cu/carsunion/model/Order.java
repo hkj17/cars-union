@@ -8,6 +8,7 @@ import java.util.Date;
  * Created by bigmao on 2017/8/28.
  */
 @Entity
+@Table(name = "user_order")
 public class Order {
 
     @Id

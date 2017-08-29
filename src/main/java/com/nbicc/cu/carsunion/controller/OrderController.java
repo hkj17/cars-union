@@ -2,13 +2,12 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.model.Order;
+import com.nbicc.cu.carsunion.model.OrderDetail;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -37,5 +36,26 @@ public class OrderController {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"wrong");
         }
     }
+
+    // todo 可能要做分页,按订单状态查询
+    @RequestMapping(value = "getOrderListByUserId", method = RequestMethod.POST)
+    public JSONObject getOrderListByUserId(@RequestParam(value = "userId")String userId){
+        List<Order> orders = orderService.getOrderListByUserId(userId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
+    }
+
+    // todo 分页
+    @RequestMapping(value = "deleteOrder",method = RequestMethod.POST)
+    public JSONObject deleteOrder(@RequestParam(value = "id") String id){
+        orderService.delete(id);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+    }
+
+    @RequestMapping(value = "getOrderDetailByOrderId", method = RequestMethod.POST)
+    public JSONObject getOrderDetailByOrderId(@RequestParam(value = "orderId") String orderId){
+        List<OrderDetail> details = orderService.getOrderDetailByOrderId(orderId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,details);
+    }
+
 
 }

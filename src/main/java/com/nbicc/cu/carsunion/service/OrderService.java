@@ -51,8 +51,8 @@ public class OrderService {
         Date date = new Date();
         BigDecimal discount = BigDecimal.valueOf(Double.valueOf("0.90"));  //todo 根据用户信用对应折扣
         BigDecimal realMoney = totalMoney.multiply(discount);
-        Merchant merchant = new Merchant();
-        Address address = new Address();
+        Merchant merchant = null;
+        Address address = null;
         if(!CommonUtil.isNullOrEmpty(merchantId)){
             merchant = merchantDao.findById(merchantId);
         }
@@ -72,4 +72,23 @@ public class OrderService {
         return "0010" + time.substring(0,5) + random + time.substring(5);
     }
 
+    public List<Order> getOrderListByUserId(String userId) {
+        return orderDao.findByUserId(userId);
+    }
+
+    public List<Order> getOrderListByMerchantId(String merchantId){
+        return orderDao.findByMerchantId(merchantId);
+    }
+
+    @Transactional
+    public void delete(String id) {
+        Order order = orderDao.findOne(id);
+        List<OrderDetail> lists = orderDetailDao.findByOrderId(order.getOrderId());
+        orderDetailDao.delete(lists);
+        orderDao.delete(order);
+    }
+
+    public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
+        return orderDetailDao.findByOrderId(orderId);
+    }
 }
