@@ -89,6 +89,7 @@ public class ProductController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
     }
 
+
     //根据id获取商品
     @RequestMapping(value = "getProductById", method = RequestMethod.POST)
     public JSONObject getProductByid(@RequestParam(value = "productId") String id){
