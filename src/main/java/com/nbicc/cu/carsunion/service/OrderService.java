@@ -121,7 +121,4 @@ public class OrderService {
         return "ok";
     }
 
-    public List<Order> getAllOrder() {
-        return orderDao.findAll();
-    }
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.http.data.RegionalInfo;
+import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
 import com.taobao.api.ApiException;
@@ -12,6 +13,8 @@ import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +35,9 @@ public class UtilController {
     private static final Logger logger = Logger.getLogger(UtilController.class);
 
     RegionalInfoHttpRequest httpRequest = new RegionalInfoHttpRequest();
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //给js提供七牛的uptoken，option为1表示私密上传。
     @RequestMapping(value = "getUptoken",method = RequestMethod.GET)
@@ -93,6 +99,16 @@ public class UtilController {
                                 @RequestParam(value = "district",required = false) String district) {
         List<RegionalInfo> regionalInfoList = httpRequest.getDistricts(province,city,district);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
+    }
+
+    @RequestMapping(value = "testRedis")
+    public JSONObject testRedis(){
+        User user = new User();
+        user.setId("234");
+        redisTemplate.opsForValue().set("bb",user);
+        User user1 = (User) redisTemplate.opsForValue().get("bb");
+
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, user1);
     }
 
 }
