@@ -57,4 +57,20 @@ public class OrderController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,details);
     }
 
+    //完成支付,改变订单状态为已支付
+    @RequestMapping(value = "finishPay",method = RequestMethod.POST)
+    public JSONObject finishPay(@RequestParam("orderId")String orderId){
+        String result = orderService.finishPay(orderId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
+    }
+
+    //发货，填写物流号
+    @RequestMapping(value = "deliverProducts",method = RequestMethod.POST)
+    public JSONObject finishPay(@RequestParam("orderId")String orderId,
+                                @RequestParam("courierNumber")String courierNumber){
+        String result = orderService.deliverProducts(orderId,courierNumber);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
+    }
+
+
 }
