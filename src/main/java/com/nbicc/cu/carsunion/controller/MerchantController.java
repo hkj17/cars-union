@@ -28,12 +28,7 @@ public class MerchantController {
                                                @RequestParam(value = "start", required = false) String startDate,
                                                @RequestParam(value = "end", required = false) String endDate){
         String merchantId = ((Admin) request.getSession().getAttribute("user")).getId();
-        List<Order> orders = null;
-        try {
-            orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        List<Order> orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 }

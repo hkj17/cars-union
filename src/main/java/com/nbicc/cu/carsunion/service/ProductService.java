@@ -73,7 +73,8 @@ public class ProductService {
         }
     }
 
-    public String addProduct(String classId, String name, String price, String specification, String feature) {
+    @Transactional
+    public String addProduct(String classId, String name, String price, String specification, String feature, String vehicles) {
         ProductClass productClass = productClassDao.getById(classId);
         if(CommonUtil.isNullOrEmpty(productClass)){
             logger.info("product class not exist.");
@@ -82,6 +83,15 @@ public class ProductService {
         String id = UUID.randomUUID().toString().replace("-","");
         Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin");
         productDao.save(product);
+        if(!CommonUtil.isNullOrEmpty(vehicles)){
+            String[] lists = vehicles.split(",");
+            for(int i=0; i<lists.length; ++i){
+                String result = addVehicleRelationship(id,lists[i]);
+                if(!"ok".equals(result)){
+                    throw new RuntimeException();
+                }
+            }
+        }
         return "ok";
     }
 

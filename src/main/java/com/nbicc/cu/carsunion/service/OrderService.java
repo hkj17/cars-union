@@ -63,7 +63,7 @@ public class OrderService {
         if(!CommonUtil.isNullOrEmpty(addressId)){
             address = addressDao.findOne(addressId);
         }
-        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address);
+        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address,null);
         orderDao.save(order);
         return "ok";
     }
@@ -153,4 +153,34 @@ public class OrderService {
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
         return orderDetailDao.findByOrderId(orderId);
     }
+
+    public String finishPay(String orderId) {
+        Order order = orderDao.findOne(orderId);
+        if(order == null){
+            throw new RuntimeException("order not exist!");
+        }
+        if(order.getStatus() == 0){
+            order.setStatus(1);
+        }else{
+            throw new RuntimeException("order status is not 0!");
+        }
+        orderDao.save(order);
+        return "ok";
+    }
+
+    public String deliverProducts(String orderId, String courierNumber) {
+        Order order = orderDao.findOne(orderId);
+        if(order == null){
+            throw new RuntimeException("order not exist!");
+        }
+        if(order.getStatus() == 1){
+            order.setStatus(2);
+            order.setCourierNumber(courierNumber);
+        }else{
+            throw new RuntimeException("order status is not 1!");
+        }
+        orderDao.save(order);
+        return "ok";
+    }
+
 }
