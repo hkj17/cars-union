@@ -15,6 +15,7 @@ import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 
@@ -63,6 +65,11 @@ public class UtilController {
         HttpSession session = request.getSession();
         session.setMaxInactiveInterval(10 * 60); //10min
         session.setAttribute("verify"+phone, message);
+        //增加redis保存,10min过期
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("verify"+phone, message);
+        redisTemplate.expire("verify"+phone,10, TimeUnit.MINUTES);
+
         TaobaoClient client = new DefaultTaobaoClient(ALI_DAYU_URL, ALI_DAYU_APPKEY, ALI_DAYU_SECRET);
         AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
         req.setExtend("123456");
@@ -104,10 +111,11 @@ public class UtilController {
     @RequestMapping(value = "testRedis")
     public JSONObject testRedis(){
         User user = new User();
-        user.setId("234");
+        user.setId("234234");
         redisTemplate.opsForValue().set("bb",user);
+        redisTemplate.opsForValue().set("cc","ll");
         User user1 = (User) redisTemplate.opsForValue().get("bb");
-
+        redisTemplate.expire("bb",10, TimeUnit.SECONDS);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, user1);
     }
 

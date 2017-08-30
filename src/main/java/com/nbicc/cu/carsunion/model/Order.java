@@ -48,10 +48,13 @@ public class Order {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    @Column(name = "service_time")
+    private Date serviceTime;
+
     public Order() {
     }
 
-    public Order(String id, String orderId, User user, Date datetime, BigDecimal totalMoney, double discount, BigDecimal realMoney, Merchant merchant, int status, String courierNumber, Address address) {
+    public Order(String id, String orderId, User user, Date datetime, BigDecimal totalMoney, double discount, BigDecimal realMoney, Merchant merchant, int status, String courierNumber, Address address, Date serviceTime) {
         this.id = id;
         this.orderId = orderId;
         this.user = user;
@@ -63,6 +66,7 @@ public class Order {
         this.status = status;
         this.courierNumber = courierNumber;
         this.address = address;
+        this.serviceTime = serviceTime;
     }
 
     public String getId() {
@@ -151,5 +155,13 @@ public class Order {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public Date getServiceTime() {
+        return serviceTime;
+    }
+
+    public void setServiceTime(Date serviceTime) {
+        this.serviceTime = serviceTime;
     }
 }

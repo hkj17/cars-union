@@ -59,7 +59,7 @@ public class OrderService {
         if(!CommonUtil.isNullOrEmpty(addressId)){
             address = addressDao.findOne(addressId);
         }
-        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address);
+        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address,null);
         orderDao.save(order);
         return "ok";
     }

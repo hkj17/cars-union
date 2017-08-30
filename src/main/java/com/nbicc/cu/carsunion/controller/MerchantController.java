@@ -23,7 +23,7 @@ public class MerchantController {
 
     @RequestMapping(value = "/getOrderListByMerchantId", method = RequestMethod.POST)
     public JSONObject getOrderListByMerchantId(@RequestParam(value = "merchantId")String merchantId){
-        List<Order> orders = orderService.getOrderListByUserId(merchantId);
+        List<Order> orders = orderService.getOrderListByMerchantId(merchantId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 }
