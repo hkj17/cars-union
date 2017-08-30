@@ -124,11 +124,7 @@ public class LoginController {
                                      @RequestParam(value = "contact") String contact,
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
-                                     @RequestParam(value = "recommend", required = false) String recommend,
-                                     @RequestParam(value = "token") String tokenString){
-        if(userService.validateToken(tokenString) == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
+                                     @RequestParam(value = "recommend", required = false) String recommend){
         int state = userService.userRegister(request,name,nickname,contact,portrait,recommend,password,smsCode);
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
