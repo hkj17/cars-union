@@ -57,5 +57,4 @@ public class OrderController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,details);
     }
 
-
 }

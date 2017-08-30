@@ -56,8 +56,9 @@ public class ProductController {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "price") String price,
             @RequestParam(value = "specification") String specification,
-            @RequestParam(value = "feature") String feature){
-        String result = productService.addProduct(classId,name,price,specification,feature);
+            @RequestParam(value = "feature") String feature,
+            @RequestParam(value = "vehicles")String vehicles){
+        String result = productService.addProduct(classId,name,price,specification,feature,vehicles);
         if("ok".equals(result)){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
         }else{
