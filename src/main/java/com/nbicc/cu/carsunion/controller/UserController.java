@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.model.Address;
-import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VipLevel;
 import com.nbicc.cu.carsunion.service.UserService;
@@ -27,27 +26,6 @@ public class UserController {
 
     @Autowired
     TokenDao tokenDao;
-
-    @RequestMapping(value = "/userRegister",  method = RequestMethod.POST)
-    public JSONObject modifyUserInfo(HttpServletRequest request,
-                                     @RequestParam(value = "name", required = false) String name,
-                                     @RequestParam(value = "nickname", required = false) String nickname,
-                                     @RequestParam(value = "portrait", required = false) String portrait,
-                                     @RequestParam(value = "contact") String contact,
-                                     @RequestParam(value = "password") String password,
-                                     @RequestParam(value = "smsCode") String smsCode,
-                                     @RequestParam(value = "recommend", required = false) String recommend,
-                                     @RequestParam(value = "token") String tokenString){
-        if(userService.validateToken(tokenString) == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
-        int state = userService.userRegister(request,name,nickname,contact,portrait,recommend,password,smsCode);
-        if(state == 0){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(state, "error");
-        }
-    }
 
     @RequestMapping(value = "/modifyUserInfo",  method = RequestMethod.POST)
     public JSONObject modifyUserInfo(HttpServletRequest request,

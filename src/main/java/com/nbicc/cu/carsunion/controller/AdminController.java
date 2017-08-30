@@ -2,90 +2,53 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
-import com.nbicc.cu.carsunion.model.Token;
-import com.nbicc.cu.carsunion.model.User;
-import com.nbicc.cu.carsunion.service.AdminService;
+import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-/**
- * Created by bigmao on 2017/8/18.
- */
 @RestController
+@RequestMapping("/admin")
 public class AdminController {
-
     @Autowired
-    AdminService adminService;
+    MerchantService merchantService;
 
-    @RequestMapping(value = "/merchantLogin", method = RequestMethod.POST)
-    public JSONObject merchantLogin(HttpServletRequest request,
-                            @RequestParam(value = "username") String username,
-                            @RequestParam(value = "password") String password) {
-        Map<String, Object> res = new HashMap<String, Object>();
-        Admin admin = adminService.getAdminByUserNameAndAuthority(username,1);
-        Admin validatedAdmin = adminService.validatePassword(admin, password);
-        if (validatedAdmin == null) {
-            request.getSession().removeAttribute("user");
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+    @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.GET)
+    public JSONObject getRegInProcessList(){
+        List<Merchant> merchantList = merchantService.getRegInProcessList();
+        for(Merchant m: merchantList){
+            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
+            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
+            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
         }
-
-        validatedAdmin.setUserPasswd(null);
-        request.getSession().setAttribute("user", validatedAdmin);
-        res.put("admin", validatedAdmin);
-        Merchant merchant = adminService.getMerchantById(validatedAdmin.getId());
-        res.put("merchant", merchant);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
     }
 
-    @RequestMapping(value = "/adminLogin", method = RequestMethod.POST)
-    public JSONObject adminLogin(HttpServletRequest request,
-                                 @RequestParam(value = "username") String username,
-                                 @RequestParam(value = "password") String password) {
-        Map<String, Object> res = new HashMap<String, Object>();
-        Admin admin = adminService.getAdminByUserNameAndAuthority(username,0);
-        Admin validatedAdmin = adminService.validatePassword(admin, password);
-        if (validatedAdmin == null) {
-            request.getSession().removeAttribute("user");
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+    @RequestMapping(value = "/passRegistration", method = RequestMethod.POST)
+    public JSONObject passRegistration(@RequestParam(value = "contact") String contact){
+        boolean state = merchantService.passRegistration(contact);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
-
-        validatedAdmin.setUserPasswd(null);
-        request.getSession().setAttribute("user", validatedAdmin);
-        res.put("admin", validatedAdmin);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
 
-    @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
-    public JSONObject userLogin(HttpServletRequest request,
-                                 @RequestParam(value = "username") String username,
-                                 @RequestParam(value = "password") String password) {
-        Map<String, Object> res = new HashMap<String, Object>();
-        Admin admin = adminService.getAdminByUserNameAndAuthority(username,2);
-        Admin validatedAdmin = adminService.validatePassword(admin, password);
-        if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+    @RequestMapping(value = "/failRegistration", method = RequestMethod.POST)
+    public JSONObject failRegistration(@RequestParam(value = "contact") String contact){
+        boolean state = merchantService.failRegistration(contact);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
-
-        User user = adminService.getUserById(admin.getId());
-        res.put("user", user);
-        Token token = adminService.updateToken(admin.getId());
-        res.put("token", token.getToken());
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
-    }
-
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout(HttpServletRequest request) {
-        request.getSession().invalidate();
     }
 
 
