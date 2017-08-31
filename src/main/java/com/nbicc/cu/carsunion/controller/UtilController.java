@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.http.data.RegionalInfo;
-import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
 import com.taobao.api.ApiException;
@@ -108,15 +107,15 @@ public class UtilController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
     }
 
-    @RequestMapping(value = "testRedis")
-    public JSONObject testRedis(){
-        User user = new User();
-        user.setId("234234");
-        redisTemplate.opsForValue().set("bb",user);
-        redisTemplate.opsForValue().set("cc","ll");
-        User user1 = (User) redisTemplate.opsForValue().get("bb");
-        redisTemplate.expire("bb",10, TimeUnit.SECONDS);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, user1);
-    }
+//    @RequestMapping(value = "testRedis")
+//    public JSONObject testRedis(){
+//        User user = new User();
+//        user.setId("234234");
+//        redisTemplate.opsForValue().set("bb",user);
+//        redisTemplate.opsForValue().set("cc","ll");
+//        User user1 = (User) redisTemplate.opsForValue().get("bb");
+//        redisTemplate.expire("bb",10, TimeUnit.SECONDS);
+//        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, user1);
+//    }
 
 }
