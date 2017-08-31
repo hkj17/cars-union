@@ -2,7 +2,6 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.model.Address;
 import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VipLevel;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
 
@@ -24,9 +22,6 @@ import java.util.Set;
 public class UserController {
     @Autowired
     UserService userService;
-
-    @Autowired
-    TokenDao tokenDao;
 
     @Autowired
     RedisTemplate redisTemplate;

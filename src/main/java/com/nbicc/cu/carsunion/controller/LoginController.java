@@ -2,7 +2,6 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.model.User;

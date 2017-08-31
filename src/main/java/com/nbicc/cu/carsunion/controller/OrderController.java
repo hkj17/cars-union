@@ -5,8 +5,10 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.model.OrderDetail;
 import com.nbicc.cu.carsunion.service.OrderService;
+import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,15 +22,21 @@ import java.util.Map;
 public class OrderController {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @RequestMapping(value = "addOrder", method = RequestMethod.POST)
     public JSONObject addOrder(@RequestBody JSONObject json){
         String merchantId = json.getString("merchantId");
         List<Map> productList = json.getObject("product",List.class);
         String addressId = json.getString("addressId");
-        // todo
-        String userId = json.getString("token");
+
+        String userId = userService.validateToken(redisTemplate,json.getString("token"));
         String result = orderService.addOrder(userId,merchantId,addressId,productList);
         if("ok".equals(result)){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");

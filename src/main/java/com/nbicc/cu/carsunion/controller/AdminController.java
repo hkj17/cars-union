@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -53,14 +52,18 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/modifyMerchantInfo", method = RequestMethod.POST)
-    public JSONObject modifyMerchantInfo(HttpServletRequest request,
+    public JSONObject modifyMerchantInfo(@RequestParam(value = "id") String id,
                                          @RequestParam(value = "name", required = false) String name,
                                          @RequestParam(value = "address", required = false) String address,
                                          @RequestParam(value = "region", required = false) String region,
                                          @RequestParam(value = "contact", required = false) String contact,
-                                         @RequestParam(value = "longtitude", required = false) String longtitude,
+                                         @RequestParam(value = "longitude", required = false) String longitude,
                                          @RequestParam(value = "latitude", required = false) String latitude){
-        //TODO
-        return null;
+        boolean state = merchantService.modifyMerchantInfo(id,name,address,region,contact,longitude,latitude);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+        }
     }
 }

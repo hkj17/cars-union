@@ -2,11 +2,9 @@ package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
-import com.nbicc.cu.carsunion.dao.TokenDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
-import com.nbicc.cu.carsunion.model.Token;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
@@ -15,7 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,9 +29,6 @@ public class AdminService {
 
     @Autowired
     private UserDao userDao;
-
-    @Autowired
-    private TokenDao tokenDao;
 
     public Admin getAdminByUserNameAndAuthority(String userName, int authority) {
         return adminDao.findByUserNameAndAuthority(userName, authority);
