@@ -51,5 +51,9 @@ public class AdminController {
         }
     }
 
-
+    @RequestMapping(value = "/modifyMerchantInfo", method = RequestMethod.POST)
+    public JSONObject modifyMerchantInfo(){
+        //TODO
+        return null;
+    }
 }

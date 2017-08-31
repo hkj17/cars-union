@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by bigmao on 2017/8/28.
@@ -31,6 +31,10 @@ public class OrderService {
     private MerchantDao merchantDao;
     @Autowired
     private AddressDao addressDao;
+
+    @Autowired
+    @PersistenceContext
+    private EntityManager em;
 
     @Transactional
     public String addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
@@ -72,12 +76,70 @@ public class OrderService {
         return "0010" + time.substring(0,5) + random + time.substring(5);
     }
 
-    public List<Order> getOrderListByUserId(String userId) {
-        return orderDao.findByUserId(userId);
+    public List<Order> getOrderListByUserAndTime(String userId, String startDate, String endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
+        String sql = "from Order o where o.user.id = ?1";
+        paramMap.put(1,userId);
+        int i = 2;
+        if (!CommonUtil.isNullOrEmpty(startDate)) {
+            startDate = startDate + " 00:00:00";
+            sql += " and o.datetime>=?"+i;
+            try {
+                paramMap.put(i++, sdf.parse(startDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!CommonUtil.isNullOrEmpty(endDate)) {
+            endDate = endDate + " 23:59:59";
+            sql += " and o.datetime<=?"+i;
+            try {
+                paramMap.put(i++, sdf.parse(endDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Query query = em.createQuery(sql);
+        for (int p = 1; p <= paramMap.size(); p++) {
+            query.setParameter(p, paramMap.get(p));
+        }
+        return query.getResultList();
     }
 
-    public List<Order> getOrderListByMerchantId(String merchantId){
-        return orderDao.findByMerchantId(merchantId);
+    public List<Order> getOrderListByMerchantAndTime(String merchantId, String startDate, String endDate){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
+        String sql = "from Order o where o.merchant.id = ?1";
+        paramMap.put(1,merchantId);
+        int i = 2;
+        if (!CommonUtil.isNullOrEmpty(startDate)) {
+            startDate = startDate + " 00:00:00";
+            sql += " and o.datetime>=?"+i;
+            try {
+                paramMap.put(i++, sdf.parse(startDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!CommonUtil.isNullOrEmpty(endDate)) {
+            endDate = endDate + " 23:59:59";
+            sql += " and o.datetime<=?"+i;
+            try {
+                paramMap.put(i++, sdf.parse(endDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Query query = em.createQuery(sql);
+        for (int p = 1; p <= paramMap.size(); p++) {
+            query.setParameter(p, paramMap.get(p));
+        }
+        return query.getResultList();
     }
 
     @Transactional

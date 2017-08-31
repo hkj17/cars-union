@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,6 +25,7 @@ public class Order {
     private User user;
 
     @Column(name = "datetime")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date datetime;
 
     @Column(name = "total_money")
