@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -52,7 +53,13 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/modifyMerchantInfo", method = RequestMethod.POST)
-    public JSONObject modifyMerchantInfo(){
+    public JSONObject modifyMerchantInfo(HttpServletRequest request,
+                                         @RequestParam(value = "name", required = false) String name,
+                                         @RequestParam(value = "address", required = false) String address,
+                                         @RequestParam(value = "region", required = false) String region,
+                                         @RequestParam(value = "contact", required = false) String contact,
+                                         @RequestParam(value = "longtitude", required = false) String longtitude,
+                                         @RequestParam(value = "latitude", required = false) String latitude){
         //TODO
         return null;
     }

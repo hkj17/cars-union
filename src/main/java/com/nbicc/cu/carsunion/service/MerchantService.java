@@ -10,6 +10,7 @@ import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class MerchantService {
     @Autowired
     MerchantDao merchantDao;
 
-    public int merchantRegister(HttpServletRequest request, String name, String address, String region, String contact,
+    public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
         Merchant m = merchantDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1){
@@ -39,7 +40,7 @@ public class MerchantService {
             m.setId(CommonUtil.generateUUID32());
             m.setContact(contact);
         }
-        if(!SmsUtil.verifySmsCode(request,contact,smsCode)){
+        if(!SmsUtil.verifySmsCode(redisTemplate,contact,smsCode)){
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         m.setName(name);

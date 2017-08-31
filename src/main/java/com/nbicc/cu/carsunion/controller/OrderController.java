@@ -53,6 +53,12 @@ public class OrderController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
     }
 
+    @RequestMapping(value = "getOrderByOrderId", method = RequestMethod.POST)
+    public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId){
+        Order order = orderService.getOrderByOrderId(orderId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,order);
+    }
+
     @RequestMapping(value = "getOrderDetailByOrderId", method = RequestMethod.POST)
     public JSONObject getOrderDetailByOrderId(@RequestParam(value = "orderId") String orderId){
         List<OrderDetail> details = orderService.getOrderDetailByOrderId(orderId);

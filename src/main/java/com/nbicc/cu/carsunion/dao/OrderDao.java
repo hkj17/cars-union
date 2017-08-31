@@ -9,7 +9,6 @@ import java.util.List;
  * Created by bigmao on 2017/8/28.
  */
 public interface OrderDao extends JpaRepository<Order,String>{
-    List<Order> findByUserId(String userId);
 
-    List<Order> findByMerchantId(String merchantId);
+    Order findByOrderId(String orderId);
 }

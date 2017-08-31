@@ -11,6 +11,7 @@ import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,9 @@ public class LoginController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @RequestMapping(value = "/merchantLogin", method = RequestMethod.POST)
     public JSONObject merchantLogin(HttpServletRequest request,
@@ -86,8 +90,8 @@ public class LoginController {
 
         User user = adminService.getUserById(admin.getId());
         res.put("user", user);
-        Token token = adminService.updateToken(admin.getId());
-        res.put("token", token.getToken());
+        String token = adminService.updateToken(redisTemplate,admin.getId());
+        res.put("token", token);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
 
@@ -97,8 +101,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/merchantRegister", method = RequestMethod.POST)
-    public JSONObject merchantRegister(HttpServletRequest request,
-                                       @RequestParam(value = "name") String name,
+    public JSONObject merchantRegister(@RequestParam(value = "name") String name,
                                        @RequestParam(value = "address") String address,
                                        @RequestParam(value = "region") String region,
                                        @RequestParam(value = "contact") String contact,
@@ -108,7 +111,7 @@ public class LoginController {
                                        @RequestParam(value = "idcardBack") String idcardBack,
                                        @RequestParam(value = "license") String license,
                                        @RequestParam(value = "smsCode") String smsCode) {
-        int state = merchantService.merchantRegister(request,name,address,region,contact,longitude,latitude,idcardFront,idcardBack,license, smsCode);
+        int state = merchantService.merchantRegister(redisTemplate,name,address,region,contact,longitude,latitude,idcardFront,idcardBack,license, smsCode);
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
         }else{
@@ -117,15 +120,14 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/userRegister",  method = RequestMethod.POST)
-    public JSONObject modifyUserInfo(HttpServletRequest request,
-                                     @RequestParam(value = "name", required = false) String name,
+    public JSONObject modifyUserInfo(@RequestParam(value = "name", required = false) String name,
                                      @RequestParam(value = "nickname", required = false) String nickname,
                                      @RequestParam(value = "portrait", required = false) String portrait,
                                      @RequestParam(value = "contact") String contact,
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
                                      @RequestParam(value = "recommend", required = false) String recommend){
-        int state = userService.userRegister(request,name,nickname,contact,portrait,recommend,password,smsCode);
+        int state = userService.userRegister(redisTemplate,name,nickname,contact,portrait,recommend,password,smsCode);
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
         }else{

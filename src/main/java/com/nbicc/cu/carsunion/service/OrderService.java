@@ -81,26 +81,7 @@ public class OrderService {
         Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
         String sql = "from Order o where o.user.id = ?1";
         paramMap.put(1,userId);
-        int i = 2;
-        if (!CommonUtil.isNullOrEmpty(startDate)) {
-            startDate = startDate + " 00:00:00";
-            sql += " and o.datetime>=?"+i;
-            try {
-                paramMap.put(i++, sdf.parse(startDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (!CommonUtil.isNullOrEmpty(endDate)) {
-            endDate = endDate + " 23:59:59";
-            sql += " and o.datetime<=?"+i;
-            try {
-                paramMap.put(i++, sdf.parse(endDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
+        sql = setSqlDate(sql,paramMap,2,startDate,endDate);
 
         Query query = em.createQuery(sql);
         for (int p = 1; p <= paramMap.size(); p++) {
@@ -114,26 +95,7 @@ public class OrderService {
         Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
         String sql = "from Order o where o.merchant.id = ?1";
         paramMap.put(1,merchantId);
-        int i = 2;
-        if (!CommonUtil.isNullOrEmpty(startDate)) {
-            startDate = startDate + " 00:00:00";
-            sql += " and o.datetime>=?"+i;
-            try {
-                paramMap.put(i++, sdf.parse(startDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (!CommonUtil.isNullOrEmpty(endDate)) {
-            endDate = endDate + " 23:59:59";
-            sql += " and o.datetime<=?"+i;
-            try {
-                paramMap.put(i++, sdf.parse(endDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
+        sql = setSqlDate(sql,paramMap,2,startDate,endDate);
 
         Query query = em.createQuery(sql);
         for (int p = 1; p <= paramMap.size(); p++) {
@@ -148,6 +110,10 @@ public class OrderService {
         List<OrderDetail> lists = orderDetailDao.findByOrderId(order.getOrderId());
         orderDetailDao.delete(lists);
         orderDao.delete(order);
+    }
+
+    public Order getOrderByOrderId(String orderId){
+        return orderDao.findByOrderId(orderId);
     }
 
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
@@ -183,4 +149,28 @@ public class OrderService {
         return "ok";
     }
 
+    private String setSqlDate(String sql, Map<Integer,Object> paramMap, int i, String startDate, String endDate){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (!CommonUtil.isNullOrEmpty(startDate)) {
+            startDate = startDate + " 00:00:00";
+            sql += " and o.datetime>=?"+i;
+            try {
+                paramMap.put(i++, sdf.parse(startDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!CommonUtil.isNullOrEmpty(endDate)) {
+            endDate = endDate + " 23:59:59";
+            sql += " and o.datetime<=?"+i;
+            try {
+                paramMap.put(i++, sdf.parse(endDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return sql;
+    }
 }
