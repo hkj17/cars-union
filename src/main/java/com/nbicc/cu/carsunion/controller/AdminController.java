@@ -52,8 +52,18 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/modifyMerchantInfo", method = RequestMethod.POST)
-    public JSONObject modifyMerchantInfo(){
-        //TODO
-        return null;
+    public JSONObject modifyMerchantInfo(@RequestParam(value = "id") String id,
+                                         @RequestParam(value = "name", required = false) String name,
+                                         @RequestParam(value = "address", required = false) String address,
+                                         @RequestParam(value = "region", required = false) String region,
+                                         @RequestParam(value = "contact", required = false) String contact,
+                                         @RequestParam(value = "longitude", required = false) String longitude,
+                                         @RequestParam(value = "latitude", required = false) String latitude){
+        boolean state = merchantService.modifyMerchantInfo(id,name,address,region,contact,longitude,latitude);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+        }
     }
 }

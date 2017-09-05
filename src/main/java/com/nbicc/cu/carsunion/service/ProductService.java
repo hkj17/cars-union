@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -80,7 +79,7 @@ public class ProductService {
             logger.info("product class not exist.");
             return "product class not exist.";
         }
-        String id = UUID.randomUUID().toString().replace("-","");
+        String id = CommonUtil.generateUUID32();
         Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin");
         productDao.save(product);
         if(!CommonUtil.isNullOrEmpty(vehicles)){

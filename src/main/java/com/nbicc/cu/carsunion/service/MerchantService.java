@@ -10,10 +10,10 @@ import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class MerchantService {
     @Autowired
     MerchantDao merchantDao;
 
-    public int merchantRegister(HttpServletRequest request, String name, String address, String region, String contact,
+    public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
         Merchant m = merchantDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1){
@@ -39,7 +39,7 @@ public class MerchantService {
             m.setId(CommonUtil.generateUUID32());
             m.setContact(contact);
         }
-        if(!SmsUtil.verifySmsCode(request,contact,smsCode)){
+        if(!SmsUtil.verifySmsCode(redisTemplate,contact,smsCode)){
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         m.setName(name);
@@ -86,6 +86,47 @@ public class MerchantService {
     }
 
     public List<Merchant> getRegInProcessList(){
-        return merchantDao.findRegInProcessList();
+        return merchantDao.findByRegStatus(0);
+    }
+
+    public List<Merchant> getRegisteredMerchantList(){
+        return merchantDao.findByRegStatus(1);
+    }
+
+    @Transactional
+    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longitude, String latitude){
+        Merchant m = merchantDao.findById(id);
+        if(CommonUtil.isNullOrEmpty(m)){
+            return false;
+        }
+
+        if(!CommonUtil.isNullOrEmpty(name)){
+            m.setName(name);
+        }
+        if(!CommonUtil.isNullOrEmpty(address)){
+            m.setAddress(address);
+        }
+        if(!CommonUtil.isNullOrEmpty(region)){
+            m.setRegion(region);
+        }
+        if(!CommonUtil.isNullOrEmpty(contact)){
+            Admin admin = adminDao.findByUserNameAndAuthority(contact,1);
+            if(admin!=null){
+                admin.setUserName(contact);
+                adminDao.save(admin);
+            }else{
+                return false;
+            }
+            m.setContact(contact);
+
+        }
+        if(!CommonUtil.isNullOrEmpty(longitude)){
+            m.setLongitude(longitude);
+        }
+        if(!CommonUtil.isNullOrEmpty(latitude)){
+            m.setLatitude(latitude);
+        }
+        merchantDao.save(m);
+        return true;
     }
 }

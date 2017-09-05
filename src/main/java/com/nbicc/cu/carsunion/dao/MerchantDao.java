@@ -15,6 +15,5 @@ public interface MerchantDao extends JpaRepository<Merchant,String> {
 
     Merchant findByContact(String contact);
 
-    @Query("select m from Merchant m where m.regStatus = 0 order by m.contact")
-    List<Merchant> findRegInProcessList();
+    List<Merchant> findByRegStatus(int i);
 }

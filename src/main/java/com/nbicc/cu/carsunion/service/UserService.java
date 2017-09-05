@@ -4,13 +4,14 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,23 +36,32 @@ public class UserService {
     AddressDao addressDao;
 
     @Autowired
-    TokenDao tokenDao;
-
-    @Autowired
     VipLevelDao vipLevelDao;
 
-    public String validateToken(String tokenString){
-        Token token = tokenDao.findByToken(tokenString);
-        if(CommonUtil.isNullOrEmpty(token)){
-            return null;
+    public String validateToken(RedisTemplate redisTemplate, String token){
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        return (String) valueOperations.get("token"+token);
+    }
+
+    public int updatePassword(RedisTemplate redisTemplate, String id, String oldPassword, String newPassword, String smsCode){
+        Admin admin = adminDao.findById(id);
+        if(admin==null){
+            return ParameterKeys.REQUEST_FAIL;
         }
-        Timestamp expiresAt = token.getExpiresAt();
-        return new Timestamp(System.currentTimeMillis()).before(expiresAt) ? token.getId():null;
+        if(!SmsUtil.verifySmsCode(redisTemplate,admin.getUserName(),smsCode)){
+            return ParameterKeys.FAIL_SMS_VERIFICATION;
+        }
+        if(admin.getUserPasswd()==null || !admin.getUserPasswd().equals(MessageDigestUtil.MD5Encode(oldPassword, null))){
+            return ParameterKeys.REQUEST_FAIL;
+        }
+        admin.setUserPasswd(MessageDigestUtil.MD5Encode(newPassword,null));
+        adminDao.save(admin);
+        return ParameterKeys.REQUEST_SUCCESS;
     }
 
     @Transactional
-    public int userRegister(HttpServletRequest request, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode){
-        if(!SmsUtil.verifySmsCode(request,contact,smsCode)){
+    public int userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode){
+        if(!SmsUtil.verifySmsCode(redisTemplate,contact,smsCode)){
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         User user = userDao.findByContact(contact);
@@ -92,7 +102,7 @@ public class UserService {
     }
 
     @Transactional
-    public int modifyUserInfo(HttpServletRequest request, String id, String name, String nickName, String contact, String portrait, String smsCode){
+    public int modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String portrait, String smsCode){
         User user = userDao.findById(id);
         if(CommonUtil.isNullOrEmpty(user)){
             return ParameterKeys.REQUEST_FAIL;
@@ -107,7 +117,7 @@ public class UserService {
             user.setPortraitPath(portrait);
         }
         if(!CommonUtil.isNullOrEmpty(contact)){
-            boolean passSmsVerification = SmsUtil.verifySmsCode(request,contact,smsCode);
+            boolean passSmsVerification = SmsUtil.verifySmsCode(redisTemplate,contact,smsCode);
             if(!passSmsVerification){
                 return ParameterKeys.FAIL_SMS_VERIFICATION;
             }else{
