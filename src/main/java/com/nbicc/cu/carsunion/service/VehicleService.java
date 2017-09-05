@@ -15,7 +15,7 @@ public class VehicleService {
     @Autowired
     VehicleDao vehicleDao;
 
-    public boolean addVehicle(String path, String pid, String name, Integer level, String logo) {
+    public Vehicle addVehicle(String path, String pid, String name, Integer level, String logo) {
         String uuid = CommonUtil.generateUUID16();
         String currPath = "";
         if (!CommonUtil.isNullOrEmpty(pid)) {
@@ -35,8 +35,8 @@ public class VehicleService {
         v.setName(name);
         v.setLogo(logo);
         v.setPinyin(pinyin);
-        vehicleDao.save(v);
-        return true;
+        Vehicle newVehicle = vehicleDao.save(v);
+        return newVehicle;
     }
 
     public boolean deleteVehicles(String path, String id) {

@@ -26,9 +26,9 @@ public class VehicleController {
                                  @RequestParam(value = "name") String name,
                                  @RequestParam(value = "level", required = false) Integer level,
                                  @RequestParam(value = "logo", required = false) String logo) {
-        boolean state = vehicleService.addVehicle(path, pid, name, level, logo);
-        if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        Vehicle newVehicle = vehicleService.addVehicle(path, pid, name, level, logo);
+        if(newVehicle != null){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,newVehicle);
         }else{
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
         }
