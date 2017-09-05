@@ -77,8 +77,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
-    public JSONObject userLogin(HttpServletRequest request,
-                                 @RequestParam(value = "username") String username,
+    public JSONObject userLogin(@RequestParam(value = "username") String username,
                                  @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
         Admin admin = adminService.getAdminByUserNameAndAuthority(username,2);

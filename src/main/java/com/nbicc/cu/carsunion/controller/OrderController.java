@@ -37,9 +37,13 @@ public class OrderController {
         String addressId = json.getString("addressId");
 
         String userId = userService.validateToken(redisTemplate,json.getString("token"));
-        String result = orderService.addOrder(userId,merchantId,addressId,productList);
-        if("ok".equals(result)){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        if(CommonUtil.isNullOrEmpty(userId)){
+            return CommonUtil.response(ParameterKeys.USER_NOT_LOGGED_IN,"not login");
+        }
+
+        Order newOrder = orderService.addOrder(userId,merchantId,addressId,productList);
+        if(newOrder != null){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,newOrder);
         }else{
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"wrong");
         }
@@ -47,14 +51,19 @@ public class OrderController {
 
     // todo 可能要做分页,按订单状态查询
     @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
-    public JSONObject getOrderListByUserId(@RequestParam(value = "userId")String userId,
-                                           @RequestParam(value = "start")String startDate,
-                                           @RequestParam(value = "end")String endDate){
+    public JSONObject getOrderListByUserId(@RequestParam(value = "start")String startDate,
+                                           @RequestParam(value = "end")String endDate,
+                                           @RequestParam(value = "token")String token){
+        String userId = userService.validateToken(redisTemplate,token);
+        if(CommonUtil.isNullOrEmpty(userId)){
+            return CommonUtil.response(ParameterKeys.USER_NOT_LOGGED_IN,"not login");
+        }
+
         List<Order> orders = orderService.getOrderListByUserAndTime(userId,startDate,endDate);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 
-    // todo 分页
+
     @RequestMapping(value = "deleteOrder",method = RequestMethod.POST)
     public JSONObject deleteOrder(@RequestParam(value = "id") String id){
         orderService.delete(id);
@@ -75,16 +84,16 @@ public class OrderController {
 
     //完成支付,改变订单状态为已支付
     @RequestMapping(value = "finishPay",method = RequestMethod.POST)
-    public JSONObject finishPay(@RequestParam("orderId")String orderId){
+    public JSONObject finishPay(@RequestParam("id")String orderId){
         String result = orderService.finishPay(orderId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
     }
 
     //发货，填写物流号
     @RequestMapping(value = "deliverProducts",method = RequestMethod.POST)
-    public JSONObject finishPay(@RequestParam("orderId")String orderId,
+    public JSONObject finishPay(@RequestParam("id")String id,
                                 @RequestParam("courierNumber")String courierNumber){
-        String result = orderService.deliverProducts(orderId,courierNumber);
+        String result = orderService.deliverProducts(id,courierNumber);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
     }
 

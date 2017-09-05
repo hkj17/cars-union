@@ -37,7 +37,7 @@ public class OrderService {
     private EntityManager em;
 
     @Transactional
-    public String addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
+    public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
         String orderId = generateOrderId();
         BigDecimal totalMoney = new BigDecimal(0);
         for(Map map : productList){
@@ -64,8 +64,7 @@ public class OrderService {
             address = addressDao.findOne(addressId);
         }
         Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address,null);
-        orderDao.save(order);
-        return "ok";
+        return orderDao.save(order);
     }
 
     //生成20位订单号
