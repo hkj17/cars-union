@@ -47,7 +47,7 @@ public class LoginController {
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
             request.getSession().removeAttribute("user");
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
         }
 
         validatedAdmin.setUserPasswd(null);
@@ -67,7 +67,7 @@ public class LoginController {
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
             request.getSession().removeAttribute("user");
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
         }
 
         validatedAdmin.setUserPasswd(null);
@@ -83,7 +83,7 @@ public class LoginController {
         Admin admin = adminService.getAdminByUserNameAndAuthority(username,2);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
         }
 
         User user = adminService.getUserById(admin.getId());
@@ -113,7 +113,7 @@ public class LoginController {
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
         }else{
-            return CommonUtil.response(state,"error");
+            return CommonUtil.response(state,"Register Fail!");
         }
     }
 
@@ -129,7 +129,7 @@ public class LoginController {
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
         }else{
-            return CommonUtil.response(state, "error");
+            return CommonUtil.response(state, "Register Fail!");
         }
     }
 

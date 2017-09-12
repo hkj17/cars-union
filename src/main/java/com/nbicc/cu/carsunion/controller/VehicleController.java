@@ -3,6 +3,7 @@ package com.nbicc.cu.carsunion.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Vehicle;
+import com.nbicc.cu.carsunion.model.VehicleTreeModel;
 import com.nbicc.cu.carsunion.service.VehicleService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,12 @@ public class VehicleController {
                                   @RequestParam(value = "path", required = false) String path){
         List<String> nameList = vehicleService.getFullName(path, id);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,nameList);
+    }
+
+    @RequestMapping(value = "getVehicleTrees", method = {RequestMethod.GET,RequestMethod.POST})
+    public JSONObject getVehicleTrees(){
+        List<VehicleTreeModel> lists = vehicleService.getVehicleTrees();
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
     }
 
 }

@@ -2,6 +2,7 @@ package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.dao.VehicleDao;
 import com.nbicc.cu.carsunion.model.Vehicle;
+import com.nbicc.cu.carsunion.model.VehicleTreeModel;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.PinyinUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,5 +73,36 @@ public class VehicleService {
         }
         idList.add(id);
         return vehicleDao.findVehicleFullName(idList);
+    }
+
+    public List<VehicleTreeModel> getVehicleTrees() {
+        List<VehicleTreeModel> result = new ArrayList<>();
+        List<Vehicle> lists = vehicleDao.findRootVehicles();
+        for(Vehicle vehicle : lists){
+            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(),vehicle.getName(),vehicle.getLogo(),vehicle.getPinyin(),vehicle.getPath(),vehicle.getLevel());
+            setVehicleChild(model);
+            result.add(model);
+        }
+        return result;
+    }
+
+    private void setVehicleChild(VehicleTreeModel model1) {
+        List<VehicleTreeModel> result = new ArrayList<>();
+        String path;
+        if(model1.getLevel() == 0){
+            path = model1.getId();
+        }else{
+            path = model1.getPath()+","+model1.getId();
+        }
+        List<Vehicle> lists = vehicleDao.findByPath(path);
+        if(lists.size() == 0){
+            return;
+        }
+        for(Vehicle vehicle : lists){
+            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(),vehicle.getName(),vehicle.getPath(),vehicle.getLevel());
+            setVehicleChild(model);
+            result.add(model);
+        }
+        model1.setChild(result);
     }
 }
