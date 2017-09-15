@@ -40,6 +40,9 @@ public class Product {
     @Column(name = "created_by")
     private String admin;
 
+    @Column(name = "on_sale")
+    private int onSale;
+
     @ManyToMany
     @JoinTable(name = "vehicle_product_relationship", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
     private Set<Vehicle> vehicles;
@@ -47,7 +50,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, String classId, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin) {
+    public Product(String id, String classId, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin, int onSale) {
         this.id = id;
         this.classId = classId;
         this.name = name;
@@ -56,6 +59,7 @@ public class Product {
         this.feature = feature;
         this.createdTime = createdTime;
         this.admin = admin;
+        this.onSale = onSale;
     }
 
     public String getId() {
@@ -129,5 +133,13 @@ public class Product {
 
     public void setVehicles(Set<Vehicle> vehicles) {
         this.vehicles = vehicles;
+    }
+
+    public int getOnSale() {
+        return onSale;
+    }
+
+    public void setOnSale(int onSale) {
+        this.onSale = onSale;
     }
 }

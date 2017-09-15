@@ -16,4 +16,6 @@ public class ParameterKeys {
     public static final int FAIL_SMS_VERIFICATION = 3;
 
     public static final int USER_NOT_LOGGED_IN = 4;
+
+    public static final int PHONE_ALREADY_REGISTER = 5;
 }

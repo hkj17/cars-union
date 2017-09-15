@@ -21,8 +21,8 @@ public class AdminController {
     MerchantService merchantService;
 
     @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.GET)
-    public JSONObject getRegInProcessList(){
-        List<Merchant> merchantList = merchantService.getRegInProcessList();
+    public JSONObject getRegInProcessList(@RequestParam("status")String status){
+        List<Merchant> merchantList = merchantService.getRegInProcessList(Integer.parseInt(status));
         for(Merchant m: merchantList){
             m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
             m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));

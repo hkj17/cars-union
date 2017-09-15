@@ -80,7 +80,7 @@ public class ProductService {
             return "product class not exist.";
         }
         String id = CommonUtil.generateUUID32();
-        Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin");
+        Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin",0);  //0默认上架
         productDao.save(product);
         if(!CommonUtil.isNullOrEmpty(vehicles)){
             String[] lists = vehicles.split(",");
@@ -245,5 +245,23 @@ public class ProductService {
             sb.append(s + " ");
         }
         return sb.toString();
+    }
+
+    public List<ProductClass> getProductClassById(String id) {
+        String[] strs = id.split(",");
+        List<ProductClass> results = new ArrayList<>();
+        for(String str : strs){
+            ProductClass pc = productClassDao.findOne(str);
+            if(pc != null){
+                results.add(pc);
+            }
+        }
+        return results;
+    }
+
+    public void setProductOnSale(String id, String state) {
+        Product product = productDao.findOne(id);
+        product.setOnSale(Integer.parseInt(state));
+        productDao.save(product);
     }
 }

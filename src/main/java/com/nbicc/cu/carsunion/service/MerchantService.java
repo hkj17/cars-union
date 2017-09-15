@@ -31,7 +31,7 @@ public class MerchantService {
         Merchant m = merchantDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1){
             //已通过注册，请登录
-            return ParameterKeys.REQUEST_FAIL;
+            return ParameterKeys.PHONE_ALREADY_REGISTER;
         }
 
         if(CommonUtil.isNullOrEmpty(m)){
@@ -85,8 +85,8 @@ public class MerchantService {
         return true;
     }
 
-    public List<Merchant> getRegInProcessList(){
-        return merchantDao.findByRegStatus(0);
+    public List<Merchant> getRegInProcessList(int status){
+        return merchantDao.findByRegStatus(status);
     }
 
     public List<Merchant> getRegisteredMerchantList(){

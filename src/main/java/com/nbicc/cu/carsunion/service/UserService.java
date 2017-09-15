@@ -66,7 +66,7 @@ public class UserService {
         }
         User user = userDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(user)){
-            return ParameterKeys.REQUEST_FAIL;
+            return ParameterKeys.PHONE_ALREADY_REGISTER;
         }
 
         user = new User();
@@ -94,7 +94,7 @@ public class UserService {
         userDao.save(user);
         Admin admin = new Admin();
         admin.setUserName(contact);
-        admin.setUserPasswd(password);
+        admin.setUserPasswd(MessageDigestUtil.MD5Encode(password,null));
         admin.setId(id);
         admin.setAuthority(2);
         adminDao.save(admin);

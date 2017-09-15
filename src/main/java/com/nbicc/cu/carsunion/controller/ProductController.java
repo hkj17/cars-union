@@ -49,6 +49,13 @@ public class ProductController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
     }
 
+    //查询商品分类byid
+    @RequestMapping(value = "getProductClassById",method = RequestMethod.POST)
+    public JSONObject getProductClassById(@RequestParam(value = "id") String id){
+        List<ProductClass> lists = productService.getProductClassById(id);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
+    }
+
     //添加商品
     @RequestMapping(value = "addProduct", method = RequestMethod.POST)
     public JSONObject addProduct(
@@ -105,6 +112,13 @@ public class ProductController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
     }
 
+    //商品下架/上架
+    @RequestMapping(value = "productOnSale", method = RequestMethod.POST)
+    public JSONObject productOnSale(@RequestParam(value = "productId") String id,
+                                    @RequestParam(value = "state")String state){
+        productService.setProductOnSale(id,state);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+    }
 
     //查看商品适用车型
     @RequestMapping(value = "getVehicleRelationship",method = RequestMethod.POST)
