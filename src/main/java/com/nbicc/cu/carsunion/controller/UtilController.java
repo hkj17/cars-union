@@ -56,14 +56,10 @@ public class UtilController {
 
     //短信
     @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
-    public JSONObject getSmsCode(HttpServletRequest request,
-                              @RequestParam(value = "phone",required = false) String phone)
+    public JSONObject getSmsCode(@RequestParam(value = "phone",required = false) String phone)
             throws ApiException {
         int num = (int) (Math.random() * 900000 + 100000);
         String message = String.valueOf(num);
-        HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(10 * 60); //10min
-        session.setAttribute("verify"+phone, message);
         //增加redis保存,10min过期
         ValueOperations valueOperations = redisTemplate.opsForValue();
         valueOperations.set("verify"+phone, message);

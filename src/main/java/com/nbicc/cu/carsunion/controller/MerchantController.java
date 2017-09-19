@@ -28,10 +28,8 @@ public class MerchantController {
 
     @Authority(value = AuthorityType.MerchantValidate)
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
-    public JSONObject getOrderListByMerchantId(HttpServletRequest request,
-                                               @RequestParam(value = "start", required = false) String startDate,
+    public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", required = false) String startDate,
                                                @RequestParam(value = "end", required = false) String endDate){
-//        String merchantId = ((Admin) request.getSession().getAttribute("user")).getId();
         String merchantId = hostHolder.getAdmin().getId();
         List<Order> orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);

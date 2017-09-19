@@ -23,6 +23,7 @@ public class VehicleController {
     @Autowired
     VehicleService vehicleService;
 
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/addVehicle", method = RequestMethod.POST)
     public JSONObject addVehicle(@RequestParam(value = "id", required = false) String pid,
                                  @RequestParam(value = "path", required = false) String path,
@@ -37,6 +38,7 @@ public class VehicleController {
         }
     }
 
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/deleteVehicles", method = RequestMethod.POST)
     public JSONObject deleteVehicles(@RequestParam(value = "id") String id,
                                      @RequestParam(value = "path", required = false) String path) {

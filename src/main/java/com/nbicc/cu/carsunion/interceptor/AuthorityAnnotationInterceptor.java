@@ -69,6 +69,16 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                                 hostHolder.setAdmin(admin);
                                 return true;
                             }
+                        } else if (AuthorityType.UserValidate == authority.value()){
+                            // 验证用户权限
+                            logger.info("---UserValidate---");
+
+                            String userId = (String) valueOperations.get("token" + token);
+                            Admin admin = adminService.getById(userId);
+                            if(admin != null && admin.getAuthority() == 2) {
+                                hostHolder.setAdmin(admin);
+                                return true;
+                            }
                         } else if (AuthorityType.MerchantValidate == authority.value()){
                             // 验证商家权限
                             logger.info("---MerchantValidate---");

@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.service.MerchantService;
@@ -20,6 +22,7 @@ public class AdminController {
     @Autowired
     MerchantService merchantService;
 
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.GET)
     public JSONObject getRegInProcessList(@RequestParam("status")String status){
         List<Merchant> merchantList = merchantService.getRegInProcessList(Integer.parseInt(status));
@@ -31,6 +34,7 @@ public class AdminController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
     }
 
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/passRegistration", method = RequestMethod.POST)
     public JSONObject passRegistration(@RequestParam(value = "contact") String contact){
         boolean state = merchantService.passRegistration(contact);
@@ -41,6 +45,7 @@ public class AdminController {
         }
     }
 
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/failRegistration", method = RequestMethod.POST)
     public JSONObject failRegistration(@RequestParam(value = "contact") String contact){
         boolean state = merchantService.failRegistration(contact);
@@ -51,6 +56,7 @@ public class AdminController {
         }
     }
 
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/modifyMerchantInfo", method = RequestMethod.POST)
     public JSONObject modifyMerchantInfo(@RequestParam(value = "id") String id,
                                          @RequestParam(value = "name", required = false) String name,
