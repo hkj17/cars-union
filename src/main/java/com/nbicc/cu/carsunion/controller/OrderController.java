@@ -1,14 +1,16 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.model.OrderDetail;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/order")
+@Authority(value = AuthorityType.UserValidate)
 public class OrderController {
 
     @Autowired
@@ -28,7 +31,7 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private HostHolder hostHolder;
 
     @RequestMapping(value = "addOrder", method = RequestMethod.POST)
     public JSONObject addOrder(@RequestBody JSONObject json){
@@ -36,12 +39,7 @@ public class OrderController {
         List<Map> productList = json.getObject("product",List.class);
         String addressId = json.getString("addressId");
 
-        String userId = userService.validateToken(redisTemplate,json.getString("token"));
-        if(CommonUtil.isNullOrEmpty(userId)){
-            return CommonUtil.response(ParameterKeys.USER_NOT_LOGGED_IN,"not login");
-        }
-
-        Order newOrder = orderService.addOrder(userId,merchantId,addressId,productList);
+        Order newOrder = orderService.addOrder(hostHolder.getAdmin().getId(),merchantId,addressId,productList);
         if(newOrder != null){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,newOrder);
         }else{
@@ -52,14 +50,8 @@ public class OrderController {
     // todo 可能要做分页,按订单状态查询
     @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByUserId(@RequestParam(value = "start")String startDate,
-                                           @RequestParam(value = "end")String endDate,
-                                           @RequestParam(value = "token")String token){
-        String userId = userService.validateToken(redisTemplate,token);
-        if(CommonUtil.isNullOrEmpty(userId)){
-            return CommonUtil.response(ParameterKeys.USER_NOT_LOGGED_IN,"not login");
-        }
-
-        List<Order> orders = orderService.getOrderListByUserAndTime(userId,startDate,endDate);
+                                           @RequestParam(value = "end")String endDate){
+        List<Order> orders = orderService.getOrderListByUserAndTime(hostHolder.getAdmin().getId(),startDate,endDate);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 
@@ -90,6 +82,7 @@ public class OrderController {
     }
 
     //发货，填写物流号
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "deliverProducts",method = RequestMethod.POST)
     public JSONObject finishPay(@RequestParam("id")String id,
                                 @RequestParam("courierNumber")String courierNumber){

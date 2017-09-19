@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
@@ -17,6 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/product")
+@Authority
 public class ProductController {
 
     @Autowired
@@ -24,6 +27,7 @@ public class ProductController {
 
     //增加商品类别
     //id,path,level都是传父节点的.
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "addProductClass",method = RequestMethod.POST)
     public JSONObject addProductClass(@RequestParam(value = "id", required = false) String pid,
                                       @RequestParam(value = "path",required = false) String path,
@@ -34,6 +38,7 @@ public class ProductController {
     }
 
     //删除商品类别,包括它的子节点
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "deleteProductClass",method = RequestMethod.POST)
     public JSONObject deleteProductClass(@RequestParam(value = "id") String id,
                                          @RequestParam(value = "path",required = false) String path){
@@ -57,6 +62,7 @@ public class ProductController {
     }
 
     //添加商品
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "addProduct", method = RequestMethod.POST)
     public JSONObject addProduct(
             @RequestParam(value = "classId") String classId,
@@ -74,6 +80,7 @@ public class ProductController {
     }
 
     //编辑商品
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "editProduct", method = RequestMethod.POST)
     public JSONObject editProduct(
             @RequestParam(value = "productId") String productId,
@@ -106,6 +113,7 @@ public class ProductController {
     }
 
     //删除商品
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "deleteProduct",method = RequestMethod.POST)
     public JSONObject deleteProductClass(@RequestParam(value = "productId") String productId){
         productService.deleteProduct(productId);
@@ -113,6 +121,7 @@ public class ProductController {
     }
 
     //商品下架/上架
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "productOnSale", method = RequestMethod.POST)
     public JSONObject productOnSale(@RequestParam(value = "productId") String id,
                                     @RequestParam(value = "state")String state){
@@ -128,6 +137,7 @@ public class ProductController {
     }
 
     //批量添加商品适用车型
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "addVehicleRelationship",method = RequestMethod.POST)
     public JSONObject addVehicleRelationship(@RequestBody JSONObject json){
         String productId = json.getString("productId");
@@ -146,6 +156,7 @@ public class ProductController {
     }
 
     //批量删除商品适用车型
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "deleteVehicleRelationship",method = RequestMethod.POST)
     public JSONObject deleteVehicleRelationship(@RequestBody JSONObject json){
         String productId = json.getString("productId");

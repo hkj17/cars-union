@@ -17,7 +17,13 @@ public class CarUnionConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(authorityAnnotationInterceptor);
-        registry.addInterceptor(authorityAnnotationInterceptor).addPathPatterns("/merchant/*").addPathPatterns("/vehicle/*");
+        registry.addInterceptor(authorityAnnotationInterceptor)
+                .addPathPatterns("/merchant/*")
+                .addPathPatterns("/vehicle/*")
+                .addPathPatterns("/admin/*")
+                .addPathPatterns("/order/*")
+                .addPathPatterns("/product/*")
+                .addPathPatterns("/user/*");
         super.addInterceptors(registry);
     }
 
