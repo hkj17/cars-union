@@ -3,6 +3,7 @@ package com.nbicc.cu.carsunion.interceptor;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.service.AdminService;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by bigmao on 2017/9/15.
@@ -56,6 +58,10 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                     if (authority != null) {
                         String token = request.getHeader("token");
                         ValueOperations valueOperations = redisTemplate.opsForValue();
+                        String tokenValue = (String) valueOperations.get("token" + token);
+                        if(!CommonUtil.isNullOrEmpty(tokenValue)){
+                            redisTemplate.expire("token" + token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
+                        }
                         if (AuthorityType.NoValidate == authority.value()) {
                             // 标记为不验证,放行
                             logger.info("---NoValidate---");

@@ -22,6 +22,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
+@Authority
 public class UserController {
     @Autowired
     UserService userService;
