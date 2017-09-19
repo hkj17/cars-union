@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@Authority
 public class AdminController {
     @Autowired
     MerchantService merchantService;

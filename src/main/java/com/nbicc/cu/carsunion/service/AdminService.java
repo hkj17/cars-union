@@ -1,5 +1,6 @@
 package com.nbicc.cu.carsunion.service;
 
+import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
@@ -53,7 +54,7 @@ public class AdminService {
         ValueOperations valueOperations = redisTemplate.opsForValue();
         String token = CommonUtil.generateUUID32();
         valueOperations.set("token"+token, id);
-        redisTemplate.expire("token"+token,2, TimeUnit.HOURS);
+        redisTemplate.expire("token"+token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
         return token;
     }
 

@@ -1,6 +1,7 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.http.data.RegionalInfo;
@@ -30,6 +31,7 @@ import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
  */
 @RestController
 @RequestMapping("/util")
+@Authority
 public class UtilController {
     private static final Logger logger = Logger.getLogger(UtilController.class);
 
@@ -101,5 +103,14 @@ public class UtilController {
         List<RegionalInfo> regionalInfoList = httpRequest.getDistricts(province,city,district);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
     }
+
+//    @RequestMapping(value = "/testExpire",method = RequestMethod.GET)
+//    public String test(){
+//        ValueOperations valueOperations = redisTemplate.opsForValue();
+//        valueOperations.set("aa", "a");
+////        redisTemplate.expire("aa",2, TimeUnit.SECONDS);
+//        redisTemplate.expire("aa",20, TimeUnit.SECONDS);
+//        return "aa";
+//    }
 
 }

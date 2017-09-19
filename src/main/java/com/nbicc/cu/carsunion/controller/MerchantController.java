@@ -20,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/merchant")
+@Authority
 public class MerchantController {
 
     @Autowired
