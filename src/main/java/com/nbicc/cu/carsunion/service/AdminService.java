@@ -38,8 +38,11 @@ public class AdminService {
         if (admin == null) {
             return null;
         }
-        String md5 = MessageDigestUtil.MD5Encode(password, null);
-        if (md5 == null || !md5.equals(admin.getUserPasswd())) {
+        
+        StringBuilder sb = new StringBuilder(admin.getUserName());
+        sb.append(admin.getUserPasswd().toLowerCase());
+        String md5 = MessageDigestUtil.MD5Encode(sb.toString(),null);
+        if (md5 == null || !md5.equals(password)) {
             return null;
         }else{
             return admin;
