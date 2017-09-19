@@ -65,4 +65,8 @@ public class AdminService {
     public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longtitude, String latitude){
         return false;
     }
+
+    public Admin getById(String userId) {
+        return adminDao.findById(userId);
+    }
 }

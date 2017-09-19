@@ -1,6 +1,6 @@
 package com.nbicc.cu.carsunion.configuration;
 
-import com.nbicc.cu.carsunion.interceptor.LoginRequiredInterceptor;
+import com.nbicc.cu.carsunion.interceptor.AuthorityAnnotationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -12,12 +12,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Component
 public class CarUnionConfiguration extends WebMvcConfigurerAdapter {
     @Autowired
-    LoginRequiredInterceptor loginRequiredInterceptor;
+    AuthorityAnnotationInterceptor authorityAnnotationInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //registry.addInterceptor(loginRequiredInterceptor).
-        //        addPathPatterns("/user/*");
+//        registry.addInterceptor(authorityAnnotationInterceptor);
+        registry.addInterceptor(authorityAnnotationInterceptor).addPathPatterns("/merchant/*").addPathPatterns("/vehicle/*");
         super.addInterceptors(registry);
     }
 

@@ -39,19 +39,20 @@ public class LoginController {
     RedisTemplate redisTemplate;
 
     @RequestMapping(value = "/merchantLogin", method = RequestMethod.POST)
-    public JSONObject merchantLogin(HttpServletRequest request,
-                            @RequestParam(value = "username") String username,
+    public JSONObject merchantLogin(@RequestParam(value = "username") String username,
                             @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
         Admin admin = adminService.getAdminByUserNameAndAuthority(username,1);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            request.getSession().removeAttribute("user");
+//            request.getSession().removeAttribute("user");
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
         }
 
         validatedAdmin.setUserPasswd(null);
-        request.getSession().setAttribute("user", validatedAdmin);
+//        request.getSession().setAttribute("user", validatedAdmin);
+        String token = adminService.updateToken(redisTemplate,admin.getId());
+        res.put("token", token);
         res.put("admin", validatedAdmin);
         Merchant merchant = adminService.getMerchantById(validatedAdmin.getId());
         res.put("merchant", merchant);
@@ -66,12 +67,14 @@ public class LoginController {
         Admin admin = adminService.getAdminByUserNameAndAuthority(username,0);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            request.getSession().removeAttribute("user");
+//            request.getSession().removeAttribute("user");
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
         }
 
         validatedAdmin.setUserPasswd(null);
-        request.getSession().setAttribute("user", validatedAdmin);
+//        request.getSession().setAttribute("user", validatedAdmin);
+        String token = adminService.updateToken(redisTemplate,admin.getId());
+        res.put("token", token);
         res.put("admin", validatedAdmin);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
@@ -93,6 +96,7 @@ public class LoginController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
     }
 
+    // todo
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public void logout(HttpServletRequest request) {
         request.getSession().invalidate();
