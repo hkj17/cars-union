@@ -89,8 +89,12 @@ public class MerchantService {
         return merchantDao.findByRegStatus(status);
     }
 
-    public List<Merchant> getRegisteredMerchantList(){
-        return merchantDao.findByRegStatus(1);
+    public Merchant getMerchantByContact(String contact){
+        return merchantDao.findByContact(contact);
+    }
+
+    public List<Merchant> getMerchantListByKeyword(String keyword){
+        return merchantDao.findByNameLike("%" + keyword + "%");
     }
 
     @Transactional
@@ -128,5 +132,13 @@ public class MerchantService {
         }
         merchantDao.save(m);
         return true;
+    }
+
+    public List<Merchant> getMerchantListByRegion(String region){
+        if(CommonUtil.isNullOrEmpty(region)){
+            return merchantDao.findAll();
+        }else{
+            return merchantDao.findByRegionLike("%" + region + "%");
+        }
     }
 }
