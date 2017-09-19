@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VehicleTreeModel;
