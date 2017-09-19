@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * Created by bigmao on 2017/9/15.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD,ElementType.TYPE})
 @Documented
 public @interface Authority {
     AuthorityType value() default AuthorityType.NoValidate;

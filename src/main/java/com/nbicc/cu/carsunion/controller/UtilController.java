@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -56,14 +54,13 @@ public class UtilController {
 
     //短信
     @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
-    public JSONObject getSmsCode(HttpServletRequest request,
-                              @RequestParam(value = "phone",required = false) String phone)
+    public JSONObject getSmsCode(@RequestParam(value = "phone",required = false) String phone)
             throws ApiException {
         int num = (int) (Math.random() * 900000 + 100000);
         String message = String.valueOf(num);
-        HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(10 * 60); //10min
-        session.setAttribute("verify"+phone, message);
+//        HttpSession session = request.getSession();
+//        session.setMaxInactiveInterval(10 * 60); //10min
+//        session.setAttribute("verify"+phone, message);
         //增加redis保存,10min过期
         ValueOperations valueOperations = redisTemplate.opsForValue();
         valueOperations.set("verify"+phone, message);

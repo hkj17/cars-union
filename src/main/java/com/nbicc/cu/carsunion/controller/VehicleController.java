@@ -1,8 +1,6 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.nbicc.cu.carsunion.constant.Authority;
-import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VehicleTreeModel;
@@ -62,7 +60,7 @@ public class VehicleController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,nameList);
     }
 
-    @Authority(value = AuthorityType.MerchantValidate)
+
     @RequestMapping(value = "getVehicleTrees", method = {RequestMethod.GET,RequestMethod.POST})
     public JSONObject getVehicleTrees(){
         List<VehicleTreeModel> lists = vehicleService.getVehicleTrees();
