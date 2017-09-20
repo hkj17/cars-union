@@ -34,7 +34,7 @@ public class ProductService {
     @Autowired
     private ProductDao productDao;
     @Autowired
-    private ProductDaoWithPage productDaoWithPage;
+    private ProductDaoWithPageDao productDaoWithPageDao;
     @Autowired
     private VehicleDao vehicleDao;
     @Autowired
@@ -128,9 +128,7 @@ public class ProductService {
         if(products.isEmpty()){
             return products;
         }
-        for(Product product : products){
-            transformPhotoUrl(product);
-        }
+        products.forEach(product -> transformPhotoUrl(product));
         return products;
     }
 
@@ -139,14 +137,15 @@ public class ProductService {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         if (CommonUtil.isNullOrEmpty(classId)) {
-            products = productDaoWithPage.findAll(pageable);
+            products = productDaoWithPageDao.findAll(pageable);
         }else {
             ProductClass productClass = productClassDao.getById(classId);
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDaoWithPage.findByClassIdLike("%" + classId + "%",pageable);
+            products = productDaoWithPageDao.findByClassIdLike("%" + classId + "%",pageable);
         }
+        products.forEach(product -> transformPhotoUrl(product));
         return products;
     }
 
@@ -290,9 +289,19 @@ public class ProductService {
             return null;
         }
         List<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle);
-        for(VehicleProductRelationship vpr : lists){
-            transformPhotoUrl(vpr.getProduct());
-        }
+        lists.forEach(vehicleProductRelationship -> transformPhotoUrl(vehicleProductRelationship.getProduct()));
         return lists;
+    }
+
+    public Page<Product> getProductByClassIdAndVehicleIdWithPage(String classId, String vehicleId,int pageNum,int pageSize) {
+        Vehicle vehicle = vehicleDao.findOne(vehicleId);
+        if(CommonUtil.isNullOrEmpty(vehicle)){
+            return getProductByClassIdWithPage(classId,pageNum,pageSize);
+        }
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<Product> products = productDaoWithPageDao.findByClassIdAndVehicle(vehicle,"%" + classId + "%",pageable);
+        products.forEach(product -> transformPhotoUrl(product));
+        return products;
     }
 }

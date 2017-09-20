@@ -11,8 +11,10 @@ import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +54,21 @@ public class OrderController {
     public JSONObject getOrderListByUserId(@RequestParam(value = "start")String startDate,
                                            @RequestParam(value = "end")String endDate){
         List<Order> orders = orderService.getOrderListByUserAndTime(hostHolder.getAdmin().getId(),startDate,endDate);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
+    }
+
+    //带分页的订单列表
+    @RequestMapping(value = "getOrderListWithPage", method = RequestMethod.POST)
+    public JSONObject getOrderListByUserIdWithPage(@RequestParam(value = "start",defaultValue = "2017-01-01 00:00:00")String startDate,
+                                           @RequestParam(value = "end",defaultValue = "2050-01-01 00:00:00")String endDate,
+                                                   @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
+                                                   @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
+        Page<Order> orders = null;
+        try {
+            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(),startDate,endDate,Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 

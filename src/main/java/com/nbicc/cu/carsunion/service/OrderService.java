@@ -4,10 +4,16 @@ import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,6 +31,8 @@ public class OrderService {
     private OrderDetailDao orderDetailDao;
     @Autowired
     private OrderDao orderDao;
+    @Autowired
+    private OrderWithPageDao orderWithPageDao;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -88,6 +96,17 @@ public class OrderService {
         }
         return query.getResultList();
     }
+
+    public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date start = sdf.parse(startDate);
+        Date end = sdf.parse(endDate);
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<Order> lists = orderWithPageDao.findAllByUserAndDatetimeBetween(userDao.findById(userId),start,end,pageable);
+        return lists;
+    }
+
 
     public List<Order> getOrderListByMerchantAndTime(String merchantId, String startDate, String endDate){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

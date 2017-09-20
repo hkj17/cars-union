@@ -99,21 +99,33 @@ public class ProductController {
     }
 
     //根据类别，获取商品
-    // todo 可能要做分页
-    @RequestMapping(value = "getProductByClassId", method = RequestMethod.POST)
-    public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId,
-                                          @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
-                                          @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
-        Page<Product> lists = productService.getProductByClassIdWithPage(classId, Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
-    }
+//    @RequestMapping(value = "getProductByClassId", method = RequestMethod.POST)
+//    public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId,
+//                                          @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
+//                                          @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
+//        Page<Product> lists = productService.getProductByClassIdWithPage(classId, Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
+//        if(lists != null){
+//            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
+//        }else {
+//            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "can not find this productClass!");
+//        }
+//    }
 
     //根据车型，获取商品
-    // todo 可能要做分页
-    @RequestMapping(value = "getProductByVehicleId", method = RequestMethod.POST)
-    public JSONObject getProductByVehicleId(@RequestParam(value = "vehicleId", required = false) String vehicleId){
-        List<VehicleProductRelationship> list = productService.getProductByVehicleId(vehicleId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,list);
+//    @RequestMapping(value = "getProductByVehicleId", method = RequestMethod.POST)
+//    public JSONObject getProductByVehicleId(@RequestParam(value = "vehicleId", required = false) String vehicleId){
+//        List<VehicleProductRelationship> list = productService.getProductByVehicleId(vehicleId);
+//        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,list);
+//    }
+
+    //根据车型或商品类别获取商品，带分页
+    @RequestMapping(value = "getProductByClassAndVehicle",method = RequestMethod.POST)
+    public JSONObject getProductByClassAndVehicle(@RequestParam(value = "vehicleId") String vehicleId,
+                                                  @RequestParam(value = "classId") String classId,
+                                                  @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
+                                                  @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
+        Page<Product> lists = productService.getProductByClassIdAndVehicleIdWithPage(classId,vehicleId,Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
     }
 
 
