@@ -15,7 +15,7 @@ public interface MerchantDao extends JpaRepository<Merchant,String> {
 
     Merchant findByContact(String contact);
 
-    List<Merchant> findByRegStatus(int i);
+    //List<Merchant> findByRegStatus(int status);
 
     List<Merchant> findByRegionLike(String region);
 

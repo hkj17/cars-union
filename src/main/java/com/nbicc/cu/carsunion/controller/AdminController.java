@@ -9,6 +9,7 @@ import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,14 +25,16 @@ public class AdminController {
     MerchantService merchantService;
 
     @Authority(value = AuthorityType.AdminValidate)
-    @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.GET)
-    public JSONObject getRegInProcessList(@RequestParam("status")String status){
-        List<Merchant> merchantList = merchantService.getRegInProcessList(Integer.parseInt(status));
-        for(Merchant m: merchantList){
-            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
-            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
-            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
-        }
+    @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.POST)
+    public JSONObject getRegInProcessList(@RequestParam(value = "status")int status,
+                                           @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
+                                           @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
+        Page<Merchant> merchantList = merchantService.getRegInProcessList(status,pageNum,pageSize);
+//        for(Merchant m: merchantList){
+//            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
+//            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
+//            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
+//        }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
     }
 
