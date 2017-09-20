@@ -118,7 +118,7 @@ public class ProductController {
 //        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,list);
 //    }
 
-    //根据车型或商品类别获取商品，带分页
+    //根据车型或商品类别获取商品，带分页git
     @RequestMapping(value = "getProductByClassAndVehicle",method = RequestMethod.POST)
     public JSONObject getProductByClassAndVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                                   @RequestParam(value = "classId") String classId,
