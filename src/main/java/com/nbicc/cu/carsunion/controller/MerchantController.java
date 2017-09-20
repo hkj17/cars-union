@@ -40,13 +40,6 @@ public class MerchantController {
     }
 
     @Authority(value = AuthorityType.UserValidate)
-    @RequestMapping(value = "/getMerchantListByRegion", method = RequestMethod.POST)
-    public JSONObject getMerchantListByRegion(@RequestParam(value = "region", required =  false) String region){
-        List<Merchant> merchantList = merchantService.getMerchantListByRegion(region);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,merchantList);
-    }
-
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/getMerchantByContact", method = RequestMethod.POST)
     public JSONObject getMerchantByContact(@RequestParam(value = "contact") String contact){
         Merchant merchant = merchantService.getMerchantByContact(contact);
@@ -54,9 +47,10 @@ public class MerchantController {
     }
 
     @Authority(value = AuthorityType.UserValidate)
-    @RequestMapping(value = "/getMerchantListByKeyword", method = RequestMethod.POST)
-    public JSONObject getMerchantListByKeyword(@RequestParam(value = "keyword") String keyword){
-        List<Merchant> merchantList = merchantService.getMerchantListByKeyword(keyword);
+    @RequestMapping(value = "/searchMerchant", method = RequestMethod.POST)
+    public JSONObject searchMerchant(@RequestParam(value = "region", required =  false) String region,
+                                      @RequestParam(value = "keyword", required = false) String keyword){
+        List<Merchant> merchantList = merchantService.getMerchantList(region,keyword);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,merchantList);
     }
 }

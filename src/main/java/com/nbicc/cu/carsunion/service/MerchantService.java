@@ -14,8 +14,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MerchantService {
@@ -25,6 +30,10 @@ public class MerchantService {
 
     @Autowired
     MerchantDao merchantDao;
+
+    @Autowired
+    @PersistenceContext
+    private EntityManager em;
 
     public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
@@ -89,14 +98,6 @@ public class MerchantService {
         return merchantDao.findByRegStatus(status);
     }
 
-    public Merchant getMerchantByContact(String contact){
-        return merchantDao.findByContact(contact);
-    }
-
-    public List<Merchant> getMerchantListByKeyword(String keyword){
-        return merchantDao.findByNameLike("%" + keyword + "%");
-    }
-
     @Transactional
     public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longitude, String latitude){
         Merchant m = merchantDao.findById(id);
@@ -134,11 +135,29 @@ public class MerchantService {
         return true;
     }
 
-    public List<Merchant> getMerchantListByRegion(String region){
-        if(CommonUtil.isNullOrEmpty(region)){
-            return merchantDao.findAll();
-        }else{
-            return merchantDao.findByRegionLike("%" + region + "%");
+
+    public Merchant getMerchantByContact(String contact){
+        return merchantDao.findByContact(contact);
+    }
+
+    public List<Merchant> getMerchantList(String region, String keyword) {
+        String sql = "from Merchant m where m.regStatus = 1";
+        Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
+        int i = 1;
+        if (!CommonUtil.isNullOrEmpty(region)) {
+            sql += " and m.region like ?" + i;
+            paramMap.put(i++, "%" + region + "%");
         }
+
+        if (!CommonUtil.isNullOrEmpty(keyword)) {
+            sql += " and m.name like ?" + i;
+            paramMap.put(i++, "%" + keyword + "%");
+        }
+
+        Query query = em.createQuery(sql);
+        for (int p = 1; p <= paramMap.size(); p++) {
+            query.setParameter(p, paramMap.get(p));
+        }
+        return query.getResultList();
     }
 }
