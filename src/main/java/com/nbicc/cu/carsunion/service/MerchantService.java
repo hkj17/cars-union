@@ -104,7 +104,7 @@ public class MerchantService {
 
     public Page<Merchant> getRegInProcessList(int status, int pageNum, int pageSize){
         Sort sort = new Sort(Sort.Direction.DESC, "id");
-        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Pageable pageable = new PageRequest(pageNum - 1, pageSize, sort);
         return merchantDaoWithPage.findByRegStatus(status,pageable);
     }
 

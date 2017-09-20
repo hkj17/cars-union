@@ -29,13 +29,14 @@ public class AdminController {
     public JSONObject getRegInProcessList(@RequestParam(value = "status")int status,
                                            @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
                                            @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
-        Page<Merchant> merchantList = merchantService.getRegInProcessList(status,pageNum,pageSize);
-//        for(Merchant m: merchantList){
-//            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
-//            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
-//            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
-//        }
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
+        Page<Merchant> merchantPage = merchantService.getRegInProcessList(status,pageNum,pageSize);
+        List<Merchant> merchantList = merchantPage.getContent();
+        for(Merchant m: merchantList){
+            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
+            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
+            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
+        }
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantPage);
     }
 
     @Authority(value = AuthorityType.AdminValidate)

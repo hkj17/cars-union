@@ -139,6 +139,13 @@ public class UserController {
     }
 
     @Authority(value = AuthorityType.UserValidate)
+    @RequestMapping(value = "/getDefaultVehicle",  method = RequestMethod.POST)
+    public JSONObject getDefaultVehicle(){
+        String userId = hostHolder.getAdmin().getId();
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,userService.getDefaultVehicle(userId));
+    }
+
+    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/setDefaultVehicle",  method = RequestMethod.POST)
     public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId){
         String userId = hostHolder.getAdmin().getId();

@@ -34,9 +34,11 @@ public class MerchantController {
     @Authority(value = AuthorityType.MerchantValidate)
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", required = false) String startDate,
-                                               @RequestParam(value = "end", required = false) String endDate){
+                                               @RequestParam(value = "end", required = false) String endDate,
+                                               @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
+                                               @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
         String merchantId = hostHolder.getAdmin().getId();
-        List<Order> orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate);
+        List<Order> orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate,pageNum,pageSize);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 
