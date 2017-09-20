@@ -1,9 +1,6 @@
 package com.nbicc.cu.carsunion.service;
 
-import com.nbicc.cu.carsunion.dao.ProductClassDao;
-import com.nbicc.cu.carsunion.dao.ProductDao;
-import com.nbicc.cu.carsunion.dao.VehicleDao;
-import com.nbicc.cu.carsunion.dao.VehicleProductRelationshipDao;
+import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
 import com.nbicc.cu.carsunion.model.Vehicle;
@@ -12,6 +9,10 @@ import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,8 @@ public class ProductService {
     private ProductClassDao productClassDao;
     @Autowired
     private ProductDao productDao;
+    @Autowired
+    private ProductDaoWithPage productDaoWithPage;
     @Autowired
     private VehicleDao vehicleDao;
     @Autowired
@@ -127,6 +130,22 @@ public class ProductService {
         }
         for(Product product : products){
             transformPhotoUrl(product);
+        }
+        return products;
+    }
+
+    public Page<Product> getProductByClassIdWithPage(String classId, int pageNum, int pageSize) {
+        Page<Product> products;
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        if (CommonUtil.isNullOrEmpty(classId)) {
+            products = productDaoWithPage.findAll(pageable);
+        }else {
+            ProductClass productClass = productClassDao.getById(classId);
+            if (CommonUtil.isNullOrEmpty(productClass)) {
+                return null;
+            }
+            products = productDaoWithPage.findByClassIdLike("%" + classId + "%",pageable);
         }
         return products;
     }
@@ -263,5 +282,17 @@ public class ProductService {
         Product product = productDao.findOne(id);
         product.setOnSale(Integer.parseInt(state));
         productDao.save(product);
+    }
+
+    public List<VehicleProductRelationship> getProductByVehicleId(String vehicleId) {
+        Vehicle vehicle = vehicleDao.findOne(vehicleId);
+        if(CommonUtil.isNullOrEmpty(vehicle)){
+            return null;
+        }
+        List<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle);
+        for(VehicleProductRelationship vpr : lists){
+            transformPhotoUrl(vpr.getProduct());
+        }
+        return lists;
     }
 }

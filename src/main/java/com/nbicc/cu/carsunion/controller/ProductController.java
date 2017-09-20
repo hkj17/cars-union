@@ -10,6 +10,7 @@ import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -98,10 +99,21 @@ public class ProductController {
     }
 
     //根据类别，获取商品
+    // todo 可能要做分页
     @RequestMapping(value = "getProductByClassId", method = RequestMethod.POST)
-    public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId){
-        List<Product> lists = productService.getProductByClassId(classId);
+    public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId,
+                                          @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
+                                          @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
+        Page<Product> lists = productService.getProductByClassIdWithPage(classId, Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
+    }
+
+    //根据车型，获取商品
+    // todo 可能要做分页
+    @RequestMapping(value = "getProductByVehicleId", method = RequestMethod.POST)
+    public JSONObject getProductByVehicleId(@RequestParam(value = "vehicleId", required = false) String vehicleId){
+        List<VehicleProductRelationship> list = productService.getProductByVehicleId(vehicleId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,list);
     }
 
 
