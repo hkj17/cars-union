@@ -102,7 +102,7 @@ public class OrderService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
         Date end = sdf.parse(endDate);
-        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         Page<Order> lists = orderWithPageDao.findAllByUserAndDatetimeBetween(userDao.findById(userId),start,end,pageable);
         return lists;
@@ -122,6 +122,16 @@ public class OrderService {
         query.setFirstResult((pageNum -1)*pageSize);
         query.setMaxResults(pageSize);
         return query.getResultList();
+    }
+
+    public Page<Order> getOrderListByMerchantAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date start = sdf.parse(startDate);
+        Date end = sdf.parse(endDate);
+        Sort sort = new Sort(Sort.Direction.DESC, "datetime");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<Order> lists = orderWithPageDao.findAllByMerchantAndDatetimeBetween(merchantDao.findById(userId),start,end,pageable);
+        return lists;
     }
 
     @Transactional

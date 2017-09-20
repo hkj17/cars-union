@@ -50,24 +50,24 @@ public class OrderController {
     }
 
     // todo 可能要做分页,按订单状态查询
-    @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
-    public JSONObject getOrderListByUserId(@RequestParam(value = "start", required = false)String startDate,
-                                           @RequestParam(value = "end", required = false)String endDate,
-                                           @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
-                                           @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
-        List<Order> orders = orderService.getOrderListByUserAndTime(hostHolder.getAdmin().getId(),startDate,endDate, pageNum, pageSize);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
-    }
+//    @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
+//    public JSONObject getOrderListByUserId(@RequestParam(value = "start", required = false)String startDate,
+//                                           @RequestParam(value = "end", required = false)String endDate,
+//                                           @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
+//                                           @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
+//        List<Order> orders = orderService.getOrderListByUserAndTime(hostHolder.getAdmin().getId(),startDate,endDate, pageNum, pageSize);
+//        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
+//    }
 
     //带分页的订单列表
-    @RequestMapping(value = "getOrderListWithPage", method = RequestMethod.POST)
+    @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByUserIdWithPage(@RequestParam(value = "start",defaultValue = "2017-01-01 00:00:00")String startDate,
-                                           @RequestParam(value = "end",defaultValue = "2050-01-01 00:00:00")String endDate,
-                                                   @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
-                                                   @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
+                                                   @RequestParam(value = "end",defaultValue = "2050-01-01 00:00:00")String endDate,
+                                                   @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(),startDate,endDate,Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
+            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(),startDate,endDate,pageNum-1,pageSize);
         } catch (ParseException e) {
             e.printStackTrace();
         }
