@@ -30,6 +30,7 @@ public class MerchantController {
     @Autowired
     HostHolder hostHolder;
 
+    // todo 可能要做分页,按订单状态查询
     @Authority(value = AuthorityType.MerchantValidate)
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", required = false) String startDate,

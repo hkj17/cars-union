@@ -62,12 +62,14 @@ public class OrderController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
     }
 
+    @Authority
     @RequestMapping(value = "getOrderByOrderId", method = RequestMethod.POST)
     public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId){
         Order order = orderService.getOrderByOrderId(orderId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,order);
     }
 
+    @Authority
     @RequestMapping(value = "getOrderDetailByOrderId", method = RequestMethod.POST)
     public JSONObject getOrderDetailByOrderId(@RequestParam(value = "orderId") String orderId){
         List<OrderDetail> details = orderService.getOrderDetailByOrderId(orderId);
@@ -75,6 +77,7 @@ public class OrderController {
     }
 
     //完成支付,改变订单状态为已支付
+    @Authority
     @RequestMapping(value = "finishPay",method = RequestMethod.POST)
     public JSONObject finishPay(@RequestParam("id")String orderId){
         String result = orderService.finishPay(orderId);

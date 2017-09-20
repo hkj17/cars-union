@@ -142,4 +142,5 @@ public class Product {
     public void setOnSale(int onSale) {
         this.onSale = onSale;
     }
+
 }

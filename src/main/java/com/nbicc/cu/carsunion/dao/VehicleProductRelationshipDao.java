@@ -15,4 +15,6 @@ public interface VehicleProductRelationshipDao extends JpaRepository<VehicleProd
     VehicleProductRelationship findByVehicleAndProduct(Vehicle vehicle, Product product);
 
     List<VehicleProductRelationship> findByProduct(Product product);
+
+    List<VehicleProductRelationship> findByVehicle(Vehicle vehicle);
 }

@@ -4,12 +4,17 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
+import com.nbicc.cu.carsunion.dao.MerchantDaoWithPage;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +39,9 @@ public class MerchantService {
     @Autowired
     @PersistenceContext
     private EntityManager em;
+
+    @Autowired
+    MerchantDaoWithPage merchantDaoWithPage;
 
     public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
@@ -94,8 +102,10 @@ public class MerchantService {
         return true;
     }
 
-    public List<Merchant> getRegInProcessList(int status){
-        return merchantDao.findByRegStatus(status);
+    public Page<Merchant> getRegInProcessList(int status, int pageNum, int pageSize){
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        return merchantDaoWithPage.findByRegStatus(status,pageable);
     }
 
     @Transactional
@@ -134,7 +144,6 @@ public class MerchantService {
         merchantDao.save(m);
         return true;
     }
-
 
     public Merchant getMerchantByContact(String contact){
         return merchantDao.findByContact(contact);
