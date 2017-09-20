@@ -83,8 +83,7 @@ public class OrderService {
         return "0010" + time.substring(0,5) + random + time.substring(5);
     }
 
-    public List<Order> getOrderListByUserAndTime(String userId, String startDate, String endDate) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public List<Order> getOrderListByUserAndTime(String userId, String startDate, String endDate, int pageNum, int pageSize) {
         Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
         String sql = "from Order o where o.user.id = ?1";
         paramMap.put(1,userId);
@@ -94,6 +93,8 @@ public class OrderService {
         for (int p = 1; p <= paramMap.size(); p++) {
             query.setParameter(p, paramMap.get(p));
         }
+        query.setFirstResult((pageNum -1)*pageSize);
+        query.setMaxResults(pageSize);
         return query.getResultList();
     }
 
@@ -108,8 +109,7 @@ public class OrderService {
     }
 
 
-    public List<Order> getOrderListByMerchantAndTime(String merchantId, String startDate, String endDate){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public List<Order> getOrderListByMerchantAndTime(String merchantId, String startDate, String endDate, int pageNum, int pageSize){
         Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
         String sql = "from Order o where o.merchant.id = ?1";
         paramMap.put(1,merchantId);
@@ -119,6 +119,8 @@ public class OrderService {
         for (int p = 1; p <= paramMap.size(); p++) {
             query.setParameter(p, paramMap.get(p));
         }
+        query.setFirstResult((pageNum -1)*pageSize);
+        query.setMaxResults(pageSize);
         return query.getResultList();
     }
 
@@ -188,7 +190,6 @@ public class OrderService {
                 e.printStackTrace();
             }
         }
-
         return sql;
     }
 }

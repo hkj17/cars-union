@@ -246,6 +246,18 @@ public class UserService {
         return true;
     }
 
+    public Vehicle getDefaultVehicle(String userId){
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
+            return null;
+        }
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
+        if(CommonUtil.isNullOrEmpty(uvr)){
+            return null;
+        }
+        return uvr.getVehicle();
+    }
+
     public VipLevel getVipLevelByUser(String userId){
         User user = userDao.findById(userId);
         if(CommonUtil.isNullOrEmpty(user)){

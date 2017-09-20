@@ -51,9 +51,11 @@ public class OrderController {
 
     // todo 可能要做分页,按订单状态查询
     @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
-    public JSONObject getOrderListByUserId(@RequestParam(value = "start")String startDate,
-                                           @RequestParam(value = "end")String endDate){
-        List<Order> orders = orderService.getOrderListByUserAndTime(hostHolder.getAdmin().getId(),startDate,endDate);
+    public JSONObject getOrderListByUserId(@RequestParam(value = "start", required = false)String startDate,
+                                           @RequestParam(value = "end", required = false)String endDate,
+                                           @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
+                                           @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
+        List<Order> orders = orderService.getOrderListByUserAndTime(hostHolder.getAdmin().getId(),startDate,endDate, pageNum, pageSize);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
     }
 

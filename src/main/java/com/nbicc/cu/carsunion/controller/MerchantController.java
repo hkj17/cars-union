@@ -34,17 +34,12 @@ public class MerchantController {
     @Authority(value = AuthorityType.MerchantValidate)
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", required = false) String startDate,
-                                               @RequestParam(value = "end", required = false) String endDate){
+                                               @RequestParam(value = "end", required = false) String endDate,
+                                               @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
+                                               @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
         String merchantId = hostHolder.getAdmin().getId();
-        List<Order> orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate);
+        List<Order> orders = orderService.getOrderListByMerchantAndTime(merchantId, startDate, endDate,pageNum,pageSize);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
-    }
-
-    @Authority(value = AuthorityType.UserValidate)
-    @RequestMapping(value = "/getMerchantListByRegion", method = RequestMethod.POST)
-    public JSONObject getMerchantListByRegion(@RequestParam(value = "region", required =  false) String region){
-        List<Merchant> merchantList = merchantService.getMerchantListByRegion(region);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,merchantList);
     }
 
     @Authority(value = AuthorityType.UserValidate)
@@ -55,9 +50,10 @@ public class MerchantController {
     }
 
     @Authority(value = AuthorityType.UserValidate)
-    @RequestMapping(value = "/getMerchantListByKeyword", method = RequestMethod.POST)
-    public JSONObject getMerchantListByKeyword(@RequestParam(value = "keyword") String keyword){
-        List<Merchant> merchantList = merchantService.getMerchantListByKeyword(keyword);
+    @RequestMapping(value = "/searchMerchant", method = RequestMethod.POST)
+    public JSONObject searchMerchant(@RequestParam(value = "region", required =  false) String region,
+                                      @RequestParam(value = "keyword", required = false) String keyword){
+        List<Merchant> merchantList = merchantService.getMerchantList(region,keyword);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,merchantList);
     }
 }

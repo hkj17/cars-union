@@ -104,13 +104,4 @@ public class UtilController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
     }
 
-//    @RequestMapping(value = "/testExpire",method = RequestMethod.GET)
-//    public String test(){
-//        ValueOperations valueOperations = redisTemplate.opsForValue();
-//        valueOperations.set("aa", "a");
-////        redisTemplate.expire("aa",2, TimeUnit.SECONDS);
-//        redisTemplate.expire("aa",20, TimeUnit.SECONDS);
-//        return "aa";
-//    }
-
 }
