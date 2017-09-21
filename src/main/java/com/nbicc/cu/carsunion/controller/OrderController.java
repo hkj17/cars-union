@@ -48,6 +48,20 @@ public class OrderController {
         }
     }
 
+    @RequestMapping(value = "deleteFromShoppingCart", method = RequestMethod.POST)
+    public JSONObject deleteFromShoppingCart(@RequestBody JSONObject json){
+        String userId = hostHolder.getAdmin().getId();
+        orderService.deleteFromShoppingCart(userId, json.getObject("productIdList",List.class));
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+    }
+
+    @RequestMapping(value = "modifyShoppingCart", method = RequestMethod.POST)
+    public JSONObject modifyShoppingCart(@RequestBody JSONObject json){
+        String userId = hostHolder.getAdmin().getId();
+        orderService.modifyShoppingCart(userId, json.getObject("productIdMap", Map.class));
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+    }
+
     @RequestMapping(value = "getShoppingCartList", method = RequestMethod.POST)
     public JSONObject getShoppingCartList(){
         String userId = hostHolder.getAdmin().getId();
