@@ -87,7 +87,9 @@ public class ProductService {
             String[] lists = vehicles.split(",");
             for(int i=0; i<lists.length; ++i){
                 String result = addVehicleRelationship(id,lists[i]);
-                if(!"ok".equals(result)){
+                if("alreadly add".equals(result)){
+                    continue;
+                }else if(!"ok".equals(result)){
                     throw new RuntimeException();
                 }
             }
@@ -184,7 +186,7 @@ public class ProductService {
         VehicleProductRelationship relationship = vehicleProductRelationshipDao.findByVehicleAndProduct(vehicle,product);
         if(!CommonUtil.isNullOrEmpty(relationship)){
             logger.info("when add vehicleRelationship, alreadly add.");
-            return "alreadly add.";
+            return "alreadly add";
         }
         vehicleProductRelationshipDao.save(new VehicleProductRelationship(vehicle,product));
         return "ok";
@@ -194,7 +196,9 @@ public class ProductService {
     public String addVehicleRelationshipBatch(String productId, List<String> vehicles) {
         for(String vehicle : vehicles){
             String result = addVehicleRelationship(productId,vehicle);
-            if(!"ok".equals(result)){
+            if("alreadly add".equals(result)){
+                continue;
+            }else if(!"ok".equals(result)){
                 throw new RuntimeException();
             }
         }
@@ -298,7 +302,9 @@ public class ProductService {
     public String addProductFroVehicle(String vehicleId, List<String> product) {
         for(String productId : product){
             String result = addVehicleRelationship(productId,vehicleId);
-            if(!"ok".equals(result)){
+            if("alreadly add".equals(result)){
+                continue;
+            }else if(!"ok".equals(result)){
                 throw new RuntimeException();
             }
         }
