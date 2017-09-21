@@ -3,6 +3,7 @@ package com.nbicc.cu.carsunion.service;
 import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,10 +40,14 @@ public class OrderService {
     private MerchantDao merchantDao;
     @Autowired
     private AddressDao addressDao;
+    @Autowired
+    private ShoppingCartDao shoppingCartDao;
 
     @Autowired
     @PersistenceContext
     private EntityManager em;
+
+    private Logger logger = Logger.getLogger(OrderService.class);
 
     @Transactional
     public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
@@ -135,7 +140,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void delete(String id) {
+    public void deleteOrderById(String id) {
         Order order = orderDao.findOne(id);
         List<OrderDetail> lists = orderDetailDao.findByOrderId(order.getOrderId());
         orderDetailDao.delete(lists);
@@ -177,6 +182,28 @@ public class OrderService {
         }
         orderDao.save(order);
         return "ok";
+    }
+
+    @Transactional
+    public boolean addProductToShoppingCart(String userId, String productId, int quantity){
+        User user = userDao.findById(userId);
+        Product product = productDao.findById(productId);
+        if(user == null || product == null){
+            return false;
+        }
+        ShoppingCart cart = new ShoppingCart();
+        cart.setId(CommonUtil.generateUUID32());
+        cart.setUser(user);
+        cart.setProduct(product);
+        cart.setQuantity(quantity);
+        cart.setCreatedAt(new Date());
+        shoppingCartDao.save(cart);
+        return true;
+    }
+
+    public List<ShoppingCart> getShoppingCartList(String userId){
+        User user = userDao.findById(userId);
+        return shoppingCartDao.findByUser(user);
     }
 
     private String setSqlDate(String sql, Map<Integer,Object> paramMap, int i, String startDate, String endDate){

@@ -7,6 +7,7 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.model.OrderDetail;
+import com.nbicc.cu.carsunion.model.ShoppingCart;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -34,6 +35,25 @@ public class OrderController {
 
     @Autowired
     private HostHolder hostHolder;
+
+    @RequestMapping(value = "addToShoppingCart", method = RequestMethod.POST)
+    public JSONObject addToShoppingCart(@RequestParam(value = "productId") String productId,
+                                         @RequestParam(value = "quantity") int quantity){
+        String userId = hostHolder.getAdmin().getId();
+        boolean state = orderService.addProductToShoppingCart(userId,productId, quantity);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+        }
+    }
+
+    @RequestMapping(value = "getShoppingCartList", method = RequestMethod.POST)
+    public JSONObject getShoppingCartList(){
+        String userId = hostHolder.getAdmin().getId();
+        List<ShoppingCart> shoppingCartList = orderService.getShoppingCartList(userId);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,shoppingCartList);
+    }
 
     @RequestMapping(value = "addOrder", method = RequestMethod.POST)
     public JSONObject addOrder(@RequestBody JSONObject json){
@@ -77,7 +97,7 @@ public class OrderController {
 
     @RequestMapping(value = "deleteOrder",method = RequestMethod.POST)
     public JSONObject deleteOrder(@RequestParam(value = "id") String id){
-        orderService.delete(id);
+        orderService.deleteOrderById(id);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
     }
 

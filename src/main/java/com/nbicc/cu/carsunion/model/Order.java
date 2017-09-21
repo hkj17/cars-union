@@ -52,6 +52,7 @@ public class Order {
     private Address address;
 
     @Column(name = "service_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date serviceTime;
 
     public Order() {
