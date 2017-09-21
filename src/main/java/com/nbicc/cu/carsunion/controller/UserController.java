@@ -22,7 +22,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
-@Authority
+@Authority(value = AuthorityType.UserValidate)
 public class UserController {
     @Autowired
     UserService userService;
@@ -33,7 +33,6 @@ public class UserController {
     @Autowired
     HostHolder hostHolder;
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/modifyUserInfo",  method = RequestMethod.POST)
     public JSONObject modifyUserInfo(@RequestParam(value = "name", required = false) String name,
                                      @RequestParam(value = "nickname", required = false) String nickname,
@@ -52,7 +51,6 @@ public class UserController {
         }
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/updatePassword",  method = RequestMethod.POST)
     public JSONObject updatePassword(@RequestParam(value = "oldPassword") String oldPassword,
                                      @RequestParam(value = "newPassword") String newPassword,
@@ -69,7 +67,6 @@ public class UserController {
         }
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/getAddressList",  method = RequestMethod.POST)
     public JSONObject getAddressList(){
         String userId = hostHolder.getAdmin().getId();
@@ -80,7 +77,6 @@ public class UserController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,addressList);
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/addAddress",  method = RequestMethod.POST)
     public JSONObject addAddress(@RequestParam(value = "address") String address,
                                   @RequestParam(value = "default") Boolean isDefault){
@@ -96,7 +92,20 @@ public class UserController {
         }
     }
 
-    @Authority(value = AuthorityType.UserValidate)
+    @RequestMapping(value = "/deleteAddress",  method = RequestMethod.POST)
+    public JSONObject deleteAddress(@RequestParam(value = "addressId") String addressId){
+        String userId = hostHolder.getAdmin().getId();
+        if(userId == null){
+            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
+        }
+        boolean state = userService.deleteAddress(userId, addressId);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+        }
+    }
+
     @RequestMapping(value = "/setDefaultAddress",  method = RequestMethod.POST)
     public JSONObject setDefaultAddress(@RequestParam(value = "addressId") String addressId){
         String userId = hostHolder.getAdmin().getId();
@@ -111,7 +120,6 @@ public class UserController {
         }
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/addVehicle",  method = RequestMethod.POST)
     public JSONObject addVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                  @RequestParam(value = "default") Boolean isDefault){
@@ -127,7 +135,20 @@ public class UserController {
         }
     }
 
-    @Authority(value = AuthorityType.UserValidate)
+    @RequestMapping(value = "/deleteVehicle",  method = RequestMethod.POST)
+    public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId){
+        String userId = hostHolder.getAdmin().getId();
+        if(userId == null){
+            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
+        }
+        boolean state = userService.deleteVehicle(userId,vehicleId);
+        if(state){
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        }else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+        }
+    }
+
     @RequestMapping(value = "/getVehicles",  method = RequestMethod.POST)
     public JSONObject getVehicles(){
         String userId = hostHolder.getAdmin().getId();
@@ -138,14 +159,12 @@ public class UserController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vehicles);
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/getDefaultVehicle",  method = RequestMethod.POST)
     public JSONObject getDefaultVehicle(){
         String userId = hostHolder.getAdmin().getId();
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,userService.getDefaultVehicle(userId));
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/setDefaultVehicle",  method = RequestMethod.POST)
     public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId){
         String userId = hostHolder.getAdmin().getId();
@@ -160,7 +179,6 @@ public class UserController {
         }
     }
 
-    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/getVipLevel",  method = RequestMethod.POST)
     public JSONObject getVipLevel(){
         String userId = hostHolder.getAdmin().getId();

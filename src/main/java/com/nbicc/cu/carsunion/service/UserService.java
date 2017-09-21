@@ -156,6 +156,17 @@ public class UserService {
     }
 
     @Transactional
+    public boolean deleteAddress(String userId, String addressId){
+        Address address = addressDao.findById(addressId);
+        if(address == null || !userId.equals(address.getUser().getId())){
+            return false;
+        }else{
+            addressDao.delete(address);
+            return true;
+        }
+    }
+
+    @Transactional
     public boolean setDefaultAddress(String userId, String addressId){
         User user = userDao.findById(userId);
         if(CommonUtil.isNullOrEmpty(user)){
@@ -221,6 +232,23 @@ public class UserService {
         }
         userVehicleRelationshipDao.save(userVehicleRelationship);
         return true;
+    }
+
+    @Transactional
+    public boolean deleteVehicle(String userId, String vehicleId){
+        User user = userDao.findById(userId);
+        Vehicle vehicle = vehicleDao.findById(vehicleId);
+        if(user == null || vehicle == null){
+            return false;
+        }
+
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
+        if(uvr == null){
+            return false;
+        }else{
+            userVehicleRelationshipDao.delete(uvr);
+            return true;
+        }
     }
 
     @Transactional
