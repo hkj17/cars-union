@@ -11,6 +11,7 @@ import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.service.VehicleService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -115,9 +116,15 @@ public class VehicleController {
 
     //查看车型适用商品
     @RequestMapping(value = "getVehicleRelationship",method = RequestMethod.POST)
-    public JSONObject getVehicleRelationship(@RequestParam(value = "vehicleId")String vehicleId){
-        List<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
+    public JSONObject getVehicleRelationship(@RequestParam(value = "vehicleId")String vehicleId,
+                                             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        Page<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId,pageNum-1,pageSize);
+        if(list == null ){
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "can not find the vehicle!");
+        }else {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
+        }
     }
 
 }

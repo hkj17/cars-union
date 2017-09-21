@@ -34,8 +34,6 @@ public class ProductService {
     @Autowired
     private ProductDao productDao;
     @Autowired
-    private ProductDaoWithPageDao productDaoWithPageDao;
-    @Autowired
     private VehicleDao vehicleDao;
     @Autowired
     private VehicleProductRelationshipDao vehicleProductRelationshipDao;
@@ -83,7 +81,7 @@ public class ProductService {
             return "product class not exist.";
         }
         String id = CommonUtil.generateUUID32();
-        Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin",0);  //0默认上架
+        Product product = new Product(id,productClass.getPath()+","+productClass.getId(),name,new BigDecimal(price),specification,feature,new Date(),"admin",0,0);  //0默认上架
         productDao.save(product);
         if(!CommonUtil.isNullOrEmpty(vehicles)){
             String[] lists = vehicles.split(",");
@@ -137,13 +135,13 @@ public class ProductService {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         if (CommonUtil.isNullOrEmpty(classId)) {
-            products = productDaoWithPageDao.findAll(pageable);
+            products = productDao.findAll(pageable);
         }else {
             ProductClass productClass = productClassDao.getById(classId);
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDaoWithPageDao.findByClassIdLike("%" + classId + "%",pageable);
+            products = productDao.findByClassIdLike("%" + classId + "%",pageable);
         }
         products.forEach(product -> transformPhotoUrl(product));
         return products;
@@ -291,7 +289,7 @@ public class ProductService {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Product> products = productDaoWithPageDao.findByClassIdAndVehicle(vehicle,"%" + classId + "%",pageable);
+        Page<Product> products = productDao.findByClassIdAndVehicle(vehicle,"%" + classId + "%",pageable);
         products.forEach(product -> transformPhotoUrl(product));
         return products;
     }
@@ -319,17 +317,17 @@ public class ProductService {
         return "ok";
     }
 
-    public List<VehicleProductRelationship> getVehicleRelationshipByVehicle(String vehicleId) {
+    public Page<VehicleProductRelationship> getVehicleRelationshipByVehicle(String vehicleId,int pageNum, int pageSize) {
         Vehicle vehicle = vehicleDao.findById(vehicleId);
         if(CommonUtil.isNullOrEmpty(vehicle)){
             return null;
         }
-        List<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle);
-        if(lists != null && lists.size() > 0){
-            for(VehicleProductRelationship vp : lists){
-                vp.getVehicle().setName(getFullName(vp.getVehicle().getPath(),vp.getVehicle().getId()));
-                transformPhotoUrl(vp.getProduct());
-            }
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle,pageable);
+        for(VehicleProductRelationship vp : lists){
+            vp.getVehicle().setName(getFullName(vp.getVehicle().getPath(),vp.getVehicle().getId()));
+            transformPhotoUrl(vp.getProduct());
         }
         return lists;
     }

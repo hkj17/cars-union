@@ -32,8 +32,6 @@ public class OrderService {
     @Autowired
     private OrderDao orderDao;
     @Autowired
-    private OrderWithPageDao orderWithPageDao;
-    @Autowired
     private UserDao userDao;
     @Autowired
     private MerchantDao merchantDao;
@@ -104,7 +102,7 @@ public class OrderService {
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderWithPageDao.findAllByUserAndDatetimeBetween(userDao.findById(userId),start,end,pageable);
+        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetween(userDao.findById(userId),start,end,pageable);
         return lists;
     }
 
@@ -130,7 +128,7 @@ public class OrderService {
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderWithPageDao.findAllByMerchantAndDatetimeBetween(merchantDao.findById(userId),start,end,pageable);
+        Page<Order> lists = orderDao.findAllByMerchantAndDatetimeBetween(merchantDao.findById(userId),start,end,pageable);
         return lists;
     }
 
