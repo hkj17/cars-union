@@ -283,15 +283,6 @@ public class ProductService {
         productDao.save(product);
     }
 
-    public List<VehicleProductRelationship> getProductByVehicleId(String vehicleId) {
-        Vehicle vehicle = vehicleDao.findOne(vehicleId);
-        if(CommonUtil.isNullOrEmpty(vehicle)){
-            return null;
-        }
-        List<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle);
-        lists.forEach(vehicleProductRelationship -> transformPhotoUrl(vehicleProductRelationship.getProduct()));
-        return lists;
-    }
 
     public Page<Product> getProductByClassIdAndVehicleIdWithPage(String classId, String vehicleId,int pageNum,int pageSize) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
@@ -303,5 +294,43 @@ public class ProductService {
         Page<Product> products = productDaoWithPageDao.findByClassIdAndVehicle(vehicle,"%" + classId + "%",pageable);
         products.forEach(product -> transformPhotoUrl(product));
         return products;
+    }
+
+    @Transactional
+    public String addProductFroVehicle(String vehicleId, List<String> product) {
+        for(String productId : product){
+            String result = addVehicleRelationship(productId,vehicleId);
+            if(!"ok".equals(result)){
+                throw new RuntimeException();
+            }
+        }
+        return "ok";
+    }
+
+
+    @Transactional
+    public String deleteProductFroVehicle(String vehicleId, List<String> product) {
+        for(String productId : product){
+            String result = deleteVehicleRelation(productId,vehicleId);
+            if(!"ok".equals(result)){
+                throw new RuntimeException();
+            }
+        }
+        return "ok";
+    }
+
+    public List<VehicleProductRelationship> getVehicleRelationshipByVehicle(String vehicleId) {
+        Vehicle vehicle = vehicleDao.findById(vehicleId);
+        if(CommonUtil.isNullOrEmpty(vehicle)){
+            return null;
+        }
+        List<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle);
+        if(lists != null && lists.size() > 0){
+            for(VehicleProductRelationship vp : lists){
+                vp.getVehicle().setName(getFullName(vp.getVehicle().getPath(),vp.getVehicle().getId()));
+                transformPhotoUrl(vp.getProduct());
+            }
+        }
+        return lists;
     }
 }
