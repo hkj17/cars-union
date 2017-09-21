@@ -4,7 +4,6 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
-import com.nbicc.cu.carsunion.dao.MerchantDaoWithPage;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -39,9 +38,6 @@ public class MerchantService {
     @Autowired
     @PersistenceContext
     private EntityManager em;
-
-    @Autowired
-    MerchantDaoWithPage merchantDaoWithPage;
 
     public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
@@ -105,7 +101,7 @@ public class MerchantService {
     public Page<Merchant> getRegInProcessList(int status, int pageNum, int pageSize){
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum - 1, pageSize, sort);
-        return merchantDaoWithPage.findByRegStatus(status,pageable);
+        return merchantDao.findByRegStatus(status,pageable);
     }
 
     @Transactional
