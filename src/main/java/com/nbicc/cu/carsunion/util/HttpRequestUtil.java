@@ -2,12 +2,8 @@ package com.nbicc.cu.carsunion.util;
 
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.*;
+import java.net.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +53,7 @@ public class HttpRequestUtil {
                     connection.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                result += line;
+                result += line + "\n";
             }
         } catch (Exception e) {
             System.out.println("发送GET请求出现异常！" + e);
@@ -76,62 +72,59 @@ public class HttpRequestUtil {
         return result;
     }
 
-    /**
-     * 向指定 URL 发送POST方法的请求
-     *
-     * @param url
-     *            发送请求的 URL
-     * @param param
-     *            请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
-     * @return 所代表远程资源的响应结果
-     */
-    public static String sendPost(String url, String param) {
-        PrintWriter out = null;
-        BufferedReader in = null;
+    public static String sendPost(String urlString, String postdata) {
         String result = "";
+        BufferedReader in = null;
         try {
-            URL realUrl = new URL(url);
-            // 打开和URL之间的连接
-            URLConnection conn = realUrl.openConnection();
-            // 设置通用的请求属性
-            conn.setRequestProperty("accept", "*/*");
-            conn.setRequestProperty("connection", "Keep-Alive");
-            conn.setRequestProperty("user-agent",
-                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-            // 发送POST请求必须设置如下两行
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            // 获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
-            // 发送请求参数
-            out.print(param);
-            // flush输出流的缓冲
-            out.flush();
-            // 定义BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream()));
+            byte[] postdataBytes = postdata.getBytes("UTF-8");
+            URL url = new URL(urlString);
+            HttpURLConnection httpConn=(HttpURLConnection)url.openConnection();
+            httpConn.setDoOutput(true);   //需要输出
+            httpConn.setDoInput(true);   //需要输入
+            httpConn.setUseCaches(false);  //不允许缓存
+            httpConn.setRequestMethod("POST");   //设置POST方式连接
+            //设置请求属性
+            httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            httpConn.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+            httpConn.setRequestProperty("Charset", "UTF-8");
+            //连接,也可以不用明文connect，使用下面的httpConn.getOutputStream()会自动connect
+            httpConn.connect();
+            //建立输入流，向指向的URL传入参数
+            DataOutputStream dos=new DataOutputStream(httpConn.getOutputStream());
+            dos.write(postdataBytes);
+            dos.flush();
+            dos.close();
+
+            // 定义 BufferedReader输入流来读取URL的响应
+            in = new BufferedReader(new InputStreamReader(
+                    httpConn.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                result += line;
+                result += line + "\n";
             }
+            return result;
         } catch (Exception e) {
-            System.out.println("发送 POST 请求出现异常！"+e);
             e.printStackTrace();
+            return null;
         }
-        //使用finally块来关闭输出流、输入流
-        finally{
-            try{
-                if(out!=null){
-                    out.close();
-                }
-                if(in!=null){
-                    in.close();
-                }
-            }
-            catch(IOException ex){
-                ex.printStackTrace();
-            }
-        }
-        return result;
+
     }
+
+//    public static void main(String[] args){
+//        String postData = "<xml>\n" +
+//                "   <appid>wx2421b1c4370ec43b</appid>\n" +
+//                "   <attach>支付测试</attach>\n" +
+//                "   <body>APP支付测试</body>\n" +
+//                "   <mch_id>10000100</mch_id>\n" +
+//                "   <nonce_str>1add1a30ac87aa2db72f57a2375d8fec</nonce_str>\n" +
+//                "   <notify_url>http://wxpay.wxutil.com/pub_v2/pay/notify.v2.php</notify_url>\n" +
+//                "   <out_trade_no>1415659990</out_trade_no>\n" +
+//                "   <spbill_create_ip>14.23.150.211</spbill_create_ip>\n" +
+//                "   <total_fee>1</total_fee>\n" +
+//                "   <trade_type>APP</trade_type>\n" +
+//                "   <sign>0CB01533B8C1EF103065174F50BCA001</sign>\n" +
+//                "</xml>";
+//        String url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+//        System.out.println(HttpRequestUtil.sendPost(url,postData));
+//    }
 }

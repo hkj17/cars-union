@@ -3,35 +3,36 @@ package com.nbicc.cu.carsunion.http;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.HttpRequestUtil;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class HttpRequest {
     protected  String url = "";
     protected String response = "";
-    protected Map<String, Object> paramMap;
+    protected SortedMap<String, Object> paramMap;
 
     public HttpRequest(String url){
         this.url = url;
-        paramMap = new HashMap<String, Object>();
+        paramMap = new TreeMap<String, Object>();
     }
 
-    public void setParamater(String key, Object value) {
-        paramMap.put(key,value);
-    }
-
-    public Object getParameter(String key){
-        return paramMap.get(key);
-    }
-
-    public String getResponse(){
+    public String getCachedResponseGET(){
         if(CommonUtil.isNullOrEmpty(response)){
-            response = sendHttpRequest();
+            response = sendHttpRequestGet();
         }
         return response;
     }
 
-    private String sendHttpRequest(){
+    public String getResponsePOST(String postdata){
+        response = sendHttpRequestPost(postdata);
+        return response;
+    }
+
+    private String sendHttpRequestGet(){
         return HttpRequestUtil.sendGet(url,paramMap);
+    }
+
+    private String sendHttpRequestPost(String postdata){
+        return HttpRequestUtil.sendPost(url,postdata);
     }
 }

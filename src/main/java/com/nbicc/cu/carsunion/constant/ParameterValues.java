@@ -3,6 +3,8 @@ package com.nbicc.cu.carsunion.constant;
 public class ParameterValues {
     public final static String URL_REGIONAL = "http://restapi.amap.com/v3/config/district";
 
+    public final static String URL_UNIFIED_ORDER = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+
     public final static String REGIONAL_KEY = "3a7d689c0fc2c8aa2214fed217a16c67";
 
     public final static String DEFAULT_PASSWD = "123456";
@@ -18,4 +20,8 @@ public class ParameterValues {
     public static final String ALI_DAYU_SECRET = "88c9dec9a90e7069050ea6fb1ee37750";
 
     public static final int TOKEN_EXPIRE_VALUE = 7;
+
+    public final static String APP_ID = "wxabe6785e709a35f1";
+
+    public static String WXPAY_APP_KEY = "b025e9edcd054c489af018ef6c8943a0";
 }

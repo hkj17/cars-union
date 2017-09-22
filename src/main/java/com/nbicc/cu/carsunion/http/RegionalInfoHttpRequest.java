@@ -12,12 +12,14 @@ import java.util.List;
 public class RegionalInfoHttpRequest extends HttpRequest {
     public RegionalInfoHttpRequest(){
         super(ParameterValues.URL_REGIONAL);
-        super.setParamater("subdistrict", 3);
-        super.setParamater("key",ParameterValues.REGIONAL_KEY);
+        paramMap.put("subdistrict",3);
+        paramMap.put("key",ParameterValues.REGIONAL_KEY);
+        //super.setParamater("subdistrict", 3);
+        //super.setParamater("key",ParameterValues.REGIONAL_KEY);
     }
 
     public List<RegionalInfo> getDistricts(String province, String city, String district){
-        super.getResponse();
+        super.getCachedResponseGET();
         JSONObject json = JSONObject.parseObject(response);
         JSONArray jArray = json.getJSONArray("districts").getJSONObject(0).getJSONArray("districts");
         if(CommonUtil.isNullOrEmpty(province)){
