@@ -123,7 +123,7 @@ public class ProductService {
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDao.findByClassIdLike("%" + classId + "%");
+            products = productDao.findByClassIdLikeAndDelFlag("%" + classId + "%",0);
         }
         if(products.isEmpty()){
             return products;
@@ -143,19 +143,23 @@ public class ProductService {
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDao.findByClassIdLike("%" + classId + "%",pageable);
+            products = productDao.findByClassIdLikeAndDelFlag("%" + classId + "%",0,pageable);
         }
         products.forEach(product -> transformPhotoUrl(product));
         return products;
     }
 
     public void deleteProduct(String productId) {
-        productDao.delete(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
+        product.setDelFlag(1);
+        productDao.save(product);
     }
 
     public Product getProductById(String id) {
-        Product product = productDao.findOne(id);
-        transformPhotoUrl(product);
+        Product product = productDao.findByIdAndDelFlag(id,0);
+        if(product != null){
+            transformPhotoUrl(product);
+        }
         return product;
     }
 
@@ -174,7 +178,7 @@ public class ProductService {
 
     public String addVehicleRelationship(String productId, String vehicleId) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
-        Product product = productDao.findOne(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(CommonUtil.isNullOrEmpty(product)){
             logger.info("when add vehicleRelationship, product is not exist.");
             return "product is not exist.";
@@ -218,7 +222,7 @@ public class ProductService {
 
     private String deleteVehicleRelation(String productId, String vehicleId) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
-        Product product = productDao.findOne(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(CommonUtil.isNullOrEmpty(product)){
             logger.info("when delete vehicleRelationship, product is not exist.");
             return "product is not exist.";
@@ -237,7 +241,7 @@ public class ProductService {
     }
 
     public List<VehicleProductRelationship> getVehicleRelationship(String productId) {
-        Product product = productDao.findOne(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(CommonUtil.isNullOrEmpty(product)){
             return null;
         }
@@ -280,7 +284,7 @@ public class ProductService {
     }
 
     public void setProductOnSale(String id, String state) {
-        Product product = productDao.findOne(id);
+        Product product = productDao.findByIdAndDelFlag(id,0);
         product.setOnSale(Integer.parseInt(state));
         productDao.save(product);
     }

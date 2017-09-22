@@ -119,7 +119,11 @@ public class OrderController {
     @RequestMapping(value = "getOrderByOrderId", method = RequestMethod.POST)
     public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId){
         Order order = orderService.getOrderByOrderId(orderId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,order);
+        if(order == null){
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"订单未查到");
+        }else {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, order);
+        }
     }
 
     @Authority

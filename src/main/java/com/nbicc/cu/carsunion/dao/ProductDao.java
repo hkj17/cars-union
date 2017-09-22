@@ -15,16 +15,15 @@ import java.util.List;
  */
 public interface ProductDao extends JpaRepository<Product,String>,PagingAndSortingRepository<Product,String> {
 
-    Product findById(String id);
+    Product findByIdAndDelFlag(String id,int delFlag);
 
-    List<Product> findByClassIdLike(String classId);
+    List<Product> findByClassIdLikeAndDelFlag(String classId,int delFlag);
 
-    Page<Product> findAll(Pageable pageable);
+    Page<Product> findAllByDelFlag(int delFlag, Pageable pageable);
 
-    Page<Product> findByClassIdLike(String classId, Pageable pageable);
+    Page<Product> findByClassIdLikeAndDelFlag(String classId, int delFlag, Pageable pageable);
 
     @Query("select vpr.product from VehicleProductRelationship vpr where vpr.vehicle = ?1 and vpr.product.classId like ?2")
     Page<Product> findByClassIdAndVehicle(Vehicle vehicle, String classId, Pageable pageable);
-
 
 }
