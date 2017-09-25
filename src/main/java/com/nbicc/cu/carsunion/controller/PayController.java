@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/pay")
 public class PayController {
@@ -18,7 +20,7 @@ public class PayController {
 
     @RequestMapping(value = "testPay", method = RequestMethod.POST)
     public JSONObject testPay(){
-        String response = wxpayService.unifiedOrder();
+        Map response = wxpayService.orderQuery();
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,response);
     }
 }

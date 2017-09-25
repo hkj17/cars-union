@@ -5,6 +5,10 @@ public class ParameterValues {
 
     public final static String URL_UNIFIED_ORDER = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
+    public final static String URL_CLOSE_ORDER = "https://api.mch.weixin.qq.com/pay/closeorder";
+
+    public final static String URL_ORDER_QUERY = "https://api.mch.weixin.qq.com/pay/orderquery";
+
     public final static String REGIONAL_KEY = "3a7d689c0fc2c8aa2214fed217a16c67";
 
     public final static String DEFAULT_PASSWD = "123456";
