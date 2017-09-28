@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.model.HostHolder;
-import com.nbicc.cu.carsunion.model.Order;
-import com.nbicc.cu.carsunion.model.OrderDetail;
-import com.nbicc.cu.carsunion.model.ShoppingCart;
+import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +64,17 @@ public class OrderController {
     public JSONObject getShoppingCartList(){
         String userId = hostHolder.getAdmin().getId();
         List<ShoppingCart> shoppingCartList = orderService.getShoppingCartList(userId);
+        for(ShoppingCart sc : shoppingCartList){
+            Product product = sc.getProduct();
+            String[] feature = product.getFeature().split(",");
+            StringBuilder newFeature =  new StringBuilder();
+            for(String s : feature){
+                newFeature.append(QiniuUtil.photoUrlForPublic(s)).append(",");
+            }
+            newFeature.deleteCharAt(newFeature.length()-1);
+            product.setFeature(newFeature.toString());
+            sc.setProduct(product);
+        }
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,shoppingCartList);
     }
 
