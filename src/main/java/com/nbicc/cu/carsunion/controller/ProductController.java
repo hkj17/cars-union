@@ -118,7 +118,7 @@ public class ProductController {
 //        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,list);
 //    }
 
-    //根据车型或商品类别获取商品，带分页git
+    //根据车型或商品类别获取商品，带分页
     @RequestMapping(value = "getProductByClassAndVehicle",method = RequestMethod.POST)
     public JSONObject getProductByClassAndVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                                   @RequestParam(value = "classId") String classId,
@@ -133,7 +133,11 @@ public class ProductController {
     @RequestMapping(value = "getProductById", method = RequestMethod.POST)
     public JSONObject getProductByid(@RequestParam(value = "productId") String id){
         Product product = productService.getProductById(id);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,product);
+        if(product == null){
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"商品不存在！");
+        }else{
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,product);
+        }
     }
 
     //删除商品

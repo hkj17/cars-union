@@ -46,6 +46,9 @@ public class Product {
     @Column(name = "sale_num")
     private int saleNum;
 
+    @Column(name = "del_flag")
+    private int delFlag;
+
     @ManyToMany
     @JoinTable(name = "vehicle_product_relationship", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
     private Set<Vehicle> vehicles;
@@ -64,6 +67,7 @@ public class Product {
         this.admin = admin;
         this.onSale = onSale;
         this.saleNum = saleNum;
+        this.delFlag = 0;
     }
 
     public String getId() {
@@ -153,5 +157,13 @@ public class Product {
 
     public void setSaleNum(int saleNum) {
         this.saleNum = saleNum;
+    }
+
+    public int getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(int delFlag) {
+        this.delFlag = delFlag;
     }
 }

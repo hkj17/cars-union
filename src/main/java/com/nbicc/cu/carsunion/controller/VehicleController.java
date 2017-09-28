@@ -77,7 +77,7 @@ public class VehicleController {
 
     //批量添加车型适用商品
     @Authority(value = AuthorityType.AdminValidate)
-    @RequestMapping(value = "addProductFroVehicle",method = RequestMethod.POST)
+    @RequestMapping(value = "addProductForVehicle",method = RequestMethod.POST)
     public JSONObject addProductFroVehicle(@RequestBody JSONObject json){
         String vehicleId = json.getString("vehicleId");
         String result;
@@ -96,7 +96,7 @@ public class VehicleController {
 
     //批量删除车型适用商品
     @Authority(value = AuthorityType.AdminValidate)
-    @RequestMapping(value = "deleteProductFroVehicle",method = RequestMethod.POST)
+    @RequestMapping(value = "deleteProductForVehicle",method = RequestMethod.POST)
     public JSONObject deleteProductFroVehicle(@RequestBody JSONObject json){
         String vehicleId = json.getString("vehicleId");
         String result;

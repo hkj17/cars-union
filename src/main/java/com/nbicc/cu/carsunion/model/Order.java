@@ -55,10 +55,16 @@ public class Order {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date serviceTime;
 
+    //删除标记，0未删除，1已删除
+    @Column(name = "del_flag")
+    private int delFlag;
+
     public Order() {
     }
 
-    public Order(String id, String orderId, User user, Date datetime, BigDecimal totalMoney, double discount, BigDecimal realMoney, Merchant merchant, int status, String courierNumber, Address address, Date serviceTime) {
+    public Order(String id, String orderId, User user, Date datetime, BigDecimal totalMoney, double discount,
+                 BigDecimal realMoney, Merchant merchant, int status, String courierNumber, Address address,
+                 Date serviceTime) {
         this.id = id;
         this.orderId = orderId;
         this.user = user;
@@ -71,6 +77,7 @@ public class Order {
         this.courierNumber = courierNumber;
         this.address = address;
         this.serviceTime = serviceTime;
+        this.delFlag = 0;
     }
 
     public String getId() {
@@ -167,5 +174,13 @@ public class Order {
 
     public void setServiceTime(Date serviceTime) {
         this.serviceTime = serviceTime;
+    }
+
+    public int getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(int delFlag) {
+        this.delFlag = delFlag;
     }
 }

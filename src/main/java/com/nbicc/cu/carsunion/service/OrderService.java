@@ -53,7 +53,7 @@ public class OrderService {
         for(Map map : productList){
             String id = UUID.randomUUID().toString().replace("-","");
             String productId = (String) map.get("productId");
-            Product product = productDao.findOne(productId);
+            Product product = productDao.findByIdAndDelFlag(productId,0);
             int count = (int) map.get("count");
             BigDecimal money = product.getPrice().multiply(BigDecimal.valueOf(count));
             totalMoney = totalMoney.add(money);
@@ -106,7 +106,7 @@ public class OrderService {
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetween(userDao.findById(userId),start,end,pageable);
+        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId),start,end,0,pageable);
         return lists;
     }
 
@@ -132,20 +132,18 @@ public class OrderService {
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByMerchantAndDatetimeBetween(merchantDao.findById(userId),start,end,pageable);
+        Page<Order> lists = orderDao.findAllByMerchantAndDatetimeBetweenAndDelFlag(merchantDao.findById(userId),start,end,0,pageable);
         return lists;
     }
 
-    @Transactional
     public void deleteOrderById(String id) {
-        Order order = orderDao.findOne(id);
-        List<OrderDetail> lists = orderDetailDao.findByOrderId(order.getOrderId());
-        orderDetailDao.delete(lists);
-        orderDao.delete(order);
+        Order order = orderDao.findByOrderIdAndDelFlag(id,0);
+        order.setDelFlag(1);
+        orderDao.save(order);
     }
 
     public Order getOrderByOrderId(String orderId){
-        return orderDao.findByOrderId(orderId);
+        return orderDao.findByOrderIdAndDelFlag(orderId,0);
     }
 
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
@@ -153,7 +151,7 @@ public class OrderService {
     }
 
     public String finishPay(String orderId) {
-        Order order = orderDao.findOne(orderId);
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
         if(order == null){
             throw new RuntimeException("order not exist!");
         }
@@ -167,7 +165,7 @@ public class OrderService {
     }
 
     public String deliverProducts(String orderId, String courierNumber) {
-        Order order = orderDao.findOne(orderId);
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
         if(order == null){
             throw new RuntimeException("order not exist!");
         }
@@ -184,7 +182,7 @@ public class OrderService {
     @Transactional
     public boolean addProductToShoppingCart(String userId, String productId, int quantity){
         User user = userDao.findById(userId);
-        Product product = productDao.findById(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(user == null || product == null){
             return false;
         }

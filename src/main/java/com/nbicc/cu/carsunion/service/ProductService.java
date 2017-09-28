@@ -87,7 +87,9 @@ public class ProductService {
             String[] lists = vehicles.split(",");
             for(int i=0; i<lists.length; ++i){
                 String result = addVehicleRelationship(id,lists[i]);
-                if(!"ok".equals(result)){
+                if("alreadly add".equals(result)){
+                    continue;
+                }else if(!"ok".equals(result)){
                     throw new RuntimeException();
                 }
             }
@@ -121,7 +123,7 @@ public class ProductService {
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDao.findByClassIdLike("%" + classId + "%");
+            products = productDao.findByClassIdLikeAndDelFlag("%" + classId + "%",0);
         }
         if(products.isEmpty()){
             return products;
@@ -141,19 +143,23 @@ public class ProductService {
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDao.findByClassIdLike("%" + classId + "%",pageable);
+            products = productDao.findByClassIdLikeAndDelFlag("%" + classId + "%",0,pageable);
         }
         products.forEach(product -> transformPhotoUrl(product));
         return products;
     }
 
     public void deleteProduct(String productId) {
-        productDao.delete(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
+        product.setDelFlag(1);
+        productDao.save(product);
     }
 
     public Product getProductById(String id) {
-        Product product = productDao.findOne(id);
-        transformPhotoUrl(product);
+        Product product = productDao.findByIdAndDelFlag(id,0);
+        if(product != null){
+            transformPhotoUrl(product);
+        }
         return product;
     }
 
@@ -172,7 +178,7 @@ public class ProductService {
 
     public String addVehicleRelationship(String productId, String vehicleId) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
-        Product product = productDao.findOne(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(CommonUtil.isNullOrEmpty(product)){
             logger.info("when add vehicleRelationship, product is not exist.");
             return "product is not exist.";
@@ -184,7 +190,7 @@ public class ProductService {
         VehicleProductRelationship relationship = vehicleProductRelationshipDao.findByVehicleAndProduct(vehicle,product);
         if(!CommonUtil.isNullOrEmpty(relationship)){
             logger.info("when add vehicleRelationship, alreadly add.");
-            return "alreadly add.";
+            return "alreadly add";
         }
         vehicleProductRelationshipDao.save(new VehicleProductRelationship(vehicle,product));
         return "ok";
@@ -194,7 +200,9 @@ public class ProductService {
     public String addVehicleRelationshipBatch(String productId, List<String> vehicles) {
         for(String vehicle : vehicles){
             String result = addVehicleRelationship(productId,vehicle);
-            if(!"ok".equals(result)){
+            if("alreadly add".equals(result)){
+                continue;
+            }else if(!"ok".equals(result)){
                 throw new RuntimeException();
             }
         }
@@ -214,7 +222,7 @@ public class ProductService {
 
     private String deleteVehicleRelation(String productId, String vehicleId) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
-        Product product = productDao.findOne(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(CommonUtil.isNullOrEmpty(product)){
             logger.info("when delete vehicleRelationship, product is not exist.");
             return "product is not exist.";
@@ -233,7 +241,7 @@ public class ProductService {
     }
 
     public List<VehicleProductRelationship> getVehicleRelationship(String productId) {
-        Product product = productDao.findOne(productId);
+        Product product = productDao.findByIdAndDelFlag(productId,0);
         if(CommonUtil.isNullOrEmpty(product)){
             return null;
         }
@@ -276,7 +284,7 @@ public class ProductService {
     }
 
     public void setProductOnSale(String id, String state) {
-        Product product = productDao.findOne(id);
+        Product product = productDao.findByIdAndDelFlag(id,0);
         product.setOnSale(Integer.parseInt(state));
         productDao.save(product);
     }
@@ -298,7 +306,9 @@ public class ProductService {
     public String addProductFroVehicle(String vehicleId, List<String> product) {
         for(String productId : product){
             String result = addVehicleRelationship(productId,vehicleId);
-            if(!"ok".equals(result)){
+            if("alreadly add".equals(result)){
+                continue;
+            }else if(!"ok".equals(result)){
                 throw new RuntimeException();
             }
         }

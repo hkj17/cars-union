@@ -15,10 +15,10 @@ import java.util.Date;
  */
 public interface OrderDao extends JpaRepository<Order,String>,PagingAndSortingRepository<Order,String> {
 
-    Order findByOrderId(String orderId);
+    Order findByOrderIdAndDelFlag(String orderId,int delFlag);
 
-    Page<Order> findAllByUserAndDatetimeBetween(User user, Date start, Date end, Pageable pageable);
+    Page<Order> findAllByUserAndDatetimeBetweenAndDelFlag(User user, Date start, Date end, int delFlag, Pageable pageable);
 
-    Page<Order> findAllByMerchantAndDatetimeBetween(Merchant byId, Date start, Date end, Pageable pageable);
+    Page<Order> findAllByMerchantAndDatetimeBetweenAndDelFlag(Merchant byId, Date start, Date end, int delFlag, Pageable pageable);
 
 }
