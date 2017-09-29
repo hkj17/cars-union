@@ -38,34 +38,34 @@ public class UserService {
     @Autowired
     VipLevelDao vipLevelDao;
 
-    public String validateToken(RedisTemplate redisTemplate, String token){
+    public String validateToken(RedisTemplate redisTemplate, String token) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
-        return (String) valueOperations.get("token"+token);
+        return (String) valueOperations.get("token" + token);
     }
 
-    public int updatePassword(RedisTemplate redisTemplate, String id, String oldPassword, String newPassword, String smsCode){
+    public int updatePassword(RedisTemplate redisTemplate, String id, String oldPassword, String newPassword, String smsCode) {
         Admin admin = adminDao.findById(id);
-        if(admin==null){
+        if (admin == null) {
             return ParameterKeys.REQUEST_FAIL;
         }
-        if(!SmsUtil.verifySmsCode(redisTemplate,admin.getUserName(),smsCode)){
+        if (!SmsUtil.verifySmsCode(redisTemplate, admin.getUserName(), smsCode)) {
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
-        if(admin.getUserPasswd()==null || !admin.getUserPasswd().equals(MessageDigestUtil.MD5Encode(oldPassword, null))){
+        if (admin.getUserPasswd() == null || !admin.getUserPasswd().equals(MessageDigestUtil.MD5Encode(oldPassword, null))) {
             return ParameterKeys.REQUEST_FAIL;
         }
-        admin.setUserPasswd(MessageDigestUtil.MD5Encode(newPassword,null));
+        admin.setUserPasswd(MessageDigestUtil.MD5Encode(newPassword, null));
         adminDao.save(admin);
         return ParameterKeys.REQUEST_SUCCESS;
     }
 
     @Transactional
-    public int userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode){
-        if(!SmsUtil.verifySmsCode(redisTemplate,contact,smsCode)){
+    public int userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode) {
+        if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         User user = userDao.findByContact(contact);
-        if(!CommonUtil.isNullOrEmpty(user)){
+        if (!CommonUtil.isNullOrEmpty(user)) {
             return ParameterKeys.PHONE_ALREADY_REGISTER;
         }
 
@@ -74,27 +74,27 @@ public class UserService {
         user.setId(id);
         user.setContact(contact);
         String defaultName = "用户" + contact.substring(7);
-        if(!CommonUtil.isNullOrEmpty(name)){
+        if (!CommonUtil.isNullOrEmpty(name)) {
             user.setName(name);
-        }else{
+        } else {
             user.setName(defaultName);
         }
-        if(!CommonUtil.isNullOrEmpty(nickName)){
+        if (!CommonUtil.isNullOrEmpty(nickName)) {
             user.setNickname(nickName);
-        }else{
+        } else {
             user.setNickname(defaultName);
         }
-        if(!CommonUtil.isNullOrEmpty(portrait)){
+        if (!CommonUtil.isNullOrEmpty(portrait)) {
             user.setPortraitPath(portrait);
         }
-        if(!CommonUtil.isNullOrEmpty(recommend)){
+        if (!CommonUtil.isNullOrEmpty(recommend)) {
             user.setRecommend(recommend);
         }
         user.setCredit(0);
         userDao.save(user);
         Admin admin = new Admin();
         admin.setUserName(contact);
-        admin.setUserPasswd(MessageDigestUtil.MD5Encode(password,null));
+        admin.setUserPasswd(MessageDigestUtil.MD5Encode(password, null));
         admin.setId(id);
         admin.setAuthority(2);
         adminDao.save(admin);
@@ -102,25 +102,25 @@ public class UserService {
     }
 
     @Transactional
-    public int modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String portrait, String smsCode){
+    public int modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String portrait, String smsCode) {
         User user = userDao.findById(id);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return ParameterKeys.REQUEST_FAIL;
         }
-        if(!CommonUtil.isNullOrEmpty(name)){
+        if (!CommonUtil.isNullOrEmpty(name)) {
             user.setName(name);
         }
-        if(!CommonUtil.isNullOrEmpty(nickName)){
+        if (!CommonUtil.isNullOrEmpty(nickName)) {
             user.setNickname(nickName);
         }
-        if(!CommonUtil.isNullOrEmpty(portrait)){
+        if (!CommonUtil.isNullOrEmpty(portrait)) {
             user.setPortraitPath(portrait);
         }
-        if(!CommonUtil.isNullOrEmpty(contact)){
-            boolean passSmsVerification = SmsUtil.verifySmsCode(redisTemplate,contact,smsCode);
-            if(!passSmsVerification){
+        if (!CommonUtil.isNullOrEmpty(contact)) {
+            boolean passSmsVerification = SmsUtil.verifySmsCode(redisTemplate, contact, smsCode);
+            if (!passSmsVerification) {
                 return ParameterKeys.FAIL_SMS_VERIFICATION;
-            }else{
+            } else {
                 Admin admin = adminDao.findById(id);
                 admin.setUserName(contact);
                 adminDao.save(admin);
@@ -132,23 +132,23 @@ public class UserService {
     }
 
     @Transactional
-    public boolean addAddress(String userId, String addr, Boolean isDefault){
+    public boolean addAddress(String userId, String addr, Boolean isDefault) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return false;
         }
-        Address address =  new Address();
+        Address address = new Address();
         address.setUser(user);
         address.setAddress(addr);
         address.setId(CommonUtil.generateUUID32());
-        if(isDefault){
-            Address defaultAddr = addressDao.findByUserAndIsDefault(user,true);
-            if(!CommonUtil.isNullOrEmpty(defaultAddr)){
+        if (isDefault) {
+            Address defaultAddr = addressDao.findByUserAndIsDefault(user, true);
+            if (!CommonUtil.isNullOrEmpty(defaultAddr)) {
                 defaultAddr.setIsDefault(false);
                 addressDao.save(defaultAddr);
             }
             address.setIsDefault(true);
-        }else{
+        } else {
             address.setIsDefault(false);
         }
         addressDao.save(address);
@@ -156,28 +156,28 @@ public class UserService {
     }
 
     @Transactional
-    public boolean deleteAddress(String userId, String addressId){
+    public boolean deleteAddress(String userId, String addressId) {
         Address address = addressDao.findById(addressId);
-        if(address == null || !userId.equals(address.getUser().getId())){
+        if (address == null || !userId.equals(address.getUser().getId())) {
             return false;
-        }else{
+        } else {
             addressDao.delete(address);
             return true;
         }
     }
 
     @Transactional
-    public boolean setDefaultAddress(String userId, String addressId){
+    public boolean setDefaultAddress(String userId, String addressId) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return false;
         }
         Address address = addressDao.findById(addressId);
-        if(CommonUtil.isNullOrEmpty(address)){
+        if (CommonUtil.isNullOrEmpty(address)) {
             return false;
         }
-        Address defaultAddr = addressDao.findByUserAndIsDefault(user,true);
-        if(!CommonUtil.isNullOrEmpty(defaultAddr)){
+        Address defaultAddr = addressDao.findByUserAndIsDefault(user, true);
+        if (!CommonUtil.isNullOrEmpty(defaultAddr)) {
             defaultAddr.setIsDefault(false);
             addressDao.save(defaultAddr);
         }
@@ -186,48 +186,48 @@ public class UserService {
         return true;
     }
 
-    public List<Address> getAddressList(String userId){
+    public List<Address> getAddressList(String userId) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return new ArrayList<Address>();
-        }else{
+        } else {
             return user.getAddressList();
         }
     }
 
-    public Set<Vehicle> getVehicleList(String userId){
+    public Set<Vehicle> getVehicleList(String userId) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return new HashSet<Vehicle>();
-        }else{
+        } else {
             return user.getVehicles();
         }
     }
 
     @Transactional
-    public boolean addVehicle(String userId, String vehicleId, Boolean isDefault){
+    public boolean addVehicle(String userId, String vehicleId, Boolean isDefault) {
         User user = userDao.findById(userId);
         Vehicle vehicle = vehicleDao.findById(vehicleId);
-        if(user == null || vehicle == null){
+        if (user == null || vehicle == null) {
             return false;
         }
 
         UserVehicleRelationship userVehicleRelationship = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
-        if(userVehicleRelationship != null){
+        if (userVehicleRelationship != null) {
             return false;
         }
 
         userVehicleRelationship = new UserVehicleRelationship();
         userVehicleRelationship.setUser(user);
         userVehicleRelationship.setVehicle(vehicle);
-        if(isDefault){
+        if (isDefault) {
             UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
-            if(uvr != null){
+            if (uvr != null) {
                 uvr.setIsDefault(false);
                 userVehicleRelationshipDao.save(uvr);
             }
             userVehicleRelationship.setIsDefault(true);
-        }else {
+        } else {
             userVehicleRelationship.setIsDefault(false);
         }
         userVehicleRelationshipDao.save(userVehicleRelationship);
@@ -235,36 +235,36 @@ public class UserService {
     }
 
     @Transactional
-    public boolean deleteVehicle(String userId, String vehicleId){
+    public boolean deleteVehicle(String userId, String vehicleId) {
         User user = userDao.findById(userId);
         Vehicle vehicle = vehicleDao.findById(vehicleId);
-        if(user == null || vehicle == null){
+        if (user == null || vehicle == null) {
             return false;
         }
 
         UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
-        if(uvr == null){
+        if (uvr == null) {
             return false;
-        }else{
+        } else {
             userVehicleRelationshipDao.delete(uvr);
             return true;
         }
     }
 
     @Transactional
-    public boolean setDefaultVehicle(String userId, String vehicleId){
+    public boolean setDefaultVehicle(String userId, String vehicleId) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return false;
         }
         Vehicle vehicle = vehicleDao.findById(vehicleId);
-        if(CommonUtil.isNullOrEmpty(vehicle)){
+        if (CommonUtil.isNullOrEmpty(vehicle)) {
             return false;
         }
 
-        UserVehicleRelationship uvr_old = userVehicleRelationshipDao.findByUserAndIsDefault(user,true);
+        UserVehicleRelationship uvr_old = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
         UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
-        if(uvr == null){
+        if (uvr == null) {
             return false;
         }
         uvr.setIsDefault(true);
@@ -274,23 +274,23 @@ public class UserService {
         return true;
     }
 
-    public Vehicle getDefaultVehicle(String userId){
+    public Vehicle getDefaultVehicle(String userId) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return null;
         }
         UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
-        if(CommonUtil.isNullOrEmpty(uvr)){
+        if (CommonUtil.isNullOrEmpty(uvr)) {
             return null;
         }
         return uvr.getVehicle();
     }
 
-    public VipLevel getVipLevelByUser(String userId){
+    public VipLevel getVipLevelByUser(String userId) {
         User user = userDao.findById(userId);
-        if(CommonUtil.isNullOrEmpty(user)){
+        if (CommonUtil.isNullOrEmpty(user)) {
             return null;
-        }else{
+        } else {
             return vipLevelDao.findVipLevelByRange(user.getCredit());
         }
     }

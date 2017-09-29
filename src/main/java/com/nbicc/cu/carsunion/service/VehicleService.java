@@ -25,8 +25,8 @@ public class VehicleService {
         }
         int currLevel = level == null ? 0 : level + 1;
         String pinyin = null;
-        if(CommonUtil.isNullOrEmpty(pid) && !CommonUtil.isNullOrEmpty(name)) {
-            pinyin = PinyinUtil.getPinyin(name).substring(0,1).toUpperCase();
+        if (CommonUtil.isNullOrEmpty(pid) && !CommonUtil.isNullOrEmpty(name)) {
+            pinyin = PinyinUtil.getPinyin(name).substring(0, 1).toUpperCase();
         }
 
         Vehicle v = new Vehicle();
@@ -42,7 +42,7 @@ public class VehicleService {
 
     public boolean deleteVehicles(String path, String id) {
         Vehicle v = vehicleDao.findById(id);
-        if(v == null) {
+        if (v == null) {
             return false;
         }
         String pattern = CommonUtil.isNullOrEmpty(path) ? "" : path + ",";
@@ -53,21 +53,21 @@ public class VehicleService {
         return true;
     }
 
-    public List<Vehicle> getVehiclesByLevel(String path, String id){
-        if(CommonUtil.isNullOrEmpty(id)) {
+    public List<Vehicle> getVehiclesByLevel(String path, String id) {
+        if (CommonUtil.isNullOrEmpty(id)) {
             return vehicleDao.findRootVehicles();
-        }else {
+        } else {
             String currPath = CommonUtil.isNullOrEmpty(path) ? "" : path + ",";
             currPath += id;
             return vehicleDao.findByPath(currPath);
         }
     }
 
-    public List<String> getFullName(String path, String id){
+    public List<String> getFullName(String path, String id) {
         List<String> idList = new ArrayList<String>();
-        if(!CommonUtil.isNullOrEmpty(path)) {
+        if (!CommonUtil.isNullOrEmpty(path)) {
             String[] idArr = path.split(",");
-            for (String currId:idArr) {
+            for (String currId : idArr) {
                 idList.add(currId);
             }
         }
@@ -78,8 +78,8 @@ public class VehicleService {
     public List<VehicleTreeModel> getVehicleTrees() {
         List<VehicleTreeModel> result = new ArrayList<>();
         List<Vehicle> lists = vehicleDao.findRootVehicles();
-        for(Vehicle vehicle : lists){
-            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(),vehicle.getName(),vehicle.getLogo(),vehicle.getPinyin(),vehicle.getPath(),vehicle.getLevel());
+        for (Vehicle vehicle : lists) {
+            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getLogo(), vehicle.getPinyin(), vehicle.getPath(), vehicle.getLevel());
             setVehicleChild(model);
             result.add(model);
         }
@@ -89,17 +89,17 @@ public class VehicleService {
     private void setVehicleChild(VehicleTreeModel model1) {
         List<VehicleTreeModel> result = new ArrayList<>();
         String path;
-        if(model1.getLevel() == 0){
+        if (model1.getLevel() == 0) {
             path = model1.getId();
-        }else{
-            path = model1.getPath()+","+model1.getId();
+        } else {
+            path = model1.getPath() + "," + model1.getId();
         }
         List<Vehicle> lists = vehicleDao.findByPath(path);
-        if(lists.size() == 0){
+        if (lists.size() == 0) {
             return;
         }
-        for(Vehicle vehicle : lists){
-            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(),vehicle.getName(),vehicle.getPath(),vehicle.getLevel());
+        for (Vehicle vehicle : lists) {
+            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getPath(), vehicle.getLevel());
             setVehicleChild(model);
             result.add(model);
         }

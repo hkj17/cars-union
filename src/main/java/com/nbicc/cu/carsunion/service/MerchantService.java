@@ -40,19 +40,19 @@ public class MerchantService {
     private EntityManager em;
 
     public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
-                                    String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
+                                String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode) {
         Merchant m = merchantDao.findByContact(contact);
-        if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1){
+        if (!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1) {
             //已通过注册，请登录
             return ParameterKeys.PHONE_ALREADY_REGISTER;
         }
 
-        if(CommonUtil.isNullOrEmpty(m)){
+        if (CommonUtil.isNullOrEmpty(m)) {
             m = new Merchant();
             m.setId(CommonUtil.generateUUID32());
             m.setContact(contact);
         }
-        if(!SmsUtil.verifySmsCode(redisTemplate,contact,smsCode)){
+        if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
             return ParameterKeys.FAIL_SMS_VERIFICATION;
         }
         m.setName(name);
@@ -69,9 +69,9 @@ public class MerchantService {
     }
 
     @Transactional
-    public boolean passRegistration(String contact){
+    public boolean passRegistration(String contact) {
         Merchant m = merchantDao.findByContact(contact);
-        if(CommonUtil.isNullOrEmpty(m)){
+        if (CommonUtil.isNullOrEmpty(m)) {
             return false;
         }
         m.setRegStatus(1);
@@ -88,9 +88,9 @@ public class MerchantService {
         return true;
     }
 
-    public boolean failRegistration(String contact){
+    public boolean failRegistration(String contact) {
         Merchant m = merchantDao.findByContact(contact);
-        if(CommonUtil.isNullOrEmpty(m)){
+        if (CommonUtil.isNullOrEmpty(m)) {
             return false;
         }
         m.setRegStatus(2);
@@ -98,50 +98,50 @@ public class MerchantService {
         return true;
     }
 
-    public Page<Merchant> getRegInProcessList(int status, int pageNum, int pageSize){
+    public Page<Merchant> getRegInProcessList(int status, int pageNum, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum - 1, pageSize, sort);
-        return merchantDao.findByRegStatus(status,pageable);
+        return merchantDao.findByRegStatus(status, pageable);
     }
 
     @Transactional
-    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longitude, String latitude){
+    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longitude, String latitude) {
         Merchant m = merchantDao.findById(id);
-        if(CommonUtil.isNullOrEmpty(m)){
+        if (CommonUtil.isNullOrEmpty(m)) {
             return false;
         }
 
-        if(!CommonUtil.isNullOrEmpty(name)){
+        if (!CommonUtil.isNullOrEmpty(name)) {
             m.setName(name);
         }
-        if(!CommonUtil.isNullOrEmpty(address)){
+        if (!CommonUtil.isNullOrEmpty(address)) {
             m.setAddress(address);
         }
-        if(!CommonUtil.isNullOrEmpty(region)){
+        if (!CommonUtil.isNullOrEmpty(region)) {
             m.setRegion(region);
         }
-        if(!CommonUtil.isNullOrEmpty(contact)){
-            Admin admin = adminDao.findByUserNameAndAuthority(contact,1);
-            if(admin!=null){
+        if (!CommonUtil.isNullOrEmpty(contact)) {
+            Admin admin = adminDao.findByUserNameAndAuthority(contact, 1);
+            if (admin != null) {
                 admin.setUserName(contact);
                 adminDao.save(admin);
-            }else{
+            } else {
                 return false;
             }
             m.setContact(contact);
 
         }
-        if(!CommonUtil.isNullOrEmpty(longitude)){
+        if (!CommonUtil.isNullOrEmpty(longitude)) {
             m.setLongitude(longitude);
         }
-        if(!CommonUtil.isNullOrEmpty(latitude)){
+        if (!CommonUtil.isNullOrEmpty(latitude)) {
             m.setLatitude(latitude);
         }
         merchantDao.save(m);
         return true;
     }
 
-    public Merchant getMerchantByContact(String contact){
+    public Merchant getMerchantByContact(String contact) {
         return merchantDao.findByContact(contact);
     }
 

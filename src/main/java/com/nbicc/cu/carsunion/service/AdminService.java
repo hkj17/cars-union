@@ -39,22 +39,22 @@ public class AdminService {
         if (admin == null) {
             return null;
         }
-        
+
         StringBuilder sb = new StringBuilder(admin.getUserName());
         sb.append(admin.getUserPasswd().toLowerCase());
-        String md5 = MessageDigestUtil.MD5Encode(sb.toString(),null);
+        String md5 = MessageDigestUtil.MD5Encode(sb.toString(), null);
         if (md5 == null || !md5.equals(password)) {
             return null;
-        }else{
+        } else {
             return admin;
         }
     }
 
-    public String updateToken(RedisTemplate redisTemplate, String id){
+    public String updateToken(RedisTemplate redisTemplate, String id) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
         String token = CommonUtil.generateUUID32();
-        valueOperations.set("token"+token, id);
-        redisTemplate.expire("token"+token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
+        valueOperations.set("token" + token, id);
+        redisTemplate.expire("token" + token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
         return token;
     }
 
@@ -62,11 +62,11 @@ public class AdminService {
         return merchantDao.findById(id);
     }
 
-    public User getUserById(String id){
+    public User getUserById(String id) {
         return userDao.findById(id);
     }
 
-    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longtitude, String latitude){
+    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longtitude, String latitude) {
         return false;
     }
 

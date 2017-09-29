@@ -36,59 +36,59 @@ public class OrderController {
 
     @RequestMapping(value = "addToShoppingCart", method = RequestMethod.POST)
     public JSONObject addToShoppingCart(@RequestParam(value = "productId") String productId,
-                                         @RequestParam(value = "quantity") int quantity){
+                                        @RequestParam(value = "quantity") int quantity) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = orderService.addProductToShoppingCart(userId,productId, quantity);
-        if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+        boolean state = orderService.addProductToShoppingCart(userId, productId, quantity);
+        if (state) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        } else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
     @RequestMapping(value = "deleteFromShoppingCart", method = RequestMethod.POST)
-    public JSONObject deleteFromShoppingCart(@RequestBody JSONObject json){
+    public JSONObject deleteFromShoppingCart(@RequestBody JSONObject json) {
         String userId = hostHolder.getAdmin().getId();
-        orderService.deleteFromShoppingCart(userId, json.getObject("productIdList",List.class));
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        orderService.deleteFromShoppingCart(userId, json.getObject("productIdList", List.class));
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
     }
 
     @RequestMapping(value = "modifyShoppingCart", method = RequestMethod.POST)
-    public JSONObject modifyShoppingCart(@RequestBody JSONObject json){
+    public JSONObject modifyShoppingCart(@RequestBody JSONObject json) {
         String userId = hostHolder.getAdmin().getId();
         orderService.modifyShoppingCart(userId, json.getObject("productIdMap", Map.class));
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
     }
 
     @RequestMapping(value = "getShoppingCartList", method = RequestMethod.POST)
-    public JSONObject getShoppingCartList(){
+    public JSONObject getShoppingCartList() {
         String userId = hostHolder.getAdmin().getId();
         List<ShoppingCart> shoppingCartList = orderService.getShoppingCartList(userId);
-        for(ShoppingCart sc : shoppingCartList){
+        for (ShoppingCart sc : shoppingCartList) {
             Product product = sc.getProduct();
             String[] feature = product.getFeature().split(",");
-            StringBuilder newFeature =  new StringBuilder();
-            for(String s : feature){
+            StringBuilder newFeature = new StringBuilder();
+            for (String s : feature) {
                 newFeature.append(QiniuUtil.photoUrlForPublic(s)).append(",");
             }
-            newFeature.deleteCharAt(newFeature.length()-1);
+            newFeature.deleteCharAt(newFeature.length() - 1);
             product.setFeature(newFeature.toString());
             sc.setProduct(product);
         }
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,shoppingCartList);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, shoppingCartList);
     }
 
     @RequestMapping(value = "addOrder", method = RequestMethod.POST)
-    public JSONObject addOrder(@RequestBody JSONObject json){
+    public JSONObject addOrder(@RequestBody JSONObject json) {
         String merchantId = json.getString("merchantId");
-        List<Map> productList = json.getObject("product",List.class);
+        List<Map> productList = json.getObject("product", List.class);
         String addressId = json.getString("addressId");
 
-        Order newOrder = orderService.addOrder(hostHolder.getAdmin().getId(),merchantId,addressId,productList);
-        if(newOrder != null){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,newOrder);
-        }else{
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"wrong");
+        Order newOrder = orderService.addOrder(hostHolder.getAdmin().getId(), merchantId, addressId, productList);
+        if (newOrder != null) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, newOrder);
+        } else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "wrong");
         }
     }
 
@@ -104,59 +104,59 @@ public class OrderController {
 
     //带分页的订单列表
     @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
-    public JSONObject getOrderListByUserIdWithPage(@RequestParam(value = "start",defaultValue = "2017-01-01 00:00:00")String startDate,
-                                                   @RequestParam(value = "end",defaultValue = "2050-01-01 00:00:00")String endDate,
+    public JSONObject getOrderListByUserIdWithPage(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
+                                                   @RequestParam(value = "end", defaultValue = "2050-01-01 00:00:00") String endDate,
                                                    @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(),startDate,endDate,pageNum-1,pageSize);
+            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(), startDate, endDate, pageNum - 1, pageSize);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, orders);
     }
 
 
-    @RequestMapping(value = "deleteOrder",method = RequestMethod.POST)
-    public JSONObject deleteOrder(@RequestParam(value = "id") String id){
+    @RequestMapping(value = "deleteOrder", method = RequestMethod.POST)
+    public JSONObject deleteOrder(@RequestParam(value = "id") String id) {
         orderService.deleteOrderById(id);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
     }
 
     @Authority
     @RequestMapping(value = "getOrderByOrderId", method = RequestMethod.POST)
-    public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId){
+    public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId) {
         Order order = orderService.getOrderByOrderId(orderId);
-        if(order == null){
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"订单未查到");
-        }else {
+        if (order == null) {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "订单未查到");
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, order);
         }
     }
 
     @Authority
     @RequestMapping(value = "getOrderDetailByOrderId", method = RequestMethod.POST)
-    public JSONObject getOrderDetailByOrderId(@RequestParam(value = "orderId") String orderId){
+    public JSONObject getOrderDetailByOrderId(@RequestParam(value = "orderId") String orderId) {
         List<OrderDetail> details = orderService.getOrderDetailByOrderId(orderId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,details);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, details);
     }
 
     //完成支付,改变订单状态为已支付
     @Authority
-    @RequestMapping(value = "finishPay",method = RequestMethod.POST)
-    public JSONObject finishPay(@RequestParam("id")String orderId){
+    @RequestMapping(value = "finishPay", method = RequestMethod.POST)
+    public JSONObject finishPay(@RequestParam("id") String orderId) {
         String result = orderService.finishPay(orderId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
     }
 
     //发货，填写物流号
     @Authority(value = AuthorityType.AdminValidate)
-    @RequestMapping(value = "deliverProducts",method = RequestMethod.POST)
-    public JSONObject finishPay(@RequestParam("id")String id,
-                                @RequestParam("courierNumber")String courierNumber){
-        String result = orderService.deliverProducts(id,courierNumber);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,result);
+    @RequestMapping(value = "deliverProducts", method = RequestMethod.POST)
+    public JSONObject finishPay(@RequestParam("id") String id,
+                                @RequestParam("courierNumber") String courierNumber) {
+        String result = orderService.deliverProducts(id, courierNumber);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
     }
 
 

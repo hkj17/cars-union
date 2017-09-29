@@ -41,66 +41,66 @@ public class UtilController {
     private RedisTemplate redisTemplate;
 
     //给js提供七牛的uptoken，option为1表示私密上传。
-    @RequestMapping(value = "getUptoken",method = RequestMethod.GET)
-    public JSONObject getUptoken(@RequestParam(value = "option",required = false)String option){
+    @RequestMapping(value = "getUptoken", method = RequestMethod.GET)
+    public JSONObject getUptoken(@RequestParam(value = "option", required = false) String option) {
         String bucket = "photo";
-        if(option!=null && option.equals("1")){
+        if (option != null && option.equals("1")) {
             bucket = "private";
         }
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("uptoken",upToken);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,jsonObject);
+        jsonObject.put("uptoken", upToken);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, jsonObject);
     }
 
     //短信
-    @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
-    public JSONObject getSmsCode(@RequestParam(value = "phone",required = false) String phone)
+    @RequestMapping(value = "/getSmsCode", method = RequestMethod.POST)
+    public JSONObject getSmsCode(@RequestParam(value = "phone", required = false) String phone)
             throws ApiException {
         int num = (int) (Math.random() * 900000 + 100000);
         String message = String.valueOf(num);
 
         //增加redis保存,10min过期
         ValueOperations valueOperations = redisTemplate.opsForValue();
-        valueOperations.set("verify"+phone, message);
-        redisTemplate.expire("verify"+phone,10, TimeUnit.MINUTES);
+        valueOperations.set("verify" + phone, message);
+        redisTemplate.expire("verify" + phone, 10, TimeUnit.MINUTES);
 
         TaobaoClient client = new DefaultTaobaoClient(ALI_DAYU_URL, ALI_DAYU_APPKEY, ALI_DAYU_SECRET);
         AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
         req.setExtend("123456");
         req.setSmsType("normal");
         req.setSmsFreeSignName("nbicc开发者中心");
-        String json = "{\"number\":\""+ message + "\"}";
+        String json = "{\"number\":\"" + message + "\"}";
         req.setSmsParamString(json);
         req.setRecNum(phone);
         req.setSmsTemplateCode("SMS_85130007");
         logger.info("----send message to : " + phone + ", verification code is : " + message);
-        try{
+        try {
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             logger.info("----send result : " + rsp.getBody());
-            if(rsp==null){
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+            if (rsp == null) {
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
             }
-            if(rsp.getResult()==null){
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+            if (rsp.getResult() == null) {
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
             }
             if (rsp.getResult().getSuccess()) {
-                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
+                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
             } else {
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+                return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
     @RequestMapping(value = "/getRegion", method = RequestMethod.POST)
-    public JSONObject getRegion(@RequestParam(value = "province",required = false) String province,
-                                @RequestParam(value = "city",required = false) String city,
-                                @RequestParam(value = "district",required = false) String district) {
-        List<RegionalInfo> regionalInfoList = httpRequest.getDistricts(province,city,district);
+    public JSONObject getRegion(@RequestParam(value = "province", required = false) String province,
+                                @RequestParam(value = "city", required = false) String city,
+                                @RequestParam(value = "district", required = false) String district) {
+        List<RegionalInfo> regionalInfoList = httpRequest.getDistricts(province, city, district);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
     }
 

@@ -19,8 +19,8 @@ public class PayController {
     WxpayService wxpayService;
 
     @RequestMapping(value = "testPay", method = RequestMethod.POST)
-    public JSONObject testPay(){
+    public JSONObject testPay() {
         Map response = wxpayService.orderQuery();
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,response);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, response);
     }
 }

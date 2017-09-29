@@ -50,30 +50,30 @@ public class OrderService {
     public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
         String orderId = generateOrderId();
         BigDecimal totalMoney = new BigDecimal(0);
-        for(Map map : productList){
-            String id = UUID.randomUUID().toString().replace("-","");
+        for (Map map : productList) {
+            String id = UUID.randomUUID().toString().replace("-", "");
             String productId = (String) map.get("productId");
-            Product product = productDao.findByIdAndDelFlag(productId,0);
+            Product product = productDao.findByIdAndDelFlag(productId, 0);
             int count = (int) map.get("count");
             BigDecimal money = product.getPrice().multiply(BigDecimal.valueOf(count));
             totalMoney = totalMoney.add(money);
-            OrderDetail od = new OrderDetail(id,orderId,product,count,money);
+            OrderDetail od = new OrderDetail(id, orderId, product, count, money);
             orderDetailDao.save(od);
         }
-        String id = UUID.randomUUID().toString().replace("-","");
+        String id = UUID.randomUUID().toString().replace("-", "");
         User user = userDao.findById(userId);
         Date date = new Date();
         BigDecimal discount = BigDecimal.valueOf(Double.valueOf("0.90"));  //todo 根据用户信用对应折扣
         BigDecimal realMoney = totalMoney.multiply(discount);
         Merchant merchant = null;
         Address address = null;
-        if(!CommonUtil.isNullOrEmpty(merchantId)){
+        if (!CommonUtil.isNullOrEmpty(merchantId)) {
             merchant = merchantDao.findById(merchantId);
         }
-        if(!CommonUtil.isNullOrEmpty(addressId)){
+        if (!CommonUtil.isNullOrEmpty(addressId)) {
             address = addressDao.findOne(addressId);
         }
-        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address,null);
+        Order order = new Order(id, orderId, user, date, totalMoney, 0.9, realMoney, merchant, 0, "aa", address, null);
         return orderDao.save(order);
     }
 
@@ -82,7 +82,7 @@ public class OrderService {
         Date curDate = new Date();
         String time = String.valueOf(curDate.getTime()).substring(3);
         String random = String.valueOf((int) (Math.random() * 900000 + 100000));
-        return "0010" + time.substring(0,5) + random + time.substring(5);
+        return "0010" + time.substring(0, 5) + random + time.substring(5);
     }
 
 //    public List<Order> getOrderListByUserAndTime(String userId, String startDate, String endDate, int pageNum, int pageSize) {
@@ -106,7 +106,7 @@ public class OrderService {
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId),start,end,0,pageable);
+        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId), start, end, 0, pageable);
         return lists;
     }
 
@@ -132,18 +132,18 @@ public class OrderService {
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByMerchantAndDatetimeBetweenAndDelFlag(merchantDao.findById(userId),start,end,0,pageable);
+        Page<Order> lists = orderDao.findAllByMerchantAndDatetimeBetweenAndDelFlag(merchantDao.findById(userId), start, end, 0, pageable);
         return lists;
     }
 
     public void deleteOrderById(String id) {
-        Order order = orderDao.findByOrderIdAndDelFlag(id,0);
+        Order order = orderDao.findByOrderIdAndDelFlag(id, 0);
         order.setDelFlag(1);
         orderDao.save(order);
     }
 
-    public Order getOrderByOrderId(String orderId){
-        return orderDao.findByOrderIdAndDelFlag(orderId,0);
+    public Order getOrderByOrderId(String orderId) {
+        return orderDao.findByOrderIdAndDelFlag(orderId, 0);
     }
 
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
@@ -151,13 +151,13 @@ public class OrderService {
     }
 
     public String finishPay(String orderId) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             throw new RuntimeException("order not exist!");
         }
-        if(order.getStatus() == 0){
+        if (order.getStatus() == 0) {
             order.setStatus(1);
-        }else{
+        } else {
             throw new RuntimeException("order status is not 0!");
         }
         orderDao.save(order);
@@ -165,14 +165,14 @@ public class OrderService {
     }
 
     public String deliverProducts(String orderId, String courierNumber) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             throw new RuntimeException("order not exist!");
         }
-        if(order.getStatus() == 1){
+        if (order.getStatus() == 1) {
             order.setStatus(2);
             order.setCourierNumber(courierNumber);
-        }else{
+        } else {
             throw new RuntimeException("order status is not 1!");
         }
         orderDao.save(order);
@@ -180,16 +180,16 @@ public class OrderService {
     }
 
     @Transactional
-    public boolean addProductToShoppingCart(String userId, String productId, int quantity){
+    public boolean addProductToShoppingCart(String userId, String productId, int quantity) {
         User user = userDao.findById(userId);
-        Product product = productDao.findByIdAndDelFlag(productId,0);
-        if(user == null || product == null){
+        Product product = productDao.findByIdAndDelFlag(productId, 0);
+        if (user == null || product == null) {
             return false;
         }
-        ShoppingCart cart = shoppingCartDao.findByUserAndProduct(user,product);
-        if(cart != null){
+        ShoppingCart cart = shoppingCartDao.findByUserAndProduct(user, product);
+        if (cart != null) {
             cart.setQuantity(cart.getQuantity() + quantity);
-        }else {
+        } else {
             cart = new ShoppingCart();
             cart.setId(CommonUtil.generateUUID32());
             cart.setUser(user);
@@ -202,27 +202,27 @@ public class OrderService {
     }
 
     @Transactional
-    public boolean deleteFromShoppingCart(String userId, List<String> productIdList){
-        List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUserAndProductIdIn(userId,productIdList);
+    public boolean deleteFromShoppingCart(String userId, List<String> productIdList) {
+        List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUserAndProductIdIn(userId, productIdList);
         shoppingCartDao.deleteInBatch(shoppingCartList);
         return true;
     }
 
-    public boolean modifyShoppingCart(String userId, Map productMap){
+    public boolean modifyShoppingCart(String userId, Map productMap) {
         User user = userDao.findById(userId);
         List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUser(user);
         Iterator<ShoppingCart> shoppingCartIterator = shoppingCartList.iterator();
-        while(shoppingCartIterator.hasNext()){
+        while (shoppingCartIterator.hasNext()) {
             ShoppingCart next = shoppingCartIterator.next();
-            if(next.getProduct()==null){
+            if (next.getProduct() == null) {
                 shoppingCartIterator.remove();
                 continue;
-            }else{
+            } else {
                 Object obj = productMap.get(next.getProduct().getId());
-                if(obj == null){
+                if (obj == null) {
                     shoppingCartIterator.remove();
                     continue;
-                }else{
+                } else {
                     next.setQuantity((int) obj);
                 }
             }
@@ -231,7 +231,7 @@ public class OrderService {
         return true;
     }
 
-    public List<ShoppingCart> getShoppingCartList(String userId){
+    public List<ShoppingCart> getShoppingCartList(String userId) {
         User user = userDao.findById(userId);
         return shoppingCartDao.findByUser(user);
     }

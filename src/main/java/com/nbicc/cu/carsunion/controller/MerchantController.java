@@ -35,32 +35,32 @@ public class MerchantController {
     // todo 可能要做分页,按订单状态查询
     @Authority(value = AuthorityType.MerchantValidate)
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
-    public JSONObject getOrderListByMerchantId(@RequestParam(value = "start",defaultValue = "2017-01-01 00:00:00")String startDate,
-                                               @RequestParam(value = "end",defaultValue = "2050-01-01 00:00:00")String endDate,
-                                               @RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
-                                               @RequestParam(value = "pageSize", defaultValue = "10")int pageSize){
+    public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
+                                               @RequestParam(value = "end", defaultValue = "2050-01-01 00:00:00") String endDate,
+                                               @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         String merchantId = hostHolder.getAdmin().getId();
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId, startDate, endDate,pageNum-1,pageSize);
+            orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId, startDate, endDate, pageNum - 1, pageSize);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,orders);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, orders);
     }
 
     @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/getMerchantByContact", method = RequestMethod.POST)
-    public JSONObject getMerchantByContact(@RequestParam(value = "contact") String contact){
+    public JSONObject getMerchantByContact(@RequestParam(value = "contact") String contact) {
         Merchant merchant = merchantService.getMerchantByContact(contact);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,merchant);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchant);
     }
 
     @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/searchMerchant", method = RequestMethod.POST)
-    public JSONObject searchMerchant(@RequestParam(value = "region", required =  false) String region,
-                                      @RequestParam(value = "keyword", required = false) String keyword){
-        List<Merchant> merchantList = merchantService.getMerchantList(region,keyword);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,merchantList);
+    public JSONObject searchMerchant(@RequestParam(value = "region", required = false) String region,
+                                     @RequestParam(value = "keyword", required = false) String keyword) {
+        List<Merchant> merchantList = merchantService.getMerchantList(region, keyword);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
     }
 }
