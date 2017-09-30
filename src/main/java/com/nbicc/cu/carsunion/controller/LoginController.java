@@ -108,7 +108,8 @@ public class LoginController {
                                        @RequestParam(value = "idcardBack") String idcardBack,
                                        @RequestParam(value = "license") String license,
                                        @RequestParam(value = "smsCode") String smsCode) {
-        int state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude, idcardFront, idcardBack, license, smsCode);
+        int state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude,
+                idcardFront, idcardBack, license, smsCode);
         if (state == 0) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
         } else {
@@ -124,7 +125,8 @@ public class LoginController {
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
                                      @RequestParam(value = "recommend", required = false) String recommend) {
-        int state = userService.userRegister(redisTemplate, name, nickname, contact, portrait, recommend, password, smsCode);
+        int state = userService.userRegister(redisTemplate, name, nickname, contact, portrait, recommend,
+                password, smsCode);
         if (state == 0) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
         } else {

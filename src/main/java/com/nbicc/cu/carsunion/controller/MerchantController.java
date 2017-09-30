@@ -42,7 +42,8 @@ public class MerchantController {
         String merchantId = hostHolder.getAdmin().getId();
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId, startDate, endDate, pageNum - 1, pageSize);
+            orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId, startDate, endDate,
+                    pageNum - 1, pageSize);
         } catch (ParseException e) {
             e.printStackTrace();
         }

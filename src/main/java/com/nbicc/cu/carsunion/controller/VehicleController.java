@@ -119,7 +119,8 @@ public class VehicleController {
     public JSONObject getVehicleRelationship(@RequestParam(value = "vehicleId") String vehicleId,
                                              @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                              @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        Page<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId, pageNum - 1, pageSize);
+        Page<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId,
+                pageNum - 1, pageSize);
         if (list == null) {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "can not find the vehicle!");
         } else {

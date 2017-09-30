@@ -110,7 +110,8 @@ public class OrderController {
                                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(), startDate, endDate, pageNum - 1, pageSize);
+            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(), startDate, endDate,
+                    pageNum - 1, pageSize);
         } catch (ParseException e) {
             e.printStackTrace();
         }
