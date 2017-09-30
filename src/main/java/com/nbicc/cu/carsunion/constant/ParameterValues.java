@@ -23,7 +23,9 @@ public class ParameterValues {
 
     public static final String ALI_DAYU_SECRET = "88c9dec9a90e7069050ea6fb1ee37750";
 
-    public static final int TOKEN_EXPIRE_VALUE = 7;
+    public static final int TOKEN_EXPIRE_VALUE = 2;
+
+    public static final int UPDATETOKEN_EXPIRE_VALUE = 7;
 
     public final static String APP_ID = "wxabe6785e709a35f1";
 

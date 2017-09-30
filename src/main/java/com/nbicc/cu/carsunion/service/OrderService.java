@@ -85,21 +85,6 @@ public class OrderService {
         return "0010" + time.substring(0,5) + random + time.substring(5);
     }
 
-//    public List<Order> getOrderListByUserAndTime(String userId, String startDate, String endDate, int pageNum, int pageSize) {
-//        Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
-//        String sql = "from Order o where o.user.id = ?1";
-//        paramMap.put(1,userId);
-//        sql = setSqlDate(sql,paramMap,2,startDate,endDate);
-//
-//        Query query = em.createQuery(sql);
-//        for (int p = 1; p <= paramMap.size(); p++) {
-//            query.setParameter(p, paramMap.get(p));
-//        }
-//        query.setFirstResult((pageNum -1)*pageSize);
-//        query.setMaxResults(pageSize);
-//        return query.getResultList();
-//    }
-
     public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
@@ -109,22 +94,6 @@ public class OrderService {
         Page<Order> lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId),start,end,0,pageable);
         return lists;
     }
-
-
-//    public List<Order> getOrderListByMerchantAndTime(String merchantId, String startDate, String endDate, int pageNum, int pageSize){
-//        Map<Integer, Object> paramMap = new HashMap<Integer, Object>();
-//        String sql = "from Order o where o.merchant.id = ?1";
-//        paramMap.put(1,merchantId);
-//        sql = setSqlDate(sql,paramMap,2,startDate,endDate);
-//
-//        Query query = em.createQuery(sql);
-//        for (int p = 1; p <= paramMap.size(); p++) {
-//            query.setParameter(p, paramMap.get(p));
-//        }
-//        query.setFirstResult((pageNum -1)*pageSize);
-//        query.setMaxResults(pageSize);
-//        return query.getResultList();
-//    }
 
     public Page<Order> getOrderListByMerchantAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -235,28 +204,4 @@ public class OrderService {
         User user = userDao.findById(userId);
         return shoppingCartDao.findByUser(user);
     }
-
-//    private String setSqlDate(String sql, Map<Integer,Object> paramMap, int i, String startDate, String endDate){
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        if (!CommonUtil.isNullOrEmpty(startDate)) {
-//            startDate = startDate + " 00:00:00";
-//            sql += " and o.datetime>=?"+i;
-//            try {
-//                paramMap.put(i++, sdf.parse(startDate));
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        if (!CommonUtil.isNullOrEmpty(endDate)) {
-//            endDate = endDate + " 23:59:59";
-//            sql += " and o.datetime<=?"+i;
-//            try {
-//                paramMap.put(i++, sdf.parse(endDate));
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return sql;
-//    }
 }

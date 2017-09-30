@@ -50,12 +50,30 @@ public class AdminService {
         }
     }
 
-    public String updateToken(RedisTemplate redisTemplate, String id){
+    public String getToken(RedisTemplate redisTemplate, String id){
         ValueOperations valueOperations = redisTemplate.opsForValue();
         String token = CommonUtil.generateUUID32();
         valueOperations.set("token"+token, id);
-        redisTemplate.expire("token"+token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
+        redisTemplate.expire("token"+token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.HOURS);
         return token;
+    }
+
+    public String getUpdateToken(RedisTemplate redisTemplate, String id){
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        String token = CommonUtil.generateUUID32();
+        valueOperations.set("updateToken"+token, id);
+        redisTemplate.expire("updateToken"+token, ParameterValues.UPDATETOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
+        return token;
+    }
+
+    public String updateToken(RedisTemplate redisTemplate, String userId, String updateToken){
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        String tokenValue = (String) valueOperations.get("updateToken" + updateToken);
+        if(!CommonUtil.isNullOrEmpty(tokenValue) && tokenValue.equals(userId)){
+            return getToken(redisTemplate,userId);
+        }else{
+            return null;
+        }
     }
 
     public Merchant getMerchantById(String id) {
@@ -64,10 +82,6 @@ public class AdminService {
 
     public User getUserById(String id){
         return userDao.findById(id);
-    }
-
-    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longtitude, String latitude){
-        return false;
     }
 
     public Admin getById(String userId) {

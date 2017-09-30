@@ -49,7 +49,7 @@ public class LoginController {
         }
 
         validatedAdmin.setUserPasswd(null);
-        String token = adminService.updateToken(redisTemplate,admin.getId());
+        String token = adminService.getToken(redisTemplate,admin.getId());
         res.put("token", token);
         res.put("admin", validatedAdmin);
         Merchant merchant = adminService.getMerchantById(validatedAdmin.getId());
@@ -68,7 +68,7 @@ public class LoginController {
         }
 
         validatedAdmin.setUserPasswd(null);
-        String token = adminService.updateToken(redisTemplate,admin.getId());
+        String token = adminService.getToken(redisTemplate,admin.getId());
         res.put("token", token);
         res.put("admin", validatedAdmin);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
@@ -86,15 +86,23 @@ public class LoginController {
 
         User user = adminService.getUserById(admin.getId());
         res.put("user", user);
-        String token = adminService.updateToken(redisTemplate,admin.getId());
+        String token = adminService.getToken(redisTemplate,admin.getId());
         res.put("token", token);
+        String updateToken = adminService.getUpdateToken(redisTemplate,admin.getId());
+        res.put("updateToken", updateToken);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
+    }
+
+    @RequestMapping(value = "/updateToken", method = RequestMethod.POST)
+    public JSONObject updateToken(@RequestParam(value = "userId") String userId,
+                                   @RequestParam(value = "updateToken") String updateToken) {
+        String token = adminService.updateToken(redisTemplate,userId,updateToken);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,token);
     }
 
     // todo
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout(HttpServletRequest request) {
-        request.getSession().invalidate();
+    public void logout() {
     }
 
     @RequestMapping(value = "/merchantRegister", method = RequestMethod.POST)
