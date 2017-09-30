@@ -60,7 +60,7 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                         ValueOperations valueOperations = redisTemplate.opsForValue();
                         String tokenValue = (String) valueOperations.get("token" + token);
                         if(!CommonUtil.isNullOrEmpty(tokenValue)){
-                            redisTemplate.expire("token" + token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.DAYS);
+                            redisTemplate.expire("token" + token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.HOURS);
                         }
                         if (AuthorityType.NoValidate == authority.value()) {
                             // 标记为不验证,放行
