@@ -160,5 +160,17 @@ public class OrderController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
     }
 
+    @Authority(value = AuthorityType.MerchantValidate)
+    @PostMapping("/setServiceTime")
+    public JSONObject setServiceTime(@RequestParam("orderId") String orderId,
+                                     @RequestParam("serviceTime") String serviceTime) {
+        Order order = orderService.setServiceTime(orderId,serviceTime);
+        if (order == null) {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"查不到订单或时间格式错误");
+        }else {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, order);
+        }
+    }
+
 
 }

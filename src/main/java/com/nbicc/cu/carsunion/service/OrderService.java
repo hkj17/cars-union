@@ -204,4 +204,22 @@ public class OrderService {
         User user = userDao.findById(userId);
         return shoppingCartDao.findByUser(user);
     }
+
+    public Order setServiceTime(String orderId, String serviceTime) {
+        Date serviceDate;
+        try {
+            serviceDate = CommonUtil.String2Date(serviceTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
+        if(order == null){
+            return null;
+        }else{
+            order.setServiceTime(serviceDate);
+            orderDao.save(order);
+            return order;
+        }
+    }
 }
