@@ -39,6 +39,8 @@ public class OrderService {
     private AddressDao addressDao;
     @Autowired
     private ShoppingCartDao shoppingCartDao;
+    @Autowired
+    private VipLevelDao vipLevelDao;
 
     @Autowired
     @PersistenceContext
@@ -63,8 +65,9 @@ public class OrderService {
         String id = UUID.randomUUID().toString().replace("-", "");
         User user = userDao.findById(userId);
         Date date = new Date();
-        BigDecimal discount = BigDecimal.valueOf(Double.valueOf("0.90"));  //todo 根据用户信用对应折扣
-        BigDecimal realMoney = totalMoney.multiply(discount);
+//        BigDecimal discount = BigDecimal.valueOf(Double.valueOf("0.90"));
+        double discount = getDiscount(user.getCredit());
+        BigDecimal realMoney = totalMoney.multiply(BigDecimal.valueOf(discount));
         Merchant merchant = null;
         Address address = null;
         if (!CommonUtil.isNullOrEmpty(merchantId)) {
@@ -73,8 +76,12 @@ public class OrderService {
         if (!CommonUtil.isNullOrEmpty(addressId)) {
             address = addressDao.findOne(addressId);
         }
-        Order order = new Order(id, orderId, user, date, totalMoney, 0.9, realMoney, merchant, 0, "aa", address, null);
+        Order order = new Order(id, orderId, user, date, totalMoney, discount, realMoney, merchant, 0, null, address, null);
         return orderDao.save(order);
+    }
+
+    private double getDiscount(int credit) {
+        return vipLevelDao.findVipLevelByRange(credit).getDiscount();
     }
 
     //生成20位订单号
