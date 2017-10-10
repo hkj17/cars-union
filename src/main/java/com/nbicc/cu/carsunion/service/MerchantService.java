@@ -4,6 +4,7 @@ import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
+import com.nbicc.cu.carsunion.enumtype.RegisterStatus;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -42,7 +43,7 @@ public class MerchantService {
     public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                     String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode){
         Merchant m = merchantDao.findByContact(contact);
-        if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == 1){
+        if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == RegisterStatus.PASSED_REVIEW.ordinal()){
             //已通过注册，请登录
             return ParameterKeys.PHONE_ALREADY_REGISTER;
         }
@@ -60,7 +61,7 @@ public class MerchantService {
         m.setRegion(region);
         m.setLongitude(longitude);
         m.setLatitude(latitude);
-        m.setRegStatus(0);
+        m.setRegStatus(RegisterStatus.UNDER_REVIEW.ordinal());
         m.setIdcardFront(idcardFront);
         m.setIdcardBack(idcardBack);
         m.setLicensePath(license);
@@ -74,7 +75,7 @@ public class MerchantService {
         if(CommonUtil.isNullOrEmpty(m)){
             return false;
         }
-        m.setRegStatus(1);
+        m.setRegStatus(RegisterStatus.PASSED_REVIEW.ordinal());
         Timestamp regTime = new Timestamp(System.currentTimeMillis());
         m.setRegTime(regTime);
         merchantDao.save(m);
@@ -93,7 +94,7 @@ public class MerchantService {
         if(CommonUtil.isNullOrEmpty(m)){
             return false;
         }
-        m.setRegStatus(2);
+        m.setRegStatus(RegisterStatus.FAILED_REVIEW.ordinal());
         merchantDao.save(m);
         return true;
     }

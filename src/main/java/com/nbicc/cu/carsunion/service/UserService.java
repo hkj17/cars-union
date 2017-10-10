@@ -38,6 +38,9 @@ public class UserService {
     @Autowired
     VipLevelDao vipLevelDao;
 
+    @Autowired
+    CreditHistoryDao creditHistoryDao;
+
     public String validateToken(RedisTemplate redisTemplate, String token){
         ValueOperations valueOperations = redisTemplate.opsForValue();
         return (String) valueOperations.get("token"+token);
@@ -293,5 +296,9 @@ public class UserService {
         }else{
             return vipLevelDao.findVipLevelByRange(user.getCredit());
         }
+    }
+
+    public List<CreditHistory> getUserCreditHistory(String userId, int source){
+        return creditHistoryDao.findByUserIdAndAndSource(userId,source);
     }
 }

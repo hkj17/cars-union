@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.service;
 
+import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.*;
+import com.nbicc.cu.carsunion.enumtype.OrderStatus;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.apache.log4j.Logger;
@@ -39,6 +41,8 @@ public class OrderService {
     private AddressDao addressDao;
     @Autowired
     private ShoppingCartDao shoppingCartDao;
+    @Autowired
+    private CreditHistoryDao creditHistoryDao;
 
     @Autowired
     @PersistenceContext
@@ -73,7 +77,7 @@ public class OrderService {
         if(!CommonUtil.isNullOrEmpty(addressId)){
             address = addressDao.findOne(addressId);
         }
-        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address,null);
+        Order order = new Order(id,orderId,user,date,totalMoney,0.9,realMoney,merchant,0,"aa",address);
         return orderDao.save(order);
     }
 
@@ -119,15 +123,34 @@ public class OrderService {
         return orderDetailDao.findByOrderId(orderId);
     }
 
+    @Transactional
     public String finishPay(String orderId) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
         if(order == null){
-            throw new RuntimeException("order not exist!");
+            throw new RuntimeException("order does not exist!");
         }
-        if(order.getStatus() == 0){
-            order.setStatus(1);
+        if(order.getStatus() == OrderStatus.NOT_PAYED.ordinal()){
+            order.setPayTime(new Date());
+            order.setStatus(OrderStatus.PAYED.ordinal());
+
+            List<CreditHistory> creditHistories = new ArrayList<CreditHistory>();
+            String userId = order.getUser().getId();
+            String recommendorId = order.getUser().getRecommend();
+            int credit = order.getRealMoney().intValue();
+            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(),userId,orderId,credit,0);
+            creditHistories.add(self);
+            if(!CommonUtil.isNullOrEmpty(recommendorId)){
+                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(),recommendorId,orderId,(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO),1);
+                creditHistories.add(firstRecommendor);
+                User recommendor = userDao.findById(recommendorId);
+                if(!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())){
+                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(),orderId,(int)(credit*ParameterValues.RECOMMENDOR_CREDIT_RATIO*ParameterValues.RECOMMENDOR_CREDIT_RATIO),2);
+                    creditHistories.add(secondRecommendor);
+                }
+            }
+            creditHistoryDao.save(creditHistories);
         }else{
-            throw new RuntimeException("order status is not 0!");
+            throw new RuntimeException("order is not ready for payment!");
         }
         orderDao.save(order);
         return "ok";
@@ -136,13 +159,14 @@ public class OrderService {
     public String deliverProducts(String orderId, String courierNumber) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
         if(order == null){
-            throw new RuntimeException("order not exist!");
+            throw new RuntimeException("order does not exist!");
         }
-        if(order.getStatus() == 1){
-            order.setStatus(2);
+        if(order.getStatus() == OrderStatus.PAYED.ordinal()){
+            order.setStatus(OrderStatus.DELIVERED.ordinal());
+            order.setDeliverTime(new Date());
             order.setCourierNumber(courierNumber);
         }else{
-            throw new RuntimeException("order status is not 1!");
+            throw new RuntimeException("order is not payed!");
         }
         orderDao.save(order);
         return "ok";

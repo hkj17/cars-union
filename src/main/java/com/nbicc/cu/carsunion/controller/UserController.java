@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.constant.ParameterKeys;
-import com.nbicc.cu.carsunion.model.Address;
-import com.nbicc.cu.carsunion.model.HostHolder;
-import com.nbicc.cu.carsunion.model.Vehicle;
-import com.nbicc.cu.carsunion.model.VipLevel;
+import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +37,6 @@ public class UserController {
                                      @RequestParam(value = "contact", required = false) String contact,
                                      @RequestParam(value = "smsCode", required = false) String smsCode){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         int state = userService.modifyUserInfo(redisTemplate,userId,name,nickname,contact,portrait,smsCode);
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
@@ -56,9 +50,6 @@ public class UserController {
                                      @RequestParam(value = "newPassword") String newPassword,
                                      @RequestParam(value = "smsCode") String smsCode){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         int state = userService.updatePassword(redisTemplate,userId,oldPassword,newPassword,smsCode);
         if(state == 0){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
@@ -70,9 +61,6 @@ public class UserController {
     @RequestMapping(value = "/getAddressList",  method = RequestMethod.POST)
     public JSONObject getAddressList(){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         List<Address> addressList = userService.getAddressList(userId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,addressList);
     }
@@ -81,9 +69,6 @@ public class UserController {
     public JSONObject addAddress(@RequestParam(value = "address") String address,
                                   @RequestParam(value = "default") Boolean isDefault){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         boolean state = userService.addAddress(userId,address,isDefault);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
@@ -95,9 +80,6 @@ public class UserController {
     @RequestMapping(value = "/deleteAddress",  method = RequestMethod.POST)
     public JSONObject deleteAddress(@RequestParam(value = "addressId") String addressId){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         boolean state = userService.deleteAddress(userId, addressId);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
@@ -109,9 +91,6 @@ public class UserController {
     @RequestMapping(value = "/setDefaultAddress",  method = RequestMethod.POST)
     public JSONObject setDefaultAddress(@RequestParam(value = "addressId") String addressId){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         boolean state = userService.setDefaultAddress(userId,addressId);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
@@ -124,9 +103,6 @@ public class UserController {
     public JSONObject addVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                  @RequestParam(value = "default") Boolean isDefault){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         boolean state = userService.addVehicle(userId,vehicleId,isDefault);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
@@ -138,9 +114,6 @@ public class UserController {
     @RequestMapping(value = "/deleteVehicle",  method = RequestMethod.POST)
     public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         boolean state = userService.deleteVehicle(userId,vehicleId);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
@@ -152,9 +125,6 @@ public class UserController {
     @RequestMapping(value = "/getVehicles",  method = RequestMethod.POST)
     public JSONObject getVehicles(){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         Set<Vehicle> vehicles = userService.getVehicleList(userId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vehicles);
     }
@@ -168,9 +138,6 @@ public class UserController {
     @RequestMapping(value = "/setDefaultVehicle",  method = RequestMethod.POST)
     public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         boolean state = userService.setDefaultVehicle(userId, vehicleId);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
@@ -182,10 +149,14 @@ public class UserController {
     @RequestMapping(value = "/getVipLevel",  method = RequestMethod.POST)
     public JSONObject getVipLevel(){
         String userId = hostHolder.getAdmin().getId();
-        if(userId == null){
-            return CommonUtil.response(ParameterKeys.NOT_AUTHORIZED, "not authorized");
-        }
         VipLevel vipLevel = userService.getVipLevelByUser(userId);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vipLevel);
+    }
+
+    @RequestMapping(value = "/getCreditHistory", method = RequestMethod.POST)
+    public JSONObject getCreditHistory(@RequestParam(value = "source") int source){
+        String userId = hostHolder.getAdmin().getId();
+        List<CreditHistory> creditHistoryList = userService.getUserCreditHistory(userId,source);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,creditHistoryList);
     }
 }
