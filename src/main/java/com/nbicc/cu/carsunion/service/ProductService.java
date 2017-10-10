@@ -132,18 +132,18 @@ public class ProductService {
         return products;
     }
 
-    public Page<Product> getProductByClassIdWithPage(String classId, int pageNum, int pageSize) {
+    public Page<Product> getProductByClassIdWithPage(String classId, int onSale, int pageNum, int pageSize) {
         Page<Product> products;
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         if (CommonUtil.isNullOrEmpty(classId)) {
-            products = productDao.findAll(pageable);
+            products = productDao.findAllByOnSaleAndDelFlag(onSale,0,pageable);
         } else {
             ProductClass productClass = productClassDao.getById(classId);
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDao.findByClassIdLikeAndDelFlag("%" + classId + "%", 0, pageable);
+            products = productDao.findByClassIdLikeAndOnSaleAndDelFlag("%" + classId + "%", onSale,0, pageable);
         }
         products.forEach(product -> transformPhotoUrl(product));
         return products;
@@ -290,14 +290,14 @@ public class ProductService {
     }
 
 
-    public Page<Product> getProductByClassIdAndVehicleIdWithPage(String classId, String vehicleId, int pageNum, int pageSize) {
+    public Page<Product> getProductByClassIdAndVehicleIdWithPage(String classId, String vehicleId, int onSale, int pageNum, int pageSize) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
         if (CommonUtil.isNullOrEmpty(vehicle)) {
-            return getProductByClassIdWithPage(classId, pageNum, pageSize);
+            return getProductByClassIdWithPage(classId, onSale, pageNum, pageSize);
         }
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Product> products = productDao.findByClassIdAndVehicle(vehicle, "%" + classId + "%", pageable);
+        Page<Product> products = productDao.findByClassIdAndVehicle(vehicle, "%" + classId + "%", onSale, pageable);
         products.forEach(product -> transformPhotoUrl(product));
         return products;
     }

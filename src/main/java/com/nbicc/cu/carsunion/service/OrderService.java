@@ -65,7 +65,6 @@ public class OrderService {
         String id = UUID.randomUUID().toString().replace("-", "");
         User user = userDao.findById(userId);
         Date date = new Date();
-//        BigDecimal discount = BigDecimal.valueOf(Double.valueOf("0.90"));
         double discount = getDiscount(user.getCredit());
         BigDecimal realMoney = totalMoney.multiply(BigDecimal.valueOf(discount));
         Merchant merchant = null;

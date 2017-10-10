@@ -122,9 +122,10 @@ public class ProductController {
     @RequestMapping(value = "getProductByClassAndVehicle", method = RequestMethod.POST)
     public JSONObject getProductByClassAndVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                                   @RequestParam(value = "classId") String classId,
+                                                  @RequestParam(value = "onSale", defaultValue = "0") int onSale,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        Page<Product> lists = productService.getProductByClassIdAndVehicleIdWithPage(classId, vehicleId,
+        Page<Product> lists = productService.getProductByClassIdAndVehicleIdWithPage(classId, vehicleId,onSale,
                 pageNum - 1, pageSize);
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, lists);
     }
