@@ -39,13 +39,13 @@ public class AdminService {
         if (admin == null) {
             return null;
         }
-        
+
         StringBuilder sb = new StringBuilder(admin.getUserName());
         sb.append(admin.getUserPasswd().toLowerCase());
-        String md5 = MessageDigestUtil.MD5Encode(sb.toString(),null);
+        String md5 = MessageDigestUtil.MD5Encode(sb.toString(), null);
         if (md5 == null || !md5.equals(password)) {
             return null;
-        }else{
+        } else {
             return admin;
         }
     }
@@ -80,7 +80,7 @@ public class AdminService {
         return merchantDao.findById(id);
     }
 
-    public User getUserById(String id){
+    public User getUserById(String id) {
         return userDao.findById(id);
     }
 

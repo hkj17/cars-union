@@ -30,12 +30,12 @@ public class UserController {
     @Autowired
     HostHolder hostHolder;
 
-    @RequestMapping(value = "/modifyUserInfo",  method = RequestMethod.POST)
+    @RequestMapping(value = "/modifyUserInfo", method = RequestMethod.POST)
     public JSONObject modifyUserInfo(@RequestParam(value = "name", required = false) String name,
                                      @RequestParam(value = "nickname", required = false) String nickname,
                                      @RequestParam(value = "portrait", required = false) String portrait,
                                      @RequestParam(value = "contact", required = false) String contact,
-                                     @RequestParam(value = "smsCode", required = false) String smsCode){
+                                     @RequestParam(value = "smsCode", required = false) String smsCode) {
         String userId = hostHolder.getAdmin().getId();
         int state = userService.modifyUserInfo(redisTemplate,userId,name,nickname,contact,portrait,smsCode);
         if(state == 0){
@@ -45,10 +45,10 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/updatePassword",  method = RequestMethod.POST)
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     public JSONObject updatePassword(@RequestParam(value = "oldPassword") String oldPassword,
                                      @RequestParam(value = "newPassword") String newPassword,
-                                     @RequestParam(value = "smsCode") String smsCode){
+                                     @RequestParam(value = "smsCode") String smsCode) {
         String userId = hostHolder.getAdmin().getId();
         int state = userService.updatePassword(redisTemplate,userId,oldPassword,newPassword,smsCode);
         if(state == 0){
@@ -58,99 +58,99 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/getAddressList",  method = RequestMethod.POST)
-    public JSONObject getAddressList(){
+    @RequestMapping(value = "/getAddressList", method = RequestMethod.POST)
+    public JSONObject getAddressList() {
         String userId = hostHolder.getAdmin().getId();
         List<Address> addressList = userService.getAddressList(userId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,addressList);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, addressList);
     }
 
-    @RequestMapping(value = "/addAddress",  method = RequestMethod.POST)
+    @RequestMapping(value = "/addAddress", method = RequestMethod.POST)
     public JSONObject addAddress(@RequestParam(value = "address") String address,
-                                  @RequestParam(value = "default") Boolean isDefault){
+                                 @RequestParam(value = "default") Boolean isDefault) {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.addAddress(userId,address,isDefault);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        }else{
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
-    @RequestMapping(value = "/deleteAddress",  method = RequestMethod.POST)
-    public JSONObject deleteAddress(@RequestParam(value = "addressId") String addressId){
+    @RequestMapping(value = "/deleteAddress", method = RequestMethod.POST)
+    public JSONObject deleteAddress(@RequestParam(value = "addressId") String addressId) {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.deleteAddress(userId, addressId);
-        if(state){
+        if (state) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        }else{
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
-    @RequestMapping(value = "/setDefaultAddress",  method = RequestMethod.POST)
-    public JSONObject setDefaultAddress(@RequestParam(value = "addressId") String addressId){
+    @RequestMapping(value = "/setDefaultAddress", method = RequestMethod.POST)
+    public JSONObject setDefaultAddress(@RequestParam(value = "addressId") String addressId) {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.setDefaultAddress(userId,addressId);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        }else{
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
-    @RequestMapping(value = "/addVehicle",  method = RequestMethod.POST)
+    @RequestMapping(value = "/addVehicle", method = RequestMethod.POST)
     public JSONObject addVehicle(@RequestParam(value = "vehicleId") String vehicleId,
-                                 @RequestParam(value = "default") Boolean isDefault){
+                                 @RequestParam(value = "default") Boolean isDefault) {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.addVehicle(userId,vehicleId,isDefault);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        }else {
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
-    @RequestMapping(value = "/deleteVehicle",  method = RequestMethod.POST)
-    public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId){
+    @RequestMapping(value = "/deleteVehicle", method = RequestMethod.POST)
+    public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId) {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.deleteVehicle(userId,vehicleId);
         if(state){
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        }else {
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
-    @RequestMapping(value = "/getVehicles",  method = RequestMethod.POST)
-    public JSONObject getVehicles(){
+    @RequestMapping(value = "/getVehicles", method = RequestMethod.POST)
+    public JSONObject getVehicles() {
         String userId = hostHolder.getAdmin().getId();
         Set<Vehicle> vehicles = userService.getVehicleList(userId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vehicles);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, vehicles);
     }
 
-    @RequestMapping(value = "/getDefaultVehicle",  method = RequestMethod.POST)
-    public JSONObject getDefaultVehicle(){
+    @RequestMapping(value = "/getDefaultVehicle", method = RequestMethod.POST)
+    public JSONObject getDefaultVehicle() {
         String userId = hostHolder.getAdmin().getId();
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,userService.getDefaultVehicle(userId));
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, userService.getDefaultVehicle(userId));
     }
 
-    @RequestMapping(value = "/setDefaultVehicle",  method = RequestMethod.POST)
-    public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId){
+    @RequestMapping(value = "/setDefaultVehicle", method = RequestMethod.POST)
+    public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId) {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.setDefaultVehicle(userId, vehicleId);
-        if(state){
+        if (state) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        }else {
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
-    @RequestMapping(value = "/getVipLevel",  method = RequestMethod.POST)
-    public JSONObject getVipLevel(){
+    @RequestMapping(value = "/getVipLevel", method = RequestMethod.POST)
+    public JSONObject getVipLevel() {
         String userId = hostHolder.getAdmin().getId();
         VipLevel vipLevel = userService.getVipLevelByUser(userId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vipLevel);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, vipLevel);
     }
 
     @RequestMapping(value = "/getCreditHistory", method = RequestMethod.POST)

@@ -22,11 +22,11 @@ import java.lang.reflect.Method;
  */
 @Configuration
 @EnableCaching
-public class RedisConfig extends CachingConfigurerSupport{
+public class RedisConfig extends CachingConfigurerSupport {
 
     @Bean
     public KeyGenerator keyGenerator() {
-        return new KeyGenerator(){
+        return new KeyGenerator() {
             @Override
             public Object generate(Object target, Method method, Object... params) {
                 StringBuilder sb = new StringBuilder();

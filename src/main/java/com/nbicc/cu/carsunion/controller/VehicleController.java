@@ -34,10 +34,10 @@ public class VehicleController {
                                  @RequestParam(value = "level", required = false) Integer level,
                                  @RequestParam(value = "logo", required = false) String logo) {
         Vehicle newVehicle = vehicleService.addVehicle(path, pid, name, level, logo);
-        if(newVehicle != null){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,newVehicle);
-        }else{
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+        if (newVehicle != null) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, newVehicle);
+        } else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
@@ -46,83 +46,84 @@ public class VehicleController {
     public JSONObject deleteVehicles(@RequestParam(value = "id") String id,
                                      @RequestParam(value = "path", required = false) String path) {
         boolean state = vehicleService.deleteVehicles(path, id);
-        if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"error");
+        if (state) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        } else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
         }
     }
 
     @RequestMapping(value = "/getVehiclesByLevel", method = RequestMethod.POST)
     public JSONObject getVehiclesByLevel(@RequestParam(value = "id", required = false) String pid,
-                                         @RequestParam(value = "path", required = false) String path){
+                                         @RequestParam(value = "path", required = false) String path) {
         List<Vehicle> vehicleList = vehicleService.getVehiclesByLevel(path, pid);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,vehicleList);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, vehicleList);
     }
 
     @RequestMapping(value = "/getFullName", method = RequestMethod.POST)
     public JSONObject getFullName(@RequestParam(value = "id") String id,
-                                  @RequestParam(value = "path", required = false) String path){
+                                  @RequestParam(value = "path", required = false) String path) {
         List<String> nameList = vehicleService.getFullName(path, id);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,nameList);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, nameList);
     }
 
 
-    @RequestMapping(value = "getVehicleTrees", method = {RequestMethod.GET,RequestMethod.POST})
-    public JSONObject getVehicleTrees(){
+    @RequestMapping(value = "getVehicleTrees", method = {RequestMethod.GET, RequestMethod.POST})
+    public JSONObject getVehicleTrees() {
         List<VehicleTreeModel> lists = vehicleService.getVehicleTrees();
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, lists);
     }
 
 
     //批量添加车型适用商品
     @Authority(value = AuthorityType.AdminValidate)
-    @RequestMapping(value = "addProductForVehicle",method = RequestMethod.POST)
-    public JSONObject addProductFroVehicle(@RequestBody JSONObject json){
+    @RequestMapping(value = "addProductForVehicle", method = RequestMethod.POST)
+    public JSONObject addProductFroVehicle(@RequestBody JSONObject json) {
         String vehicleId = json.getString("vehicleId");
         String result;
-        List<String> product = json.getObject("product",List.class);
+        List<String> product = json.getObject("product", List.class);
         try {
             result = productService.addProductFroVehicle(vehicleId, product);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             result = "add wrong";
         }
-        if("ok".equals(result)) {
+        if ("ok".equals(result)) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
-        }else{
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
         }
     }
 
     //批量删除车型适用商品
     @Authority(value = AuthorityType.AdminValidate)
-    @RequestMapping(value = "deleteProductForVehicle",method = RequestMethod.POST)
-    public JSONObject deleteProductFroVehicle(@RequestBody JSONObject json){
+    @RequestMapping(value = "deleteProductForVehicle", method = RequestMethod.POST)
+    public JSONObject deleteProductFroVehicle(@RequestBody JSONObject json) {
         String vehicleId = json.getString("vehicleId");
         String result;
-        List<String> product = json.getObject("product",List.class);
+        List<String> product = json.getObject("product", List.class);
         try {
             result = productService.deleteProductFroVehicle(vehicleId, product);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             result = "delete wrong";
         }
-        if("ok".equals(result)) {
+        if ("ok".equals(result)) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
-        }else{
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
         }
     }
 
 
     //查看车型适用商品
-    @RequestMapping(value = "getVehicleRelationship",method = RequestMethod.POST)
-    public JSONObject getVehicleRelationship(@RequestParam(value = "vehicleId")String vehicleId,
+    @RequestMapping(value = "getVehicleRelationship", method = RequestMethod.POST)
+    public JSONObject getVehicleRelationship(@RequestParam(value = "vehicleId") String vehicleId,
                                              @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
-        Page<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId,pageNum-1,pageSize);
-        if(list == null ){
+                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        Page<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId,
+                pageNum - 1, pageSize);
+        if (list == null) {
             return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "can not find the vehicle!");
-        }else {
+        } else {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
         }
     }

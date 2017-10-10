@@ -40,12 +40,12 @@ public class LoginController {
 
     @RequestMapping(value = "/merchantLogin", method = RequestMethod.POST)
     public JSONObject merchantLogin(@RequestParam(value = "username") String username,
-                            @RequestParam(value = "password") String password) {
+                                    @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
-        Admin admin = adminService.getAdminByUserNameAndAuthority(username,1);
+        Admin admin = adminService.getAdminByUserNameAndAuthority(username, 1);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "Login Fail!");
         }
 
         validatedAdmin.setUserPasswd(null);
@@ -54,34 +54,34 @@ public class LoginController {
         res.put("admin", validatedAdmin);
         Merchant merchant = adminService.getMerchantById(validatedAdmin.getId());
         res.put("merchant", merchant);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, res);
     }
 
     @RequestMapping(value = "/adminLogin", method = RequestMethod.POST)
     public JSONObject adminLogin(@RequestParam(value = "username") String username,
                                  @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
-        Admin admin = adminService.getAdminByUserNameAndAuthority(username,0);
+        Admin admin = adminService.getAdminByUserNameAndAuthority(username, 0);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "Login Fail!");
         }
 
         validatedAdmin.setUserPasswd(null);
         String token = adminService.getToken(redisTemplate,admin.getId());
         res.put("token", token);
         res.put("admin", validatedAdmin);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
+        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, res);
     }
 
     @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
     public JSONObject userLogin(@RequestParam(value = "username") String username,
-                                 @RequestParam(value = "password") String password) {
+                                @RequestParam(value = "password") String password) {
         Map<String, Object> res = new HashMap<String, Object>();
-        Admin admin = adminService.getAdminByUserNameAndAuthority(username,2);
+        Admin admin = adminService.getAdminByUserNameAndAuthority(username, 2);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL,"Login Fail!");
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "Login Fail!");
         }
 
         User user = adminService.getUserById(admin.getId());
@@ -116,26 +116,28 @@ public class LoginController {
                                        @RequestParam(value = "idcardBack") String idcardBack,
                                        @RequestParam(value = "license") String license,
                                        @RequestParam(value = "smsCode") String smsCode) {
-        int state = merchantService.merchantRegister(redisTemplate,name,address,region,contact,longitude,latitude,idcardFront,idcardBack,license, smsCode);
-        if(state == 0){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(state,"Register Fail!");
+        int state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude,
+                idcardFront, idcardBack, license, smsCode);
+        if (state == 0) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        } else {
+            return CommonUtil.response(state, "Register Fail!");
         }
     }
 
-    @RequestMapping(value = "/userRegister",  method = RequestMethod.POST)
+    @RequestMapping(value = "/userRegister", method = RequestMethod.POST)
     public JSONObject modifyUserInfo(@RequestParam(value = "name", required = false) String name,
                                      @RequestParam(value = "nickname", required = false) String nickname,
                                      @RequestParam(value = "portrait", required = false) String portrait,
                                      @RequestParam(value = "contact") String contact,
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
-                                     @RequestParam(value = "recommend", required = false) String recommend){
-        int state = userService.userRegister(redisTemplate,name,nickname,contact,portrait,recommend,password,smsCode);
-        if(state == 0){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
+                                     @RequestParam(value = "recommend", required = false) String recommend) {
+        int state = userService.userRegister(redisTemplate, name, nickname, contact, portrait, recommend,
+                password, smsCode);
+        if (state == 0) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        } else {
             return CommonUtil.response(state, "Register Fail!");
         }
     }
