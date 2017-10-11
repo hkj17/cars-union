@@ -19,6 +19,8 @@ public interface OrderDao extends JpaRepository<Order,String>,PagingAndSortingRe
 
     Page<Order> findAllByUserAndDatetimeBetweenAndDelFlag(User user, Date start, Date end, int delFlag, Pageable pageable);
 
+    Page<Order> findAllByUserAndDatetimeBetweenAndStatusAndDelFlag(User user, Date start, Date end, int status, int delFlag, Pageable pageable);
+
     Page<Order> findAllByMerchantAndDatetimeBetweenAndDelFlag(Merchant byId, Date start, Date end, int delFlag, Pageable pageable);
 
 }

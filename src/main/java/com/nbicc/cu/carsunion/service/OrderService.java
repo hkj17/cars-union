@@ -53,12 +53,14 @@ public class OrderService {
     private Logger logger = Logger.getLogger(OrderService.class);
 
     @Transactional
-    public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
+    public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList, boolean isFromSc) {
         String orderId = generateOrderId();
         BigDecimal totalMoney = new BigDecimal(0);
+        List<String> productIdList = new ArrayList<String>();
         for (Map map : productList) {
             String id = UUID.randomUUID().toString().replace("-", "");
             String productId = (String) map.get("productId");
+            productIdList.add(productId);
             Product product = productDao.findByIdAndDelFlag(productId, 0);
             int count = (int) map.get("count");
             BigDecimal money = product.getPrice().multiply(BigDecimal.valueOf(count));
@@ -81,6 +83,10 @@ public class OrderService {
         }
 
         Order order = new Order(id, orderId, user, date, totalMoney, discount, realMoney, merchant, OrderStatus.NOT_PAYED.ordinal(), null, address);
+        //从购物车里面删除商品
+        if(isFromSc){
+            deleteFromShoppingCart(userId,productIdList);
+        }
         return orderDao.save(order);
     }
 
@@ -96,13 +102,18 @@ public class OrderService {
         return "0010" + time.substring(0, 5) + random + time.substring(5);
     }
 
-    public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
+    public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int status, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId), start, end, 0, pageable);
+        Page<Order> lists = null;
+        if(status < 0){
+            lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId), start, end, 0, pageable);
+        }else{
+            lists = orderDao.findAllByUserAndDatetimeBetweenAndStatusAndDelFlag(userDao.findById(userId),start,end,status,0,pageable);
+        }
         return lists;
     }
 

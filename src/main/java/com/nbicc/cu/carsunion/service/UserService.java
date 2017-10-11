@@ -170,6 +170,18 @@ public class UserService {
     }
 
     @Transactional
+    public boolean modifyAddress(String userId, String addressId, String name){
+        Address address = addressDao.findById(addressId);
+        if(address == null || !userId.equals(address.getUser().getId())){
+            return false;
+        }else{
+            address.setAddress(name);
+            addressDao.save(address);
+            return true;
+        }
+    }
+
+    @Transactional
     public boolean setDefaultAddress(String userId, String addressId) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {

@@ -88,6 +88,18 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/modifyAddress", method = RequestMethod.POST)
+    public JSONObject modifyAddress(@RequestParam(value = "addressId") String addressId,
+                                    @RequestParam(value = "name") String name) {
+        String userId = hostHolder.getAdmin().getId();
+        boolean state = userService.modifyAddress(userId,addressId,name);
+        if (state) {
+            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        } else {
+            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+        }
+    }
+
     @RequestMapping(value = "/setDefaultAddress", method = RequestMethod.POST)
     public JSONObject setDefaultAddress(@RequestParam(value = "addressId") String addressId) {
         String userId = hostHolder.getAdmin().getId();

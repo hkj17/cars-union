@@ -83,8 +83,11 @@ public class OrderController {
         String merchantId = json.getString("merchantId");
         List<Map> productList = json.getObject("product", List.class);
         String addressId = json.getString("addressId");
-
-        Order newOrder = orderService.addOrder(hostHolder.getAdmin().getId(), merchantId, addressId, productList);
+        Boolean isOrderFromSc = json.getBoolean("isFromSc");
+        if(isOrderFromSc==null){
+            isOrderFromSc = false;
+        }
+        Order newOrder = orderService.addOrder(hostHolder.getAdmin().getId(), merchantId, addressId, productList,isOrderFromSc);
         if (newOrder != null) {
             return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, newOrder);
         } else {
@@ -106,11 +109,12 @@ public class OrderController {
     @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByUserIdWithPage(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
                                                    @RequestParam(value = "end", defaultValue = "2050-01-01 00:00:00") String endDate,
+                                                   @RequestParam(value = "status",defaultValue = "-1") int status,
                                                    @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                                    @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(), startDate, endDate,
+            orders = orderService.getOrderListByUserAndTimeWithPage(hostHolder.getAdmin().getId(), startDate, endDate,status,
                     pageNum - 1, pageSize);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -125,7 +129,7 @@ public class OrderController {
         return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
     }
 
-    @Authority
+    @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "getOrderByOrderId", method = RequestMethod.POST)
     public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId) {
         Order order = orderService.getOrderByOrderId(orderId);
