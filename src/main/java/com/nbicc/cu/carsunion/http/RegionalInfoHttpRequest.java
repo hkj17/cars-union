@@ -3,7 +3,7 @@ package com.nbicc.cu.carsunion.http;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
-import com.nbicc.cu.carsunion.http.data.RegionalInfo;
+import com.nbicc.cu.carsunion.model.RegionalInfo;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 
 import java.util.ArrayList;

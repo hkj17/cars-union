@@ -1,7 +1,7 @@
 package com.nbicc.cu.carsunion.service;
 
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.dao.*;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
@@ -46,30 +46,30 @@ public class UserService {
         return (String) valueOperations.get("token" + token);
     }
 
-    public int updatePassword(RedisTemplate redisTemplate, String id, String oldPassword, String newPassword, String smsCode) {
+    public ResponseCode updatePassword(RedisTemplate redisTemplate, String id, String oldPassword, String newPassword, String smsCode) {
         Admin admin = adminDao.findById(id);
         if (admin == null) {
-            return ParameterKeys.REQUEST_FAIL;
+            return new ResponseCode(ResponseType.REQUEST_FAIL,"用户不存在");
         }
         if (!SmsUtil.verifySmsCode(redisTemplate, admin.getUserName(), smsCode)) {
-            return ParameterKeys.FAIL_SMS_VERIFICATION;
+            return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
         if (admin.getUserPasswd() == null || !admin.getUserPasswd().equals(MessageDigestUtil.MD5Encode(oldPassword, null))) {
-            return ParameterKeys.REQUEST_FAIL;
+            return new ResponseCode(ResponseType.REQUEST_FAIL,"密码错误或为空");
         }
         admin.setUserPasswd(MessageDigestUtil.MD5Encode(newPassword, null));
         adminDao.save(admin);
-        return ParameterKeys.REQUEST_SUCCESS;
+        return new ResponseCode(ResponseType.REQUEST_SUCCESS,"更改密码成功");
     }
 
     @Transactional
-    public int userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode) {
+    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode) {
         if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
-            return ParameterKeys.FAIL_SMS_VERIFICATION;
+            return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
         User user = userDao.findByContact(contact);
         if (!CommonUtil.isNullOrEmpty(user)) {
-            return ParameterKeys.PHONE_ALREADY_REGISTER;
+            return new ResponseCode(ResponseType.PHONE_ALREADY_REGISTER,"用户手机已注册");
         }
 
         user = new User();
@@ -101,14 +101,14 @@ public class UserService {
         admin.setId(id);
         admin.setAuthority(2);
         adminDao.save(admin);
-        return ParameterKeys.REQUEST_SUCCESS;
+        return new ResponseCode(ResponseType.REQUEST_SUCCESS,"注册成功");
     }
 
     @Transactional
-    public int modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String portrait, String smsCode) {
+    public ResponseCode modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String portrait, String smsCode) {
         User user = userDao.findById(id);
         if (CommonUtil.isNullOrEmpty(user)) {
-            return ParameterKeys.REQUEST_FAIL;
+            return new ResponseCode(ResponseType.REQUEST_FAIL,"没有该用户");
         }
         if (!CommonUtil.isNullOrEmpty(name)) {
             user.setName(name);
@@ -122,7 +122,7 @@ public class UserService {
         if (!CommonUtil.isNullOrEmpty(contact)) {
             boolean passSmsVerification = SmsUtil.verifySmsCode(redisTemplate, contact, smsCode);
             if (!passSmsVerification) {
-                return ParameterKeys.FAIL_SMS_VERIFICATION;
+                return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
             } else {
                 Admin admin = adminDao.findById(id);
                 admin.setUserName(contact);
@@ -131,7 +131,7 @@ public class UserService {
             }
         }
         userDao.save(user);
-        return ParameterKeys.REQUEST_SUCCESS;
+        return  new ResponseCode(ResponseType.REQUEST_SUCCESS,"操作成功");
     }
 
     @Transactional

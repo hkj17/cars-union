@@ -3,7 +3,7 @@ package com.nbicc.cu.carsunion.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -37,12 +37,8 @@ public class UserController {
                                      @RequestParam(value = "contact", required = false) String contact,
                                      @RequestParam(value = "smsCode", required = false) String smsCode) {
         String userId = hostHolder.getAdmin().getId();
-        int state = userService.modifyUserInfo(redisTemplate,userId,name,nickname,contact,portrait,smsCode);
-        if(state == 0){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(state, "error");
-        }
+        ResponseCode state = userService.modifyUserInfo(redisTemplate,userId,name,nickname,contact,portrait,smsCode);
+        return CommonUtil.response(state, null);
     }
 
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
@@ -50,19 +46,15 @@ public class UserController {
                                      @RequestParam(value = "newPassword") String newPassword,
                                      @RequestParam(value = "smsCode") String smsCode) {
         String userId = hostHolder.getAdmin().getId();
-        int state = userService.updatePassword(redisTemplate,userId,oldPassword,newPassword,smsCode);
-        if(state == 0){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,"ok");
-        }else{
-            return CommonUtil.response(state,"error");
-        }
+        ResponseCode state = userService.updatePassword(redisTemplate,userId,oldPassword,newPassword,smsCode);
+        return CommonUtil.response(state,null);
     }
 
     @RequestMapping(value = "/getAddressList", method = RequestMethod.POST)
     public JSONObject getAddressList() {
         String userId = hostHolder.getAdmin().getId();
         List<Address> addressList = userService.getAddressList(userId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, addressList);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",addressList);
     }
 
     @RequestMapping(value = "/addAddress", method = RequestMethod.POST)
@@ -71,9 +63,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.addAddress(userId,address,isDefault);
         if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -82,9 +74,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.deleteAddress(userId, addressId);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -94,9 +86,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.modifyAddress(userId,addressId,name);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -105,9 +97,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.setDefaultAddress(userId,addressId);
         if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -117,9 +109,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.addVehicle(userId,vehicleId,isDefault);
         if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -128,9 +120,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.deleteVehicle(userId,vehicleId);
         if(state){
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -138,13 +130,14 @@ public class UserController {
     public JSONObject getVehicles() {
         String userId = hostHolder.getAdmin().getId();
         Set<Vehicle> vehicles = userService.getVehicleList(userId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, vehicles);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",vehicles);
     }
 
     @RequestMapping(value = "/getDefaultVehicle", method = RequestMethod.POST)
     public JSONObject getDefaultVehicle() {
         String userId = hostHolder.getAdmin().getId();
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, userService.getDefaultVehicle(userId));
+        Vehicle vehicle = userService.getDefaultVehicle(userId);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",vehicle);
     }
 
     @RequestMapping(value = "/setDefaultVehicle", method = RequestMethod.POST)
@@ -152,9 +145,9 @@ public class UserController {
         String userId = hostHolder.getAdmin().getId();
         boolean state = userService.setDefaultVehicle(userId, vehicleId);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -162,13 +155,13 @@ public class UserController {
     public JSONObject getVipLevel() {
         String userId = hostHolder.getAdmin().getId();
         VipLevel vipLevel = userService.getVipLevelByUser(userId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, vipLevel);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",vipLevel);
     }
 
     @RequestMapping(value = "/getCreditHistory", method = RequestMethod.POST)
     public JSONObject getCreditHistory(@RequestParam(value = "source") int source){
         String userId = hostHolder.getAdmin().getId();
         List<CreditHistory> creditHistoryList = userService.getUserCreditHistory(userId,source);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,creditHistoryList);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",creditHistoryList);
     }
 }

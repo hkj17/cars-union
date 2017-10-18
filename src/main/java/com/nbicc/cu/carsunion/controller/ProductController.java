@@ -3,7 +3,7 @@ package com.nbicc.cu.carsunion.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
 import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
@@ -34,8 +34,8 @@ public class ProductController {
                                       @RequestParam(value = "path", required = false) String path,
                                       @RequestParam(value = "name") String name,
                                       @RequestParam(value = "level", required = false) Integer level) {
-        boolean state = productService.addProductClass(pid, path, name, level);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        productService.addProductClass(pid, path, name, level);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
     }
 
     //删除商品类别,包括它的子节点
@@ -44,7 +44,7 @@ public class ProductController {
     public JSONObject deleteProductClass(@RequestParam(value = "id") String id,
                                          @RequestParam(value = "path", required = false) String path) {
         productService.deleteProductClass(id, path);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
     }
 
     //获取商品品类列表
@@ -52,14 +52,14 @@ public class ProductController {
     public JSONObject getProductClass(@RequestParam(value = "id", required = false) String id,
                                       @RequestParam(value = "path", required = false) String path) {
         List<ProductClass> lists = productService.getProductClass(id, path);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, lists);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",lists);
     }
 
     //查询商品分类byid
     @RequestMapping(value = "getProductClassById", method = RequestMethod.POST)
     public JSONObject getProductClassById(@RequestParam(value = "id") String id) {
         List<ProductClass> lists = productService.getProductClassById(id);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, lists);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",lists);
     }
 
     //添加商品
@@ -74,9 +74,9 @@ public class ProductController {
             @RequestParam(value = "vehicles", required = false) String vehicles) {
         String result = productService.addProduct(classId, name, price, specification, feature, vehicles);
         if ("ok".equals(result)) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, result,null);
         }
     }
 
@@ -92,31 +92,11 @@ public class ProductController {
             @RequestParam(value = "feature") String feature) {
         String result = productService.editProduct(productId, classId, name, price, specification, feature);
         if ("ok".equals(result)) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, result,null);
         }
     }
-
-    //根据类别，获取商品
-//    @RequestMapping(value = "getProductByClassId", method = RequestMethod.POST)
-//    public JSONObject getProductByClassId(@RequestParam(value = "classId", required = false) String classId,
-//                                          @RequestParam(value = "pageNum", defaultValue = "1") String pageNum,
-//                                          @RequestParam(value = "pageSize", defaultValue = "10") String pageSize){
-//        Page<Product> lists = productService.getProductByClassIdWithPage(classId, Integer.parseInt(pageNum)-1,Integer.parseInt(pageSize));
-//        if(lists != null){
-//            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,lists);
-//        }else {
-//            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "can not find this productClass!");
-//        }
-//    }
-
-    //根据车型，获取商品
-//    @RequestMapping(value = "getProductByVehicleId", method = RequestMethod.POST)
-//    public JSONObject getProductByVehicleId(@RequestParam(value = "vehicleId", required = false) String vehicleId){
-//        List<VehicleProductRelationship> list = productService.getProductByVehicleId(vehicleId);
-//        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,list);
-//    }
 
     //根据车型或商品类别获取商品，带分页
     @RequestMapping(value = "getProductByClassAndVehicle", method = RequestMethod.POST)
@@ -127,7 +107,7 @@ public class ProductController {
                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         Page<Product> lists = productService.getProductByClassIdAndVehicleIdWithPage(classId, vehicleId,onSale,
                 pageNum - 1, pageSize);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, lists);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", lists);
     }
 
 
@@ -136,9 +116,9 @@ public class ProductController {
     public JSONObject getProductByid(@RequestParam(value = "productId") String id) {
         Product product = productService.getProductById(id);
         if (product == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "商品不存在！");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"商品不存在",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, product);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",product);
         }
     }
 
@@ -147,7 +127,7 @@ public class ProductController {
     @RequestMapping(value = "deleteProduct", method = RequestMethod.POST)
     public JSONObject deleteProductClass(@RequestParam(value = "productId") String productId) {
         productService.deleteProduct(productId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
     }
 
     //商品下架/上架
@@ -156,14 +136,14 @@ public class ProductController {
     public JSONObject productOnSale(@RequestParam(value = "productId") String id,
                                     @RequestParam(value = "state") String state) {
         productService.setProductOnSale(id, state);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
     }
 
     //查看商品适用车型
     @RequestMapping(value = "getVehicleRelationship", method = RequestMethod.POST)
     public JSONObject getVehicleRelationship(@RequestParam(value = "productId") String productId) {
         List<VehicleProductRelationship> list = productService.getVehicleRelationship(productId);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",list);
     }
 
     //批量添加商品适用车型
@@ -179,9 +159,9 @@ public class ProductController {
             result = "add wrong";
         }
         if ("ok".equals(result)) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, result,null);
         }
     }
 
@@ -198,9 +178,9 @@ public class ProductController {
             result = "delete wrong";
         }
         if ("ok".equals(result)) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, result,null);
         }
     }
 }

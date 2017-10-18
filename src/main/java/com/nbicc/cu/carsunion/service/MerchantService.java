@@ -1,12 +1,13 @@
 package com.nbicc.cu.carsunion.service;
 
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.AdminDao;
 import com.nbicc.cu.carsunion.dao.MerchantDao;
 import com.nbicc.cu.carsunion.enumtype.RegisterStatus;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
+import com.nbicc.cu.carsunion.model.ResponseCode;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
@@ -40,12 +41,12 @@ public class MerchantService {
     @PersistenceContext
     private EntityManager em;
 
-    public int merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
-                                String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode) {
+    public ResponseCode merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
+                                         String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode) {
         Merchant m = merchantDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == RegisterStatus.PASSED_REVIEW.ordinal()){
             //已通过注册，请登录
-            return ParameterKeys.PHONE_ALREADY_REGISTER;
+            return new ResponseCode(ResponseType.PHONE_ALREADY_REGISTER,"商家手机已注册");
         }
 
         if (CommonUtil.isNullOrEmpty(m)) {
@@ -54,7 +55,7 @@ public class MerchantService {
             m.setContact(contact);
         }
         if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
-            return ParameterKeys.FAIL_SMS_VERIFICATION;
+            return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
         m.setName(name);
         m.setAddress(address);
@@ -66,7 +67,7 @@ public class MerchantService {
         m.setIdcardBack(idcardBack);
         m.setLicensePath(license);
         merchantDao.save(m);
-        return ParameterKeys.REQUEST_SUCCESS;
+        return new ResponseCode(ResponseType.REQUEST_SUCCESS,"注册成功");
     }
 
     @Transactional

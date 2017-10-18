@@ -2,8 +2,8 @@ package com.nbicc.cu.carsunion.interceptor;
 
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.service.AdminService;
@@ -108,7 +108,7 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                     }
                     // 未通过验证，返回提示json
                     PrintWriter pw = response.getWriter();
-                    pw.write(CommonUtil.response(ParameterKeys.NOT_AUTHORIZED,"error:NoAuthority!").toString());
+                    pw.write(CommonUtil.response(ResponseType.NOT_AUTHORIZED,"该用户没有权限",null).toString());
                     return false;
                 }
             } catch (Exception e) {

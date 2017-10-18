@@ -2,9 +2,9 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
-import com.nbicc.cu.carsunion.http.data.RegionalInfo;
+import com.nbicc.cu.carsunion.model.RegionalInfo;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
 import com.taobao.api.ApiException;
@@ -51,7 +51,7 @@ public class UtilController {
         String upToken = auth.uploadToken(bucket);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("uptoken", upToken);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, jsonObject);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功", jsonObject);
     }
 
     //短信
@@ -79,21 +79,18 @@ public class UtilController {
         try {
             AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
             logger.info("----send result : " + rsp.getBody());
-            if (rsp == null) {
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
-            }
-            if (rsp.getResult() == null) {
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            if (rsp == null || rsp.getResult() == null) {
+                return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
             }
             if (rsp.getResult().getSuccess()) {
-                return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+                return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "短信发送成功",null);
             } else {
-                return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+                return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     @RequestMapping(value = "/getRegion", method = RequestMethod.POST)
@@ -101,7 +98,7 @@ public class UtilController {
                                 @RequestParam(value = "city", required = false) String city,
                                 @RequestParam(value = "district", required = false) String district) {
         List<RegionalInfo> regionalInfoList = httpRequest.getDistricts(province, city, district);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, regionalInfoList);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"查询成功",regionalInfoList);
     }
 
 }

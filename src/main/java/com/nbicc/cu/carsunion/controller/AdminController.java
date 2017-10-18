@@ -3,7 +3,7 @@ package com.nbicc.cu.carsunion.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -36,7 +36,7 @@ public class AdminController {
             m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
             m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
         }
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantPage);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",merchantPage);
     }
 
     @Authority(value = AuthorityType.AdminValidate)
@@ -44,9 +44,9 @@ public class AdminController {
     public JSONObject passRegistration(@RequestParam(value = "contact") String contact) {
         boolean state = merchantService.passRegistration(contact);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -55,9 +55,9 @@ public class AdminController {
     public JSONObject failRegistration(@RequestParam(value = "contact") String contact) {
         boolean state = merchantService.failRegistration(contact);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -72,9 +72,9 @@ public class AdminController {
                                          @RequestParam(value = "latitude", required = false) String latitude) {
         boolean state = merchantService.modifyMerchantInfo(id, name, address, region, contact, longitude, latitude);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 }

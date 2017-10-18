@@ -1,9 +1,10 @@
 package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.Merchant;
+import com.nbicc.cu.carsunion.model.ResponseCode;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.service.AdminService;
 import com.nbicc.cu.carsunion.service.MerchantService;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class LoginController {
         Admin admin = adminService.getAdminByUserNameAndAuthority(username, 1);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "Login Fail!");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "登录失败",null);
         }
 
         validatedAdmin.setUserPasswd(null);
@@ -54,7 +54,7 @@ public class LoginController {
         res.put("admin", validatedAdmin);
         Merchant merchant = adminService.getMerchantById(validatedAdmin.getId());
         res.put("merchant", merchant);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, res);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "登录成功", res);
     }
 
     @RequestMapping(value = "/adminLogin", method = RequestMethod.POST)
@@ -64,14 +64,14 @@ public class LoginController {
         Admin admin = adminService.getAdminByUserNameAndAuthority(username, 0);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "Login Fail!");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "登录失败",null);
         }
 
         validatedAdmin.setUserPasswd(null);
         String token = adminService.getToken(redisTemplate,admin.getId());
         res.put("token", token);
         res.put("admin", validatedAdmin);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, res);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "登录成功", res);
     }
 
     @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
@@ -81,7 +81,7 @@ public class LoginController {
         Admin admin = adminService.getAdminByUserNameAndAuthority(username, 2);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
         if (validatedAdmin == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "Login Fail!");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "登录失败",null);
         }
 
         User user = adminService.getUserById(admin.getId());
@@ -90,14 +90,14 @@ public class LoginController {
         res.put("token", token);
         String updateToken = adminService.getUpdateToken(redisTemplate,admin.getId());
         res.put("updateToken", updateToken);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,res);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "登录成功", res);
     }
 
     @RequestMapping(value = "/updateToken", method = RequestMethod.POST)
     public JSONObject updateToken(@RequestParam(value = "userId") String userId,
                                    @RequestParam(value = "updateToken") String updateToken) {
         String token = adminService.updateToken(redisTemplate,userId,updateToken);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS,token);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"更新令牌成功", token);
     }
 
     // todo
@@ -116,13 +116,9 @@ public class LoginController {
                                        @RequestParam(value = "idcardBack") String idcardBack,
                                        @RequestParam(value = "license") String license,
                                        @RequestParam(value = "smsCode") String smsCode) {
-        int state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude,
+        ResponseCode state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude,
                 idcardFront, idcardBack, license, smsCode);
-        if (state == 0) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        } else {
-            return CommonUtil.response(state, "Register Fail!");
-        }
+        return CommonUtil.response(state,null);
     }
 
     @RequestMapping(value = "/userRegister", method = RequestMethod.POST)
@@ -133,13 +129,9 @@ public class LoginController {
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
                                      @RequestParam(value = "recommend", required = false) String recommend) {
-        int state = userService.userRegister(redisTemplate, name, nickname, contact, portrait, recommend,
+        ResponseCode state = userService.userRegister(redisTemplate, name, nickname, contact, portrait, recommend,
                 password, smsCode);
-        if (state == 0) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
-        } else {
-            return CommonUtil.response(state, "Register Fail!");
-        }
+        return CommonUtil.response(state, null);
     }
 
 }
