@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
+import com.nbicc.cu.carsunion.model.ResponseCode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,9 +15,18 @@ import java.util.UUID;
  */
 public class CommonUtil {
 
-    public static JSONObject response(int code, Object object){
+    public static JSONObject response(ResponseCode code, Object object){
         JSONObject jsonObject=new JSONObject();
-        jsonObject.put("result_code", code);
+        jsonObject.put("result_code", code.getResponseType().ordinal());
+        jsonObject.put("message",code.getMessage());
+        jsonObject.put("data", object);
+        return jsonObject;
+    }
+
+    public static JSONObject response(ResponseType type, String message, Object object){
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("result_code", type.ordinal());
+        jsonObject.put("message",message);
         jsonObject.put("data", object);
         return jsonObject;
     }

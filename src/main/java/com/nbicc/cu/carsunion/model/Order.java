@@ -55,6 +55,14 @@ public class Order {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date serviceTime;
 
+    @Column(name = "pay_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date payTime;
+
+    @Column(name = "deliver_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date deliverTime;
+
     //删除标记，0未删除，1已删除
     @Column(name = "del_flag")
     private int delFlag;
@@ -63,8 +71,7 @@ public class Order {
     }
 
     public Order(String id, String orderId, User user, Date datetime, BigDecimal totalMoney, double discount,
-                 BigDecimal realMoney, Merchant merchant, int status, String courierNumber, Address address,
-                 Date serviceTime) {
+                 BigDecimal realMoney, Merchant merchant, int status, String courierNumber, Address address) {
         this.id = id;
         this.orderId = orderId;
         this.user = user;
@@ -76,7 +83,6 @@ public class Order {
         this.status = status;
         this.courierNumber = courierNumber;
         this.address = address;
-        this.serviceTime = serviceTime;
         this.delFlag = 0;
     }
 
@@ -174,6 +180,22 @@ public class Order {
 
     public void setServiceTime(Date serviceTime) {
         this.serviceTime = serviceTime;
+    }
+
+    public Date getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(Date payTime) {
+        this.payTime = payTime;
+    }
+
+    public Date getDeliverTime() {
+        return deliverTime;
+    }
+
+    public void setDeliverTime(Date deliverTime) {
+        this.deliverTime = deliverTime;
     }
 
     public int getDelFlag() {

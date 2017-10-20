@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.service;
 
+import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.*;
+import com.nbicc.cu.carsunion.enumtype.OrderStatus;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.apache.log4j.Logger;
@@ -40,6 +42,8 @@ public class OrderService {
     @Autowired
     private ShoppingCartDao shoppingCartDao;
     @Autowired
+    private CreditHistoryDao creditHistoryDao;
+    @Autowired
     private VipLevelDao vipLevelDao;
 
     @Autowired
@@ -49,12 +53,14 @@ public class OrderService {
     private Logger logger = Logger.getLogger(OrderService.class);
 
     @Transactional
-    public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList) {
+    public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList, boolean isFromSc) {
         String orderId = generateOrderId();
         BigDecimal totalMoney = new BigDecimal(0);
+        List<String> productIdList = new ArrayList<String>();
         for (Map map : productList) {
             String id = UUID.randomUUID().toString().replace("-", "");
             String productId = (String) map.get("productId");
+            productIdList.add(productId);
             Product product = productDao.findByIdAndDelFlag(productId, 0);
             int count = (int) map.get("count");
             BigDecimal money = product.getPrice().multiply(BigDecimal.valueOf(count));
@@ -75,7 +81,12 @@ public class OrderService {
         if (!CommonUtil.isNullOrEmpty(addressId)) {
             address = addressDao.findOne(addressId);
         }
-        Order order = new Order(id, orderId, user, date, totalMoney, discount, realMoney, merchant, 0, null, address, null);
+
+        Order order = new Order(id, orderId, user, date, totalMoney, discount, realMoney, merchant, OrderStatus.NOT_PAYED.ordinal(), null, address);
+        //从购物车里面删除商品
+        if(isFromSc){
+            deleteFromShoppingCart(userId,productIdList);
+        }
         return orderDao.save(order);
     }
 
@@ -91,13 +102,18 @@ public class OrderService {
         return "0010" + time.substring(0, 5) + random + time.substring(5);
     }
 
-    public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
+    public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int status, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId), start, end, 0, pageable);
+        Page<Order> lists = null;
+        if(status < 0){
+            lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId), start, end, 0, pageable);
+        }else{
+            lists = orderDao.findAllByUserAndDatetimeBetweenAndStatusAndDelFlag(userDao.findById(userId),start,end,status,0,pageable);
+        }
         return lists;
     }
 
@@ -125,30 +141,50 @@ public class OrderService {
         return orderDetailDao.findByOrderId(orderId);
     }
 
+    @Transactional
     public String finishPay(String orderId) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
-        if (order == null) {
-            throw new RuntimeException("order not exist!");
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
+        if(order == null){
+            throw new RuntimeException("order does not exist!");
         }
-        if (order.getStatus() == 0) {
-            order.setStatus(1);
-        } else {
-            throw new RuntimeException("order status is not 0!");
+        if(order.getStatus() == OrderStatus.NOT_PAYED.ordinal()){
+            order.setPayTime(new Date());
+            order.setStatus(OrderStatus.PAYED.ordinal());
+
+            List<CreditHistory> creditHistories = new ArrayList<CreditHistory>();
+            String userId = order.getUser().getId();
+            String recommendorId = order.getUser().getRecommend();
+            int credit = order.getRealMoney().intValue();
+            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(),userId,orderId,credit,0);
+            creditHistories.add(self);
+            if(!CommonUtil.isNullOrEmpty(recommendorId)){
+                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(),recommendorId,orderId,(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO),1);
+                creditHistories.add(firstRecommendor);
+                User recommendor = userDao.findById(recommendorId);
+                if(!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())){
+                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(),orderId,(int)(credit*ParameterValues.RECOMMENDOR_CREDIT_RATIO*ParameterValues.RECOMMENDOR_CREDIT_RATIO),2);
+                    creditHistories.add(secondRecommendor);
+                }
+            }
+            creditHistoryDao.save(creditHistories);
+        }else{
+            throw new RuntimeException("order is not ready for payment!");
         }
         orderDao.save(order);
         return "ok";
     }
 
     public String deliverProducts(String orderId, String courierNumber) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
-        if (order == null) {
-            throw new RuntimeException("order not exist!");
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
+        if(order == null){
+            throw new RuntimeException("order does not exist!");
         }
-        if (order.getStatus() == 1) {
-            order.setStatus(2);
+        if(order.getStatus() == OrderStatus.PAYED.ordinal()){
+            order.setStatus(OrderStatus.DELIVERED.ordinal());
+            order.setDeliverTime(new Date());
             order.setCourierNumber(courierNumber);
-        } else {
-            throw new RuntimeException("order status is not 1!");
+        }else{
+            throw new RuntimeException("order is not payed!");
         }
         orderDao.save(order);
         return "ok";

@@ -29,5 +29,8 @@ public class ParameterValues {
 
     public final static String APP_ID = "wxabe6785e709a35f1";
 
-    public static String WXPAY_APP_KEY = "b025e9edcd054c489af018ef6c8943a0";
+    public final static String WXPAY_APP_KEY = "b025e9edcd054c489af018ef6c8943a0";
+
+    public final static double RECOMMENDOR_CREDIT_RATIO = 0.1;
+
 }

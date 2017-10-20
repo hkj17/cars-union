@@ -1,6 +1,6 @@
 package com.nbicc.cu.carsunion.interceptor;
 
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class LoginRequiredInterceptor implements HandlerInterceptor {
         Admin admin = (Admin) request.getSession().getAttribute("user");
         if(admin == null) {
             PrintWriter pw = response.getWriter();
-            pw.write(CommonUtil.response(ParameterKeys.NOT_AUTHORIZED,"请登陆!").toString());
+            pw.write(CommonUtil.response(ResponseType.NOT_AUTHORIZED,"该用户没有权限",null).toString());
             return false;
         }
         return true;

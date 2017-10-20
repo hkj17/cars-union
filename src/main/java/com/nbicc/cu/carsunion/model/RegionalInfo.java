@@ -1,4 +1,4 @@
-package com.nbicc.cu.carsunion.http.data;
+package com.nbicc.cu.carsunion.model;
 
 public class RegionalInfo {
     private String name;

@@ -3,7 +3,7 @@ package com.nbicc.cu.carsunion.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.model.Order;
@@ -47,14 +47,14 @@ public class MerchantController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, orders);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", orders);
     }
 
     @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "/getMerchantByContact", method = RequestMethod.POST)
     public JSONObject getMerchantByContact(@RequestParam(value = "contact") String contact) {
         Merchant merchant = merchantService.getMerchantByContact(contact);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchant);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",merchant);
     }
 
     @Authority(value = AuthorityType.UserValidate)
@@ -62,6 +62,6 @@ public class MerchantController {
     public JSONObject searchMerchant(@RequestParam(value = "region", required = false) String region,
                                      @RequestParam(value = "keyword", required = false) String keyword) {
         List<Merchant> merchantList = merchantService.getMerchantList(region, keyword);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, merchantList);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", merchantList);
     }
 }

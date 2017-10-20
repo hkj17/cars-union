@@ -3,7 +3,7 @@ package com.nbicc.cu.carsunion.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
-import com.nbicc.cu.carsunion.constant.ParameterKeys;
+import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.model.VehicleTreeModel;
@@ -35,9 +35,9 @@ public class VehicleController {
                                  @RequestParam(value = "logo", required = false) String logo) {
         Vehicle newVehicle = vehicleService.addVehicle(path, pid, name, level, logo);
         if (newVehicle != null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, newVehicle);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"操作成功",newVehicle);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -47,9 +47,9 @@ public class VehicleController {
                                      @RequestParam(value = "path", required = false) String path) {
         boolean state = vehicleService.deleteVehicles(path, id);
         if (state) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, "ok");
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"操作成功",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "error");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
     }
 
@@ -57,21 +57,21 @@ public class VehicleController {
     public JSONObject getVehiclesByLevel(@RequestParam(value = "id", required = false) String pid,
                                          @RequestParam(value = "path", required = false) String path) {
         List<Vehicle> vehicleList = vehicleService.getVehiclesByLevel(path, pid);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, vehicleList);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", vehicleList);
     }
 
     @RequestMapping(value = "/getFullName", method = RequestMethod.POST)
     public JSONObject getFullName(@RequestParam(value = "id") String id,
                                   @RequestParam(value = "path", required = false) String path) {
         List<String> nameList = vehicleService.getFullName(path, id);
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, nameList);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",nameList);
     }
 
 
     @RequestMapping(value = "getVehicleTrees", method = {RequestMethod.GET, RequestMethod.POST})
     public JSONObject getVehicleTrees() {
         List<VehicleTreeModel> lists = vehicleService.getVehicleTrees();
-        return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, lists);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功", lists);
     }
 
 
@@ -88,9 +88,9 @@ public class VehicleController {
             result = "add wrong";
         }
         if ("ok".equals(result)) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result, null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, result, null);
         }
     }
 
@@ -107,9 +107,9 @@ public class VehicleController {
             result = "delete wrong";
         }
         if ("ok".equals(result)) {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, result);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, result);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, result,null);
         }
     }
 
@@ -122,9 +122,9 @@ public class VehicleController {
         Page<VehicleProductRelationship> list = productService.getVehicleRelationshipByVehicle(vehicleId,
                 pageNum - 1, pageSize);
         if (list == null) {
-            return CommonUtil.response(ParameterKeys.REQUEST_FAIL, "can not find the vehicle!");
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "没有该车型",null);
         } else {
-            return CommonUtil.response(ParameterKeys.REQUEST_SUCCESS, list);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "查询成功",list);
         }
     }
 
