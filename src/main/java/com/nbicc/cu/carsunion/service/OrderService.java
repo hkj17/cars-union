@@ -93,8 +93,9 @@ public class OrderService {
         for(OrderDetail orderDetail : orderDetailList){
             orderDetail.setUserOrder(order);
         }
+        orderDao.save(order);
         orderDetailDao.save(orderDetailList);
-        return orderDao.save(order);
+        return orderDao.findByOrderIdAndDelFlag(orderId,0);
     }
 
     private double getDiscount(int credit) {
