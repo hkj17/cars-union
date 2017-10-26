@@ -9,6 +9,7 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.model.RegionalInfo;
@@ -59,6 +60,14 @@ public class UtilController {
         String upToken = auth.uploadToken(bucket);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("uptoken", upToken);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功", jsonObject);
+    }
+
+    //提供公共图片访问的前缀域名
+    @GetMapping("getPhotoPrefix")
+    public JSONObject getPhotoPrefix(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("prefix", ParameterValues.QI_NIU_PUBLIC_DOMAIN_OF_BUCKET);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功", jsonObject);
     }
 

@@ -6,8 +6,7 @@ import com.qiniu.util.Auth;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import static com.nbicc.cu.carsunion.constant.ParameterValues.accessKey;
-import static com.nbicc.cu.carsunion.constant.ParameterValues.secretKey;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 
 /**
  * Created by bigmao on 2017/8/22.
@@ -16,10 +15,10 @@ public class QiniuUtil {
 
     //输入fileName,输出完整url，公开地址
     public static String photoUrlForPublic(String fileName){
-        String domainOfBucket = "http://ov2bucobf.bkt.clouddn.com";
+//        String domainOfBucket = "http://ov2bucobf.bkt.clouddn.com";
         try {
             String encodedFileName = URLEncoder.encode(fileName, "utf-8");
-            String finalUrl = String.format("%s/%s", domainOfBucket,encodedFileName);
+            String finalUrl = String.format("%s/%s", QI_NIU_PUBLIC_DOMAIN_OF_BUCKET,encodedFileName);
             return finalUrl;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
