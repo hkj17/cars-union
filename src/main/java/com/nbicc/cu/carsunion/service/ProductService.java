@@ -128,7 +128,6 @@ public class ProductService {
         if (products.isEmpty()) {
             return products;
         }
-        products.forEach(product -> QiniuUtil.transformPhotoUrl(product));
         return products;
     }
 
@@ -145,7 +144,6 @@ public class ProductService {
             }
             products = productDao.findByClassIdLikeAndOnSaleAndDelFlag("%" + classId + "%", onSale,0, pageable);
         }
-        products.forEach(product -> QiniuUtil.transformPhotoUrl(product));
         return products;
     }
 
@@ -157,9 +155,6 @@ public class ProductService {
 
     public Product getProductById(String id) {
         Product product = productDao.findByIdAndDelFlag(id, 0);
-        if (product != null) {
-            QiniuUtil.transformPhotoUrl(product);
-        }
         return product;
     }
 
@@ -285,7 +280,6 @@ public class ProductService {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         Page<Product> products = productDao.findByClassIdAndVehicle(vehicle, "%" + classId + "%", onSale, pageable);
-        products.forEach(product -> QiniuUtil.transformPhotoUrl(product));
         return products;
     }
 
@@ -324,7 +318,6 @@ public class ProductService {
         Page<VehicleProductRelationship> lists = vehicleProductRelationshipDao.findByVehicle(vehicle, pageable);
         for (VehicleProductRelationship vp : lists) {
             vp.getVehicle().setName(getFullName(vp.getVehicle().getPath(), vp.getVehicle().getId()));
-            QiniuUtil.transformPhotoUrl(vp.getProduct());
         }
         return lists;
     }
