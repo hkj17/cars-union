@@ -25,3 +25,5 @@ nbdist/
 
 #qiniu
 ParameterKeys.java
+
+.rdb
