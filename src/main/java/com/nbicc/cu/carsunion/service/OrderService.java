@@ -5,6 +5,7 @@ import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.enumtype.OrderStatus;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,6 +58,8 @@ public class OrderService {
         String orderId = generateOrderId();
         BigDecimal totalMoney = new BigDecimal(0);
         List<String> productIdList = new ArrayList<String>();
+        List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+
         for (Map map : productList) {
             String id = UUID.randomUUID().toString().replace("-", "");
             String productId = (String) map.get("productId");
@@ -65,8 +68,8 @@ public class OrderService {
             int count = (int) map.get("count");
             BigDecimal money = product.getPrice().multiply(BigDecimal.valueOf(count));
             totalMoney = totalMoney.add(money);
-            OrderDetail od = new OrderDetail(id, orderId, product, count, money);
-            orderDetailDao.save(od);
+            orderDetailList.add(new OrderDetail(id, product, count, money));
+            //orderDetailDao.save(od);
         }
         String id = UUID.randomUUID().toString().replace("-", "");
         User user = userDao.findById(userId);
@@ -87,7 +90,12 @@ public class OrderService {
         if(isFromSc){
             deleteFromShoppingCart(userId,productIdList);
         }
-        return orderDao.save(order);
+        for(OrderDetail orderDetail : orderDetailList){
+            orderDetail.setUserOrder(order);
+        }
+        orderDao.save(order);
+        orderDetailDao.save(orderDetailList);
+        return orderDao.findByOrderIdAndDelFlag(orderId,0);
     }
 
     private double getDiscount(int credit) {
@@ -138,7 +146,13 @@ public class OrderService {
     }
 
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
-        return orderDetailDao.findByOrderId(orderId);
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
+        if(order == null){
+            System.out.println("order does not exist");
+            return new ArrayList<>();
+        }
+        System.out.println(order.getOrderId());
+        return orderDetailDao.findByUserOrder(order);
     }
 
     @Transactional
@@ -244,7 +258,13 @@ public class OrderService {
 
     public List<ShoppingCart> getShoppingCartList(String userId) {
         User user = userDao.findById(userId);
-        return shoppingCartDao.findByUser(user);
+        List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUser(user);
+        for (ShoppingCart sc : shoppingCartList) {
+            Product product = sc.getProduct();
+            QiniuUtil.transformPhotoUrl(product);
+            sc.setProduct(product);
+        }
+        return shoppingCartList;
     }
 
     public Order setServiceTime(String orderId, String serviceTime) {

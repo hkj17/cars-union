@@ -78,12 +78,12 @@ public class VehicleController {
     //批量添加车型适用商品
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "addProductForVehicle", method = RequestMethod.POST)
-    public JSONObject addProductFroVehicle(@RequestBody JSONObject json) {
+    public JSONObject addProductForVehicle(@RequestBody JSONObject json) {
         String vehicleId = json.getString("vehicleId");
         String result;
         List<String> product = json.getObject("product", List.class);
         try {
-            result = productService.addProductFroVehicle(vehicleId, product);
+            result = productService.addProductForVehicle(vehicleId, product);
         } catch (RuntimeException e) {
             result = "add wrong";
         }

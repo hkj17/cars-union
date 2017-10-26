@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -12,8 +14,10 @@ public class OrderDetail {
     @Id
     private String id;
 
-    @Column(name = "order_id")
-    private String orderId;
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    @JsonBackReference
+    private Order userOrder;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -27,9 +31,8 @@ public class OrderDetail {
     public OrderDetail() {
     }
 
-    public OrderDetail(String id, String orderId, Product product, int count, BigDecimal totalMoney) {
+    public OrderDetail(String id, Product product, int count, BigDecimal totalMoney) {
         this.id = id;
-        this.orderId = orderId;
         this.product = product;
         this.count = count;
         this.totalMoney = totalMoney;
@@ -43,12 +46,12 @@ public class OrderDetail {
         this.id = id;
     }
 
-    public String getOrderId() {
-        return orderId;
+    public Order getUserOrder() {
+        return userOrder;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setUserOrder(Order userOrder) {
+        this.userOrder = userOrder;
     }
 
     public Product getProduct() {

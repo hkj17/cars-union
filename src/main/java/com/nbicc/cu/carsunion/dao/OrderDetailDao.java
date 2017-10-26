@@ -1,5 +1,6 @@
 package com.nbicc.cu.carsunion.dao;
 
+import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.model.OrderDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,5 +11,7 @@ import java.util.List;
  */
 public interface OrderDetailDao extends JpaRepository<OrderDetail,String> {
 
-    List<OrderDetail> findByOrderId(String orderId);
+    List<OrderDetail> findByUserOrder(Order userOrder);
+
+    List<OrderDetail> findById(String id);
 }

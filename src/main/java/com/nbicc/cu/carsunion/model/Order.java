@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by bigmao on 2017/8/28.
@@ -13,10 +14,10 @@ import java.util.Date;
 @Table(name = "user_order")
 public class Order {
 
-    @Id
     @Column(name = "id")
     private String id;
 
+    @Id
     @Column(name = "order_id")
     private String orderId;
 
@@ -66,6 +67,10 @@ public class Order {
     //删除标记，0未删除，1已删除
     @Column(name = "del_flag")
     private int delFlag;
+
+    @OneToMany(mappedBy = "userOrder")
+    private List<OrderDetail> orderDetailList;
+
 
     public Order() {
     }
@@ -204,5 +209,13 @@ public class Order {
 
     public void setDelFlag(int delFlag) {
         this.delFlag = delFlag;
+    }
+
+    public List<OrderDetail> getOrderDetailList() {
+        return orderDetailList;
+    }
+
+    public void setOrderDetailList(List<OrderDetail> orderDetailList) {
+        this.orderDetailList = orderDetailList;
     }
 }
