@@ -34,7 +34,14 @@ public class VehicleService {
         v.setPath(currPath);
         v.setLevel(currLevel);
         v.setName(name);
-        v.setLogo(logo);
+        if(!CommonUtil.isNullOrEmpty(logo)) {
+            v.setLogo(logo);
+        }else if(!CommonUtil.isNullOrEmpty(currPath)){
+            Vehicle vehicle = vehicleDao.findById(currPath.split(",")[0]);
+            v.setLogo(vehicle.getLogo());
+        }else{
+
+        }
         v.setPinyin(pinyin);
         Vehicle newVehicle = vehicleDao.save(v);
         return newVehicle;
@@ -99,7 +106,7 @@ public class VehicleService {
             return;
         }
         for (Vehicle vehicle : lists) {
-            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getPath(), vehicle.getLevel());
+            VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getLogo(), null, vehicle.getPath(), vehicle.getLevel());
             setVehicleChild(model);
             result.add(model);
         }
