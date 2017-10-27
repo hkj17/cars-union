@@ -50,6 +50,9 @@ public class Merchant {
     @Column(name = "license_path")
     private String licensePath;
 
+    @Column(name = "logo")
+    private String logo;
+
     public String getId() {
         return id;
     }
@@ -144,5 +147,13 @@ public class Merchant {
 
     public void setLicensePath(String licensePath) {
         this.licensePath = licensePath;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 }

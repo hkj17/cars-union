@@ -15,7 +15,6 @@ public class QiniuUtil {
 
     //输入fileName,输出完整url，公开地址
     public static String photoUrlForPublic(String fileName){
-//        String domainOfBucket = "http://ov2bucobf.bkt.clouddn.com";
         try {
             String encodedFileName = URLEncoder.encode(fileName, "utf-8");
             String finalUrl = String.format("%s/%s", QI_NIU_PUBLIC_DOMAIN_OF_BUCKET,encodedFileName);

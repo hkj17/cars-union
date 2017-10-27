@@ -42,7 +42,7 @@ public class MerchantService {
     private EntityManager em;
 
     public ResponseCode merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
-                                         String longitude, String latitude, String idcardFront, String idcardBack, String license, String smsCode) {
+                                         String longitude, String latitude, String idcardFront, String idcardBack, String license, String logo, String smsCode) {
         Merchant m = merchantDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == RegisterStatus.PASSED_REVIEW.ordinal()){
             //已通过注册，请登录
@@ -66,6 +66,7 @@ public class MerchantService {
         m.setIdcardFront(idcardFront);
         m.setIdcardBack(idcardBack);
         m.setLicensePath(license);
+        m.setLogo(logo);
         merchantDao.save(m);
         return new ResponseCode(ResponseType.REQUEST_SUCCESS,"注册成功");
     }
@@ -107,7 +108,7 @@ public class MerchantService {
     }
 
     @Transactional
-    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longitude, String latitude) {
+    public boolean modifyMerchantInfo(String id, String name, String address, String region, String contact, String longitude, String latitude, String logo) {
         Merchant m = merchantDao.findById(id);
         if (CommonUtil.isNullOrEmpty(m)) {
             return false;
@@ -138,6 +139,9 @@ public class MerchantService {
         }
         if (!CommonUtil.isNullOrEmpty(latitude)) {
             m.setLatitude(latitude);
+        }
+        if(!CommonUtil.isNullOrEmpty(logo)){
+            m.setLogo(logo);
         }
         merchantDao.save(m);
         return true;
