@@ -6,7 +6,6 @@ import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.service.OrderService;
-import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,9 +22,6 @@ import java.util.Map;
 @RequestMapping("/order")
 @Authority(value = AuthorityType.UserValidate)
 public class OrderController {
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private OrderService orderService;
@@ -128,14 +124,6 @@ public class OrderController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "查询成功", details);
     }
 
-    //完成支付,改变订单状态为已支付
-    @Authority
-    @RequestMapping(value = "finishPay", method = RequestMethod.POST)
-    public JSONObject finishPay(@RequestParam("id") String orderId) {
-        String result = orderService.finishPay(orderId);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功", result);
-    }
-
     //发货，填写物流号
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "deliverProducts", method = RequestMethod.POST)
@@ -156,6 +144,4 @@ public class OrderController {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"查询成功",order);
         }
     }
-
-
 }
