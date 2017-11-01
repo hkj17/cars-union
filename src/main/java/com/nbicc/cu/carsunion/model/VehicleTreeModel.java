@@ -24,13 +24,6 @@ public class VehicleTreeModel {
         this.level = level;
     }
 
-    public VehicleTreeModel(String id, String name, String path, int level) {
-        this.id = id;
-        this.name = name;
-        this.path = path;
-        this.level = level;
-    }
-
     public VehicleTreeModel() {
     }
 

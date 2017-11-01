@@ -12,7 +12,9 @@ import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
+import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.model.RegionalInfo;
+import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
 import com.taobao.api.ApiException;
@@ -27,6 +29,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +52,9 @@ public class UtilController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    OrderService orderService;
+
     //给js提供七牛的uptoken，option为1表示私密上传。
     @RequestMapping(value = "getUptoken", method = RequestMethod.GET)
     public JSONObject getUptoken(@RequestParam(value = "option", required = false) String option) {
@@ -56,7 +62,7 @@ public class UtilController {
         if (option != null && option.equals("1")) {
             bucket = "private";
         }
-        Auth auth = Auth.create(accessKey, secretKey);
+        Auth auth = Auth.create(QINIU_ACCESS_KEY, QINIU_SECRET_KEY);
         String upToken = auth.uploadToken(bucket);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("uptoken", upToken);
@@ -67,7 +73,7 @@ public class UtilController {
     @GetMapping("getPhotoPrefix")
     public JSONObject getPhotoPrefix(){
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("prefix", ParameterValues.QI_NIU_PUBLIC_DOMAIN_OF_BUCKET);
+        jsonObject.put("prefix", ParameterValues.QINIU_PUBLIC_DOMAIN_OF_BUCKET);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功", jsonObject);
     }
 
@@ -122,16 +128,13 @@ public class UtilController {
     @RequestMapping(value = "/signForOrder", method = RequestMethod.POST)
     public JSONObject SignForOrder(@RequestParam(value = "orderId") String orderId){
         JSONObject result = new JSONObject();
-
-        //沙盒环境
-//        String appId = "2016081500253068";
-//        String gateway = "https://openapi.alipaydev.com/gateway.do";
-//        正式环境
-        String appId = "2017092708959573";
-        String gateway = "https://openapi.alipay.com/gateway.do";
+        Order order = orderService.getOrderByOrderId(orderId);
+        if(CommonUtil.isNullOrEmpty(order)){
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "订单不存在",result);
+        }
 
         //实例化客户端
-        AlipayClient alipayClient = new DefaultAlipayClient(gateway,appId,appPrivateKey,"json","utf-8",alipayPublicKey,"RSA2");
+        AlipayClient alipayClient = new DefaultAlipayClient(ParameterValues.ALIPAY_GATEWAY_URL,ParameterValues.ALIPAY_APPID, ALIPAY_PRIVATE_KEY,"json","utf-8", ALIPAY_PUBLIC_KEY,"RSA2");
 
         //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
@@ -140,9 +143,9 @@ public class UtilController {
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
 
         //商品详情
-        model.setBody("汽车联盟测试商品详情");
+        model.setBody("浙江众航信息技术有限公司");
         //商品名称
-        model.setSubject("汽车联盟测试商品名称");
+        model.setSubject("订单号"+orderId);
         //订单号
         model.setOutTradeNo(orderId);
 
@@ -153,10 +156,11 @@ public class UtilController {
         // 该参数数值不接受小数点，如1.5h，可转换为90m。
         model.setTimeoutExpress("30m");
         //金额
-        model.setTotalAmount("0.02");
+        DecimalFormat df=new DecimalFormat("#.00");
+        model.setTotalAmount(df.format(order.getRealMoney()));
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);
-        request.setNotifyUrl("http://120.26.60.164:7890/cars-union/util/receiveFromAlipay/" + orderId);
+        request.setNotifyUrl(ParameterValues.ALIPAY_NOTIFY_UTL + "/" + orderId);
 
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
@@ -172,7 +176,7 @@ public class UtilController {
 
     // receive alipay's notify
     @RequestMapping(value = "/receiveFromAlipay/{orderId}", method = RequestMethod.POST)
-    public String receiveFromAlipay(HttpServletRequest request,
+    public JSONObject receiveFromAlipay(HttpServletRequest request,
                                     @PathVariable("orderId") String orderId){
         Map<String,String> params = new HashMap<String,String>();
         Map requestParams = request.getParameterMap();
@@ -191,16 +195,18 @@ public class UtilController {
         //切记alipaypublickey是支付宝的公钥，请去open.alipay.com对应应用下查看。
         //boolean AlipaySignature.rsaCheckV1(Map<String, String> params, String publicKey, String charset, String sign_type)
         try {
-            boolean flag = AlipaySignature.rsaCheckV1(params, alipayPublicKey, "utf-8", "RSA2");
+            boolean flag = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "utf-8", "RSA2");
             if(flag){
-                logger.info("-------- OrderId : " + orderId + "  is payed");
+                String state = orderService.finishPay(orderId);
+                return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"支付成功",state);
             }else{
                 logger.info("-------- OrderId : " + orderId + "  is not payed");
+                return CommonUtil.response(ResponseType.REQUEST_FAIL,"支付失败",null);
             }
         } catch (AlipayApiException e) {
             e.printStackTrace();
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"支付失败",null);
         }
-        return "ok";
     }
 
 

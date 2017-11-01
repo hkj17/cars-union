@@ -32,9 +32,18 @@ public class AdminController {
         Page<Merchant> merchantPage = merchantService.getRegInProcessList(status, pageNum, pageSize);
         List<Merchant> merchantList = merchantPage.getContent();
         for (Merchant m : merchantList) {
-            m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
-            m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
-            m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
+            if(!CommonUtil.isNullOrEmpty(m.getIdcardFront())) {
+                m.setIdcardFront(QiniuUtil.photoUrlForPrivate(m.getIdcardFront()));
+            }
+            if(!CommonUtil.isNullOrEmpty(m.getIdcardBack())) {
+                m.setIdcardBack(QiniuUtil.photoUrlForPrivate(m.getIdcardBack()));
+            }
+            if(!CommonUtil.isNullOrEmpty(m.getLicensePath())) {
+                m.setLicensePath(QiniuUtil.photoUrlForPrivate(m.getLicensePath()));
+            }
+            if(!CommonUtil.isNullOrEmpty(m.getLogo())){
+                m.setLogo(QiniuUtil.photoUrlForPublic(m.getLogo()));
+            }
         }
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",merchantPage);
     }
@@ -69,8 +78,9 @@ public class AdminController {
                                          @RequestParam(value = "region", required = false) String region,
                                          @RequestParam(value = "contact", required = false) String contact,
                                          @RequestParam(value = "longitude", required = false) String longitude,
-                                         @RequestParam(value = "latitude", required = false) String latitude) {
-        boolean state = merchantService.modifyMerchantInfo(id, name, address, region, contact, longitude, latitude);
+                                         @RequestParam(value = "latitude", required = false) String latitude,
+                                         @RequestParam(value = "logo", required = false) String logo) {
+        boolean state = merchantService.modifyMerchantInfo(id, name, address, region, contact, longitude, latitude,logo);
         if (state) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {

@@ -27,7 +27,7 @@ public class WxpayService {
     }
 
     public Map unifiedOrder() {
-        unifiedOrderHttpRequest.setParameter("appid", ParameterValues.APP_ID);
+        unifiedOrderHttpRequest.setParameter("appid", ParameterValues.WXPAY_APP_ID);
         unifiedOrderHttpRequest.setParameter("body", "test");
         unifiedOrderHttpRequest.setParameter("total_fee", "1");
         unifiedOrderHttpRequest.setParameter("mch_id", "1485889482");
@@ -45,7 +45,7 @@ public class WxpayService {
     }
 
     public Map closeOrder() {
-        closeOrderHttpRequest.setParameter("appid", ParameterValues.APP_ID);
+        closeOrderHttpRequest.setParameter("appid", ParameterValues.WXPAY_APP_ID);
         closeOrderHttpRequest.setParameter("mch_id", "1485889482");
         closeOrderHttpRequest.setParameter("out_trade_no", "123456789");
         closeOrderHttpRequest.setParameter("nonce_str", "TEST");
@@ -57,7 +57,7 @@ public class WxpayService {
     }
 
     public Map orderQuery() {
-        orderQueryHttpRequest.setParameter("appid", ParameterValues.APP_ID);
+        orderQueryHttpRequest.setParameter("appid", ParameterValues.WXPAY_APP_ID);
         orderQueryHttpRequest.setParameter("mch_id", "1485889482");
         orderQueryHttpRequest.setParameter("out_trade_no", "123456789");
         orderQueryHttpRequest.setParameter("nonce_str", "TEST");

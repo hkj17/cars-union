@@ -15,10 +15,9 @@ public class QiniuUtil {
 
     //输入fileName,输出完整url，公开地址
     public static String photoUrlForPublic(String fileName){
-//        String domainOfBucket = "http://ov2bucobf.bkt.clouddn.com";
         try {
             String encodedFileName = URLEncoder.encode(fileName, "utf-8");
-            String finalUrl = String.format("%s/%s", QI_NIU_PUBLIC_DOMAIN_OF_BUCKET,encodedFileName);
+            String finalUrl = String.format("%s/%s", QINIU_PUBLIC_DOMAIN_OF_BUCKET,encodedFileName);
             return finalUrl;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -32,7 +31,7 @@ public class QiniuUtil {
         try {
             String encodedFileName = URLEncoder.encode(fileName, "utf-8");
             String publicUrl = String.format("%s/%s", domainOfBucket,encodedFileName);
-            Auth auth = Auth.create(accessKey,secretKey);
+            Auth auth = Auth.create(QINIU_ACCESS_KEY, QINIU_SECRET_KEY);
             long expireInSeconds = 3600;  //two hours
             String finalUrl = auth.privateDownloadUrl(publicUrl,expireInSeconds);
             return finalUrl;

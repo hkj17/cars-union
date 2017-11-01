@@ -259,11 +259,6 @@ public class OrderService {
     public List<ShoppingCart> getShoppingCartList(String userId) {
         User user = userDao.findById(userId);
         List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUser(user);
-        for (ShoppingCart sc : shoppingCartList) {
-            Product product = sc.getProduct();
-            QiniuUtil.transformPhotoUrl(product);
-            sc.setProduct(product);
-        }
         return shoppingCartList;
     }
 
