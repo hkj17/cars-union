@@ -124,14 +124,14 @@ public class UtilController {
         JSONObject result = new JSONObject();
 
         //沙盒环境
-        String appId = "2016081500253068";
-        String gateway = "https://openapi.alipaydev.com/gateway.do";
+//        String appId = "2016081500253068";
+//        String gateway = "https://openapi.alipaydev.com/gateway.do";
 //        正式环境
-//        String appId = "2017092708959573";
-//        String gateway = "https://openapi.alipay.com/gateway.do";
+        String appId = "2017092708959573";
+        String gateway = "https://openapi.alipay.com/gateway.do";
 
         //实例化客户端
-        AlipayClient alipayClient = new DefaultAlipayClient(gateway,appId,appPrivateKey,"json","utf-8",alipayPublicKey_test,"RSA2");
+        AlipayClient alipayClient = new DefaultAlipayClient(gateway,appId,appPrivateKey,"json","utf-8",alipayPublicKey,"RSA2");
 
         //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
