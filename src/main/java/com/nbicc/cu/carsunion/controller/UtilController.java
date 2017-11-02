@@ -165,7 +165,7 @@ public class UtilController {
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            System.out.println(response.getBody());//就是orderString 可以直接给客户端请求，无需再做处理。
+//            System.out.println(response.getBody());//就是orderString 可以直接给客户端请求，无需再做处理。
             String orderString = response.getBody();
             result.put("orderString",orderString);
         } catch (AlipayApiException e) {
@@ -176,7 +176,7 @@ public class UtilController {
 
     // receive alipay's notify
     @RequestMapping(value = "/receiveFromAlipay/{orderId}", method = RequestMethod.POST)
-    public JSONObject receiveFromAlipay(HttpServletRequest request,
+    public String receiveFromAlipay(HttpServletRequest request,
                                     @PathVariable("orderId") String orderId){
         Map<String,String> params = new HashMap<String,String>();
         Map requestParams = request.getParameterMap();
@@ -197,15 +197,16 @@ public class UtilController {
         try {
             boolean flag = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "utf-8", "RSA2");
             if(flag){
-                String state = orderService.finishPay(orderId);
-                return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"支付成功",state);
+                orderService.finishPay(orderId);
+                logger.info("-------- OrderId : " + orderId + "  is payed");
+                return "success";
             }else{
                 logger.info("-------- OrderId : " + orderId + "  is not payed");
-                return CommonUtil.response(ResponseType.REQUEST_FAIL,"支付失败",null);
+                return "failure";
             }
         } catch (AlipayApiException e) {
             e.printStackTrace();
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"支付失败",null);
+            return "failure";
         }
     }
 
