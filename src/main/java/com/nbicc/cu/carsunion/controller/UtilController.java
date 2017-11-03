@@ -156,7 +156,7 @@ public class UtilController {
         // 该参数数值不接受小数点，如1.5h，可转换为90m。
         model.setTimeoutExpress("30m");
         //金额
-        DecimalFormat df=new DecimalFormat("#.00");
+        DecimalFormat df=new DecimalFormat("0.00");
         model.setTotalAmount(df.format(order.getRealMoney()));
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);
