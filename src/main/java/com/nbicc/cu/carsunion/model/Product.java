@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,6 +24,12 @@ public class Product {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "simple_name")
+    private String simpleName;
+
+    @Column(name = "promotion")
+    private String promotion;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -46,6 +53,9 @@ public class Product {
     @Column(name = "sale_num")
     private int saleNum;
 
+    @Column(name = "group_mark")
+    private String groupMark;
+
     @Column(name = "del_flag")
     private int delFlag;
 
@@ -53,13 +63,18 @@ public class Product {
     @JoinTable(name = "vehicle_product_relationship", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
     private Set<Vehicle> vehicles;
 
+    @Transient
+    private List<Product> brotherProducts;
+
     public Product() {
     }
 
-    public Product(String id, String classId, String name, BigDecimal price, String specification, String feature, Date createdTime, String admin, int onSale,int saleNum) {
+    public Product(String id, String classId, String name, String simpleName, String promotion, BigDecimal price, String specification, String feature, Date createdTime, String admin, int onSale, int saleNum, String groupMark) {
         this.id = id;
         this.classId = classId;
         this.name = name;
+        this.simpleName = simpleName;
+        this.promotion = promotion;
         this.price = price;
         this.specification = specification;
         this.feature = feature;
@@ -67,7 +82,7 @@ public class Product {
         this.admin = admin;
         this.onSale = onSale;
         this.saleNum = saleNum;
-        this.delFlag = 0;
+        this.groupMark = groupMark;
     }
 
     public String getId() {
@@ -166,4 +181,37 @@ public class Product {
     public void setDelFlag(int delFlag) {
         this.delFlag = delFlag;
     }
+
+    public String getSimpleName() {
+        return simpleName;
+    }
+
+    public void setSimpleName(String simpleName) {
+        this.simpleName = simpleName;
+    }
+
+    public String getPromotion() {
+        return promotion;
+    }
+
+    public void setPromotion(String promotion) {
+        this.promotion = promotion;
+    }
+
+    public String getGroupMark() {
+        return groupMark;
+    }
+
+    public void setGroupMark(String groupMark) {
+        this.groupMark = groupMark;
+    }
+
+    public List<Product> getBrotherProducts() {
+        return brotherProducts;
+    }
+
+    public void setBrotherProducts(List<Product> brotherProducts) {
+        this.brotherProducts = brotherProducts;
+    }
+
 }
