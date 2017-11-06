@@ -1,6 +1,5 @@
 package com.nbicc.cu.carsunion.util;
 
-import com.nbicc.cu.carsunion.model.Product;
 import com.qiniu.util.Auth;
 
 import java.io.UnsupportedEncodingException;
@@ -39,18 +38,5 @@ public class QiniuUtil {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static void transformPhotoUrl(Product product) {
-        if (CommonUtil.isNullOrEmpty(product.getFeature())) {
-            return;
-        }
-        String[] urls = product.getFeature().split(",");
-        StringBuilder sb = new StringBuilder();
-        sb.append(QiniuUtil.photoUrlForPublic(urls[0]));
-        for (int i = 1; i < urls.length; ++i) {
-            sb.append(",").append(QiniuUtil.photoUrlForPublic(urls[i]));
-        }
-        product.setFeature(sb.toString());
     }
 }

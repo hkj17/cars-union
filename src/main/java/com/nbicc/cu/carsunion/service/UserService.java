@@ -12,10 +12,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -40,6 +37,12 @@ public class UserService {
 
     @Autowired
     CreditHistoryDao creditHistoryDao;
+
+    @Autowired
+    FavoriteDao favoriteDao;
+
+    @Autowired
+    ProductDao productDao;
 
     public String validateToken(RedisTemplate redisTemplate, String token) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
@@ -299,6 +302,88 @@ public class UserService {
             return null;
         }
         return uvr.getVehicle();
+    }
+
+    public List<Favorite> getFavoriteList(String userId){
+        return favoriteDao.findByUserAndFavorite(userId,true);
+    }
+
+    @Transactional
+    public boolean addFavorite(String userId, String productId){
+        User user = userDao.findById(userId);
+        Product product = productDao.findByIdAndDelFlag(productId, 0);
+        if (user == null || product == null) {
+            return false;
+        }
+        Favorite favorite = favoriteDao.findByUserAndProduct(user,product);
+        if(favorite==null){
+            favorite = new Favorite();
+            favorite.setId(CommonUtil.generateUUID32());
+            favorite.setUser(user);
+            favorite.setProduct(product);
+        }
+        favorite.setCreatedAt(new Date());
+        favorite.setFavorite(true);
+        favoriteDao.save(favorite);
+        return true;
+    }
+
+    @Transactional
+    public boolean deleteFromFavorite(String userId, List<String> productIdList){
+        List<Favorite> favoriteList = favoriteDao.findByUserAndProductIn(userId,productIdList);
+        List<Favorite> toRemove = new ArrayList<Favorite>();
+        Iterator<Favorite> iter = favoriteList.iterator();
+        while(iter.hasNext()){
+            Favorite curr = iter.next();
+            curr.setFavorite(false);
+            if(!curr.isBrowsed()){
+                toRemove.add(curr);
+                iter.remove();
+            }
+        }
+        favoriteDao.save(favoriteList);
+        favoriteDao.deleteInBatch(toRemove);
+        return true;
+    }
+
+    public List<Favorite> getBrowseHistory(String userId){
+        return favoriteDao.findByUserAndBrowsed(userId,true);
+    }
+
+    public boolean addToBrowseHistory(String userId, String productId){
+        User user = userDao.findById(userId);
+        Product product = productDao.findByIdAndDelFlag(productId, 0);
+        if (user == null || product == null) {
+            return false;
+        }
+        Favorite favorite = favoriteDao.findByUserAndProduct(user,product);
+        if(favorite==null){
+            favorite = new Favorite();
+            favorite.setId(CommonUtil.generateUUID32());
+            favorite.setUser(user);
+            favorite.setProduct(product);
+        }
+        favorite.setLastVisited(new Date());
+        favorite.setBrowsed(true);
+        favoriteDao.save(favorite);
+        return true;
+    }
+
+    public boolean deleteFromBrowseHistory(String userId, List<String> productIdList){
+        List<Favorite> favoriteList = favoriteDao.findByUserAndProductIn(userId,productIdList);
+        List<Favorite> toRemove = new ArrayList<Favorite>();
+        Iterator<Favorite> iter = favoriteList.iterator();
+        while(iter.hasNext()){
+            Favorite curr = iter.next();
+            curr.setBrowsed(false);
+            if(!curr.isFavorite()){
+                toRemove.add(curr);
+                iter.remove();
+            }
+        }
+        favoriteDao.save(favoriteList);
+        favoriteDao.deleteInBatch(toRemove);
+        return true;
     }
 
     public VipLevel getVipLevelByUser(String userId) {
