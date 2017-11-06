@@ -106,7 +106,8 @@ public class OrderController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
     }
 
-    @Authority(value = AuthorityType.AdminValidate)
+    //todo
+    @Authority(value = AuthorityType.NoValidate)
     @RequestMapping(value = "getOrderByOrderId", method = RequestMethod.POST)
     public JSONObject getOrderByOrderId(@RequestParam(value = "orderId") String orderId) {
         Order order = orderService.getOrderByOrderId(orderId);

@@ -7,6 +7,7 @@ import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
+import com.nbicc.cu.carsunion.model.ProductTag;
 import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.service.UserService;
@@ -76,11 +77,15 @@ public class ProductController {
     public JSONObject addProduct(
             @RequestParam(value = "classId") String classId,
             @RequestParam(value = "name") String name,
+            @RequestParam(value = "simpleName") String simpleName,
+            @RequestParam(value = "promotion") String promotion,
+            @RequestParam(value = "photos") String photos,
             @RequestParam(value = "price") String price,
             @RequestParam(value = "specification") String specification,
             @RequestParam(value = "feature") String feature,
-            @RequestParam(value = "vehicles", required = false) String vehicles) {
-        String result = productService.addProduct(classId, name, price, specification, feature, vehicles);
+            @RequestParam(value = "vehicles", required = false) String vehicles,
+            @RequestParam(value = "groupMark", required = false) String groupMark) {
+        String result = productService.addProduct(classId, name, simpleName, promotion,photos, price, specification, feature, vehicles, groupMark);
         if ("ok".equals(result)) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
@@ -95,10 +100,14 @@ public class ProductController {
             @RequestParam(value = "productId") String productId,
             @RequestParam(value = "classId") String classId,
             @RequestParam(value = "name") String name,
+            @RequestParam(value = "simpleName") String simpleName,
+            @RequestParam(value = "promotion") String promotion,
+            @RequestParam(value = "photos") String photos,
             @RequestParam(value = "price") String price,
             @RequestParam(value = "specification") String specification,
-            @RequestParam(value = "feature") String feature) {
-        String result = productService.editProduct(productId, classId, name, price, specification, feature);
+            @RequestParam(value = "feature") String feature,
+            @RequestParam(value = "groupMark", required = false) String groupMark) {
+        String result = productService.editProduct(productId, classId, name,simpleName, promotion, photos, price, specification, feature, groupMark);
         if ("ok".equals(result)) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
@@ -120,12 +129,15 @@ public class ProductController {
 
 
     //根据id获取商品
-    @Authority(value = AuthorityType.UserValidate)
+    @Authority
     @RequestMapping(value = "getProductById", method = RequestMethod.POST)
     public JSONObject getProductByid(@RequestParam(value = "productId") String id) {
         Product product = productService.getProductById(id);
-        String userId = hostHolder.getAdmin().getId();
-        userService.addToBrowseHistory(userId,id);
+        if(hostHolder.getAdmin() != null && hostHolder.getAdmin().getAuthority() == 2) {
+            //用户浏览记录跟踪
+            String userId = hostHolder.getAdmin().getId();
+            userService.addToBrowseHistory(userId, id);
+        }
         if (product == null) {
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"商品不存在",null);
         } else {
@@ -194,4 +206,52 @@ public class ProductController {
             return CommonUtil.response(ResponseType.REQUEST_FAIL, result,null);
         }
     }
+
+    //添加商品标签
+    @Authority(value = AuthorityType.AdminValidate)
+    @RequestMapping(value = "addProductTag", method = RequestMethod.POST)
+    public JSONObject addProductTag(@RequestParam("tagName") String tagName,
+                                    @RequestParam("productClassId")String productClassId) {
+        String result = productService.addProductTag(tagName,productClassId);
+        if("ok".equals(result)){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,result,null);
+        }
+    }
+
+    //根据商品类别查询商品标签
+    @Authority(value = AuthorityType.AdminValidate)
+    @RequestMapping(value = "getProductTagByProductClassId", method = RequestMethod.POST)
+    public JSONObject getProductTagByProductClassId(@RequestParam("productClassId")String productClassId) {
+        List<ProductTag> result = productService.getProductTagByProductClassId(productClassId);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "ok",result);
+    }
+
+    //编辑商品标签
+    @Authority(value = AuthorityType.AdminValidate)
+    @RequestMapping(value = "editProductTag", method = RequestMethod.POST)
+    public JSONObject editProductTag(@RequestParam("productTagId") String productTagId,
+                                     @RequestParam("tagName") String tagName,
+                                     @RequestParam("productClassId")String productClassId) {
+        String result = productService.editProductTag(productTagId,tagName,productClassId);
+        if("ok".equals(result)){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,result,null);
+        }
+    }
+
+    //删除商品标签
+    @Authority(value = AuthorityType.AdminValidate)
+    @RequestMapping(value = "deleteProductTag", method = RequestMethod.POST)
+    public JSONObject deleteProductTag(@RequestParam("productTagId") String productTagId) {
+        String result = productService.deleteProductTag(productTagId);
+        if("ok".equals(result)){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,result,null);
+        }
+    }
+
 }

@@ -64,6 +64,11 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                         if(!CommonUtil.isNullOrEmpty(tokenValue)){
                             redisTemplate.expire("token" + token, ParameterValues.TOKEN_EXPIRE_VALUE, TimeUnit.HOURS);
                         }
+                        String userId = (String) valueOperations.get("token" + token);
+                        Admin admin = adminService.getById(userId);
+                        if(admin != null) {
+                            hostHolder.setAdmin(admin);
+                        }
                         if (AuthorityType.NoValidate == authority.value()) {
                             // 标记为不验证,放行
                             logger.info("---NoValidate---");
@@ -71,39 +76,25 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                         } else if (AuthorityType.NoAuthority == authority.value()) {
                             // 不验证权限，验证是否登录
                             logger.info("---NoAuthority---");
-                            String userId = (String) valueOperations.get("token" + token);
-                            Admin admin = adminService.getById(userId);
                             if(admin != null) {
-                                hostHolder.setAdmin(admin);
                                 return true;
                             }
                         } else if (AuthorityType.UserValidate == authority.value()){
                             // 验证用户权限
                             logger.info("---UserValidate---");
-
-                            String userId = (String) valueOperations.get("token" + token);
-                            Admin admin = adminService.getById(userId);
                             if(admin != null && admin.getAuthority() == 2) {
-                                hostHolder.setAdmin(admin);
                                 return true;
                             }
                         } else if (AuthorityType.MerchantValidate == authority.value()){
                             // 验证商家权限
                             logger.info("---MerchantValidate---");
-
-                            String userId = (String) valueOperations.get("token" + token);
-                            Admin admin = adminService.getById(userId);
                             if(admin != null && admin.getAuthority() == 1) {
-                                hostHolder.setAdmin(admin);
                                 return true;
                             }
                         } else if (AuthorityType.AdminValidate == authority.value()) {
                             //验证超级管理员权限
                             logger.info("---AdminValidate---");
-                            String userId = (String) valueOperations.get("token" + token);
-                            Admin admin = adminService.getById(userId);
                             if(admin != null && admin.getAuthority() == 0) {
-                                hostHolder.setAdmin(admin);
                                 return true;
                             }
                         }

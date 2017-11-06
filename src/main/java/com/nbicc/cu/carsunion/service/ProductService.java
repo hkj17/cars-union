@@ -1,12 +1,8 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.dao.*;
-import com.nbicc.cu.carsunion.model.Product;
-import com.nbicc.cu.carsunion.model.ProductClass;
-import com.nbicc.cu.carsunion.model.Vehicle;
-import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
+import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
-import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -37,6 +31,8 @@ public class ProductService {
     private VehicleDao vehicleDao;
     @Autowired
     private VehicleProductRelationshipDao vehicleProductRelationshipDao;
+    @Autowired
+    private ProductTagDao productTagDao;
 
     public boolean addProductClass(String pid, String path, String name, Integer level) {
         String id = CommonUtil.generateUUID16();
@@ -74,14 +70,14 @@ public class ProductService {
     }
 
     @Transactional
-    public String addProduct(String classId, String name, String price, String specification, String feature, String vehicles) {
+    public String addProduct(String classId, String name,String simpleName, String promotion, String photos, String price, String specification, String feature, String vehicles,String groupMark) {
         ProductClass productClass = productClassDao.getById(classId);
         if (CommonUtil.isNullOrEmpty(productClass)) {
             logger.info("product class not exist.");
             return "product class not exist.";
         }
         String id = CommonUtil.generateUUID32();
-        Product product = new Product(id, productClass.getPath() + "," + productClass.getId(), name, new BigDecimal(price), specification, feature, new Date(), "admin", 0, 0);  //0默认上架
+        Product product = new Product(id, productClass.getPath() + "," + productClass.getId(), name, simpleName, promotion,photos, new BigDecimal(price), specification, feature, new Date(), "admin", 0, 0,groupMark);  //0默认上架
         productDao.save(product);
         if (!CommonUtil.isNullOrEmpty(vehicles)) {
             String[] lists = vehicles.split(",");
@@ -97,7 +93,7 @@ public class ProductService {
         return "ok";
     }
 
-    public String editProduct(String productId, String classId, String name, String price, String specification, String feature) {
+    public String editProduct(String productId, String classId, String name,String simpleName, String promotion,String photos, String price, String specification, String feature,String groupMark) {
         Product product = productDao.getOne(productId);
         ProductClass productClass = productClassDao.getById(classId);
         if (CommonUtil.isNullOrEmpty(productClass)) {
@@ -107,9 +103,13 @@ public class ProductService {
             product.setClassId(productClass.getPath() + "," + productClass.getId());
         }
         product.setName(name);
+        product.setSimpleName(simpleName);
+        product.setPromotion(promotion);
+        product.setPhotos(photos);
         product.setPrice(new BigDecimal(price));
         product.setSpecification(specification);
         product.setFeature(feature);
+        product.setGroupMark(groupMark);
         productDao.save(product);
         return "ok";
     }
@@ -155,6 +155,12 @@ public class ProductService {
 
     public Product getProductById(String id) {
         Product product = productDao.findByIdAndDelFlag(id, 0);
+        //增加相关联商品
+        if(product.getGroupMark() != null){
+            List<Product> brotherProducts = productDao.findByGroupMarkAndDelFlag(product.getGroupMark(),0);
+            brotherProducts.remove(product);
+            product.setBrotherProducts(brotherProducts);
+        }
         return product;
     }
 
@@ -320,5 +326,49 @@ public class ProductService {
             vp.getVehicle().setName(getFullName(vp.getVehicle().getPath(), vp.getVehicle().getId()));
         }
         return lists;
+    }
+
+    public String addProductTag(String tagName, String productClassId) {
+        ProductClass productClass = productClassDao.getById(productClassId);
+        if(productClass == null){
+            return "product class is not found!";
+        }
+        if(CommonUtil.isNullOrEmpty(tagName)){
+            return "tagName is null";
+        }
+        String id = UUID.randomUUID().toString().replace("-","");
+        productTagDao.save(new ProductTag(id,tagName,productClass.getPath() + "," + productClass.getId()));
+        return "ok";
+    }
+
+    public List<ProductTag> getProductTagByProductClassId(String productClassId) {
+        return productTagDao.findByProductClassLike("%" + productClassId + "%");
+    }
+
+    public String editProductTag(String productTagId, String tagName, String productClassId) {
+        ProductClass productClass = productClassDao.getById(productClassId);
+        if(productClass == null){
+            return "product class is not found!";
+        }
+        if(CommonUtil.isNullOrEmpty(tagName)){
+            return "tagName is null";
+        }
+        ProductTag productTag = productTagDao.findOne(productTagId);
+        if(productTag == null){
+            return "Product tag is not exist!";
+        }
+        productTag.setName(tagName);
+        productTag.setProductClass(productClass.getPath() + "," + productClass.getId());
+        productTagDao.save(productTag);
+        return "ok";
+    }
+
+    public String deleteProductTag(String productTagId) {
+        ProductTag productTag = productTagDao.findOne(productTagId);
+        if(productTag == null){
+            return "Product tag is not exist!";
+        }
+        productTagDao.delete(productTag);
+        return "ok";
     }
 }

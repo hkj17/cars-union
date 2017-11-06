@@ -5,7 +5,6 @@ import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.enumtype.OrderStatus;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
-import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -159,7 +158,7 @@ public class OrderService {
     public String finishPay(String orderId) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
         if(order == null){
-            throw new RuntimeException("order does not exist!");
+            return "order does not exist!";
         }
         if(order.getStatus() == OrderStatus.NOT_PAYED.ordinal()){
             order.setPayTime(new Date());
@@ -181,10 +180,10 @@ public class OrderService {
                 }
             }
             creditHistoryDao.save(creditHistories);
+            orderDao.save(order);
         }else{
-            throw new RuntimeException("order is not ready for payment!");
+            return "order is not ready for payment!";
         }
-        orderDao.save(order);
         return "ok";
     }
 

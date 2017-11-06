@@ -19,6 +19,8 @@ public interface ProductDao extends JpaRepository<Product,String>,PagingAndSorti
 
     List<Product> findByClassIdLikeAndDelFlag(String classId,int delFlag);
 
+    List<Product> findByGroupMarkAndDelFlag(String groupMark,int delFlag);
+
 //    Page<Product> findAllByDelFlag(int delFlag, Pageable pageable);
 
     Page<Product> findByClassIdLikeAndOnSaleAndDelFlag(String classId,int onSale, int delFlag, Pageable pageable);
