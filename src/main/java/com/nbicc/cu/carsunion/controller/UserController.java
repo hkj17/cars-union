@@ -9,10 +9,7 @@ import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -149,6 +146,45 @@ public class UserController {
         } else {
             return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
+    }
+
+    @RequestMapping(value = "/getFavoriteList", method = RequestMethod.POST)
+    public JSONObject getFavoriteList(){
+        String userId = hostHolder.getAdmin().getId();
+        List<Favorite> favoriteList = userService.getFavoriteList(userId);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",favoriteList);
+    }
+
+    @RequestMapping(value = "/addFavorite", method = RequestMethod.POST)
+    public JSONObject addFavorite(@RequestParam(value = "productId") String productId){
+        String userId = hostHolder.getAdmin().getId();
+        boolean state = userService.addFavorite(userId,productId);
+        if (state) {
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
+        } else {
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
+        }
+    }
+
+    @RequestMapping(value = "/deleteFavorite", method = RequestMethod.POST)
+    public JSONObject deleteFavorite(@RequestBody JSONObject json){
+        String userId = hostHolder.getAdmin().getId();
+        userService.deleteFromFavorite(userId, json.getObject("productIdList", List.class));
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
+    }
+
+    @RequestMapping(value = "/getBrowseHistory", method = RequestMethod.POST)
+    public JSONObject getBrowseHistory(){
+        String userId = hostHolder.getAdmin().getId();
+        List<Favorite> browseList = userService.getBrowseHistory(userId);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",browseList);
+    }
+
+    @RequestMapping(value = "/deleteBrowseHistory", method = RequestMethod.POST)
+    public JSONObject deleteBrowseHistory(@RequestBody JSONObject json){
+        String userId = hostHolder.getAdmin().getId();
+        userService.deleteFromBrowseHistory(userId, json.getObject("productIdList", List.class));
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
     }
 
     @RequestMapping(value = "/getVipLevel", method = RequestMethod.POST)

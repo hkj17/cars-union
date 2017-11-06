@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
+import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.Product;
 import com.nbicc.cu.carsunion.model.ProductClass;
 import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.service.ProductService;
+import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,12 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    HostHolder hostHolder;
 
     //增加商品类别
     //id,path,level都是传父节点的.
@@ -112,9 +120,12 @@ public class ProductController {
 
 
     //根据id获取商品
+    @Authority(value = AuthorityType.UserValidate)
     @RequestMapping(value = "getProductById", method = RequestMethod.POST)
     public JSONObject getProductByid(@RequestParam(value = "productId") String id) {
         Product product = productService.getProductById(id);
+        String userId = hostHolder.getAdmin().getId();
+        userService.addToBrowseHistory(userId,id);
         if (product == null) {
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"商品不存在",null);
         } else {
