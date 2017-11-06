@@ -371,4 +371,8 @@ public class ProductService {
         productTagDao.delete(productTag);
         return "ok";
     }
+
+    public ProductTag getProductTagById(String id) {
+        return productTagDao.findOne(id);
+    }
 }
