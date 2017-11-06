@@ -70,14 +70,14 @@ public class ProductService {
     }
 
     @Transactional
-    public String addProduct(String classId, String name,String simpleName, String promotion, String price, String specification, String feature, String vehicles,String groupMark) {
+    public String addProduct(String classId, String name,String simpleName, String promotion, String photos, String price, String specification, String feature, String vehicles,String groupMark) {
         ProductClass productClass = productClassDao.getById(classId);
         if (CommonUtil.isNullOrEmpty(productClass)) {
             logger.info("product class not exist.");
             return "product class not exist.";
         }
         String id = CommonUtil.generateUUID32();
-        Product product = new Product(id, productClass.getPath() + "," + productClass.getId(), name, simpleName, promotion, new BigDecimal(price), specification, feature, new Date(), "admin", 0, 0,groupMark);  //0默认上架
+        Product product = new Product(id, productClass.getPath() + "," + productClass.getId(), name, simpleName, promotion,photos, new BigDecimal(price), specification, feature, new Date(), "admin", 0, 0,groupMark);  //0默认上架
         productDao.save(product);
         if (!CommonUtil.isNullOrEmpty(vehicles)) {
             String[] lists = vehicles.split(",");
@@ -93,7 +93,7 @@ public class ProductService {
         return "ok";
     }
 
-    public String editProduct(String productId, String classId, String name,String simpleName, String promotion, String price, String specification, String feature,String groupMark) {
+    public String editProduct(String productId, String classId, String name,String simpleName, String promotion,String photos, String price, String specification, String feature,String groupMark) {
         Product product = productDao.getOne(productId);
         ProductClass productClass = productClassDao.getById(classId);
         if (CommonUtil.isNullOrEmpty(productClass)) {
@@ -105,6 +105,7 @@ public class ProductService {
         product.setName(name);
         product.setSimpleName(simpleName);
         product.setPromotion(promotion);
+        product.setPhotos(photos);
         product.setPrice(new BigDecimal(price));
         product.setSpecification(specification);
         product.setFeature(feature);
@@ -154,6 +155,7 @@ public class ProductService {
 
     public Product getProductById(String id) {
         Product product = productDao.findByIdAndDelFlag(id, 0);
+        //增加相关联商品
         if(product.getGroupMark() != null){
             List<Product> brotherProducts = productDao.findByGroupMarkAndDelFlag(product.getGroupMark(),0);
             brotherProducts.remove(product);

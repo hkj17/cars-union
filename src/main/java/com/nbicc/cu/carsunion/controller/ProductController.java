@@ -71,12 +71,13 @@ public class ProductController {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "simpleName") String simpleName,
             @RequestParam(value = "promotion") String promotion,
+            @RequestParam(value = "photos") String photos,
             @RequestParam(value = "price") String price,
             @RequestParam(value = "specification") String specification,
             @RequestParam(value = "feature") String feature,
             @RequestParam(value = "vehicles", required = false) String vehicles,
             @RequestParam(value = "groupMark", required = false) String groupMark) {
-        String result = productService.addProduct(classId, name, simpleName, promotion, price, specification, feature, vehicles, groupMark);
+        String result = productService.addProduct(classId, name, simpleName, promotion,photos, price, specification, feature, vehicles, groupMark);
         if ("ok".equals(result)) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {
@@ -93,11 +94,12 @@ public class ProductController {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "simpleName") String simpleName,
             @RequestParam(value = "promotion") String promotion,
+            @RequestParam(value = "photos") String photos,
             @RequestParam(value = "price") String price,
             @RequestParam(value = "specification") String specification,
             @RequestParam(value = "feature") String feature,
             @RequestParam(value = "groupMark", required = false) String groupMark) {
-        String result = productService.editProduct(productId, classId, name,simpleName, promotion, price, specification, feature, groupMark);
+        String result = productService.editProduct(productId, classId, name,simpleName, promotion, photos, price, specification, feature, groupMark);
         if ("ok".equals(result)) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
         } else {

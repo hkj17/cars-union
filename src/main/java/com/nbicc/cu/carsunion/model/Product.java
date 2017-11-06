@@ -31,6 +31,9 @@ public class Product {
     @Column(name = "promotion")
     private String promotion;
 
+    @Column(name = "photos")
+    private String photos;
+
     @Column(name = "price")
     private BigDecimal price;
 
@@ -69,12 +72,13 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, String classId, String name, String simpleName, String promotion, BigDecimal price, String specification, String feature, Date createdTime, String admin, int onSale, int saleNum, String groupMark) {
+    public Product(String id, String classId, String name, String simpleName, String promotion, String photos, BigDecimal price, String specification, String feature, Date createdTime, String admin, int onSale, int saleNum, String groupMark) {
         this.id = id;
         this.classId = classId;
         this.name = name;
         this.simpleName = simpleName;
         this.promotion = promotion;
+        this.photos = photos;
         this.price = price;
         this.specification = specification;
         this.feature = feature;
@@ -214,4 +218,11 @@ public class Product {
         this.brotherProducts = brotherProducts;
     }
 
+    public String getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(String photos) {
+        this.photos = photos;
+    }
 }
