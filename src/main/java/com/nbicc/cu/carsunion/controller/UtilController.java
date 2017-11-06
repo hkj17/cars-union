@@ -134,7 +134,7 @@ public class UtilController {
         }
 
         //实例化客户端
-        AlipayClient alipayClient = new DefaultAlipayClient(ParameterValues.ALIPAY_GATEWAY_URL,ParameterValues.ALIPAY_APPID, ALIPAY_PRIVATE_KEY,"json","utf-8", ALIPAY_PUBLIC_KEY_TEST,"RSA2");
+        AlipayClient alipayClient = new DefaultAlipayClient(ParameterValues.ALIPAY_GATEWAY_URL,ParameterValues.ALIPAY_APPID, ALIPAY_PRIVATE_KEY,"json","utf-8", ALIPAY_PUBLIC_KEY,"RSA2");
 
         //实例化具体API对应的request类,类名称和接口名称对应,当前调用接口名称：alipay.trade.app.pay
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
@@ -156,7 +156,7 @@ public class UtilController {
         // 该参数数值不接受小数点，如1.5h，可转换为90m。
         model.setTimeoutExpress("30m");
         //金额
-        DecimalFormat df=new DecimalFormat("#.00");
+        DecimalFormat df=new DecimalFormat("0.00");
         model.setTotalAmount(df.format(order.getRealMoney()));
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);
@@ -165,7 +165,7 @@ public class UtilController {
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            System.out.println(response.getBody());//就是orderString 可以直接给客户端请求，无需再做处理。
+//            System.out.println(response.getBody());//就是orderString 可以直接给客户端请求，无需再做处理。
             String orderString = response.getBody();
             result.put("orderString",orderString);
         } catch (AlipayApiException e) {
@@ -176,7 +176,7 @@ public class UtilController {
 
     // receive alipay's notify
     @RequestMapping(value = "/receiveFromAlipay/{orderId}", method = RequestMethod.POST)
-    public JSONObject receiveFromAlipay(HttpServletRequest request,
+    public String receiveFromAlipay(HttpServletRequest request,
                                     @PathVariable("orderId") String orderId){
         Map<String,String> params = new HashMap<String,String>();
         Map requestParams = request.getParameterMap();
@@ -197,15 +197,16 @@ public class UtilController {
         try {
             boolean flag = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "utf-8", "RSA2");
             if(flag){
-                String state = orderService.finishPay(orderId);
-                return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"支付成功",state);
+                orderService.finishPay(orderId);
+                logger.info("-------- OrderId : " + orderId + "  is payed");
+                return "success";
             }else{
                 logger.info("-------- OrderId : " + orderId + "  is not payed");
-                return CommonUtil.response(ResponseType.REQUEST_FAIL,"支付失败",null);
+                return "failure";
             }
         } catch (AlipayApiException e) {
             e.printStackTrace();
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"支付失败",null);
+            return "failure";
         }
     }
 
