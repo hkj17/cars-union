@@ -79,7 +79,7 @@ public class OrderController {
         }
     }
 
-    //带分页的订单列表
+    //带分页的用户订单列表
     @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByUserIdWithPage(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
                                                    @RequestParam(value = "end", defaultValue = "2050-01-01 00:00:00") String endDate,
@@ -98,6 +98,9 @@ public class OrderController {
         }
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",orders);
     }
+
+
+
 
 
     @RequestMapping(value = "deleteOrder", method = RequestMethod.POST)
