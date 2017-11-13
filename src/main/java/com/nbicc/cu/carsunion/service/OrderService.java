@@ -179,6 +179,17 @@ public class OrderService {
                     creditHistories.add(secondRecommendor);
                 }
             }
+
+            //增加商品的销售量
+            List<OrderDetail> details = orderDetailDao.findByUserOrder(order);
+            for (OrderDetail detail : details) {
+                Product product = productDao.findById(detail.getProduct().getId());
+                if (product != null) {
+                    product.setSaleNum(product.getSaleNum() + detail.getCount());
+                    productDao.save(product);
+                }
+            }
+
             creditHistoryDao.save(creditHistories);
             orderDao.save(order);
         } else {

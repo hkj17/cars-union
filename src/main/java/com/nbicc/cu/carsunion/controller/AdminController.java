@@ -104,9 +104,9 @@ public class AdminController {
         Page<Order> orders = null;
         try {
             orders = orderService.getOrderListByTimeWithPage(startDate, endDate,status, pageNum - 1, pageSize);
-            for(Order order : orders){
-                order.setUser(null);
-            }
+//            for(Order order : orders){
+//                order.setUser(null);
+//            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
