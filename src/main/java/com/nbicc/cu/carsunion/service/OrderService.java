@@ -14,8 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,9 +44,9 @@ public class OrderService {
     @Autowired
     private VipLevelDao vipLevelDao;
 
-    @Autowired
-    @PersistenceContext
-    private EntityManager em;
+//    @Autowired
+//    @PersistenceContext
+//    private EntityManager em;
 
     private Logger logger = Logger.getLogger(OrderService.class);
 
@@ -134,8 +132,8 @@ public class OrderService {
         return lists;
     }
 
-    public void deleteOrderById(String id) {
-        Order order = orderDao.findByOrderIdAndDelFlag(id, 0);
+    public void deleteOrderById(String orderId) {
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
         order.setDelFlag(1);
         orderDao.save(order);
     }
@@ -303,5 +301,13 @@ public class OrderService {
             lists = orderDao.findAllByDatetimeBetweenAndStatus(start, end, status, pageable);
         }
         return lists;
+    }
+
+    public boolean checkOrderBelongToUser(String userId, String orderId){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
+        if(order == null){
+            return false;
+        }
+        return userId.equals(order.getUser().getId());
     }
 }

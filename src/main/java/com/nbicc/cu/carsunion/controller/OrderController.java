@@ -95,6 +95,7 @@ public class OrderController {
             }
         } catch (ParseException e) {
             e.printStackTrace();
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误!",null);
         }
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",orders);
     }
@@ -104,9 +105,14 @@ public class OrderController {
 
 
     @RequestMapping(value = "deleteOrder", method = RequestMethod.POST)
-    public JSONObject deleteOrder(@RequestParam(value = "id") String id) {
-        orderService.deleteOrderById(id);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
+    public JSONObject deleteOrder(@RequestParam(value = "orderId") String orderId) {
+        //检查订单是否属于该用户
+        if(orderService.checkOrderBelongToUser(hostHolder.getAdmin().getId(),orderId)) {
+            orderService.deleteOrderById(orderId);
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "orderId is wrong!",null);
+        }
     }
 
     //todo
