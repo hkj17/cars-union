@@ -228,6 +228,14 @@ public class ProductController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "ok",result);
     }
 
+    //根据id查询商品标签
+    @Authority(value = AuthorityType.AdminValidate)
+    @RequestMapping(value = "getProductTagById", method = RequestMethod.POST)
+    public JSONObject getProductTagById(@RequestParam("id")String id) {
+        ProductTag productTag = productService.getProductTagById(id);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "ok",productTag);
+    }
+
     //编辑商品标签
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "editProductTag", method = RequestMethod.POST)

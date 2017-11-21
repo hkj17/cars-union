@@ -210,5 +210,11 @@ public class UtilController {
         }
     }
 
+//    @GetMapping("/testFinishPay/{orderId}")
+//    public String testFinishPay(@PathVariable("orderId")String orderId){
+//        orderService.finishPay(orderId);
+//        return "ok";
+//    }
+
 
 }

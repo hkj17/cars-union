@@ -5,7 +5,9 @@ import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Merchant;
+import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.service.MerchantService;
+import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.QiniuUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -23,6 +26,8 @@ import java.util.List;
 public class AdminController {
     @Autowired
     MerchantService merchantService;
+    @Autowired
+    OrderService orderService;
 
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.POST)
@@ -86,5 +91,25 @@ public class AdminController {
         } else {
             return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
         }
+    }
+
+    //带分页,所有最新订单列表（管理员查看）
+    @Authority(value = AuthorityType.AdminValidate)
+    @RequestMapping(value = "getOrderList", method = RequestMethod.POST)
+    public JSONObject getOrderListWithPage(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
+                                           @RequestParam(value = "end", defaultValue = "2050-01-01 00:00:00") String endDate,
+                                           @RequestParam(value = "status",defaultValue = "-1") int status,
+                                           @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+        Page<Order> orders = null;
+        try {
+            orders = orderService.getOrderListByTimeWithPage(startDate, endDate,status, pageNum - 1, pageSize);
+//            for(Order order : orders){
+//                order.setUser(null);
+//            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",orders);
     }
 }

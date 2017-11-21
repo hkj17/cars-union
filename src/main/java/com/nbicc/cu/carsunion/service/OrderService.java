@@ -14,8 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,9 +44,9 @@ public class OrderService {
     @Autowired
     private VipLevelDao vipLevelDao;
 
-    @Autowired
-    @PersistenceContext
-    private EntityManager em;
+//    @Autowired
+//    @PersistenceContext
+//    private EntityManager em;
 
     private Logger logger = Logger.getLogger(OrderService.class);
 
@@ -86,15 +84,15 @@ public class OrderService {
 
         Order order = new Order(id, orderId, user, date, totalMoney, discount, realMoney, merchant, OrderStatus.NOT_PAYED.ordinal(), null, address);
         //从购物车里面删除商品
-        if(isFromSc){
-            deleteFromShoppingCart(userId,productIdList);
+        if (isFromSc) {
+            deleteFromShoppingCart(userId, productIdList);
         }
-        for(OrderDetail orderDetail : orderDetailList){
+        for (OrderDetail orderDetail : orderDetailList) {
             orderDetail.setUserOrder(order);
         }
         orderDao.save(order);
         orderDetailDao.save(orderDetailList);
-        return orderDao.findByOrderIdAndDelFlag(orderId,0);
+        return orderDao.findByOrderIdAndDelFlag(orderId, 0);
     }
 
     private double getDiscount(int credit) {
@@ -116,10 +114,10 @@ public class OrderService {
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         Page<Order> lists = null;
-        if(status < 0){
+        if (status < 0) {
             lists = orderDao.findAllByUserAndDatetimeBetweenAndDelFlag(userDao.findById(userId), start, end, 0, pageable);
-        }else{
-            lists = orderDao.findAllByUserAndDatetimeBetweenAndStatusAndDelFlag(userDao.findById(userId),start,end,status,0,pageable);
+        } else {
+            lists = orderDao.findAllByUserAndDatetimeBetweenAndStatusAndDelFlag(userDao.findById(userId), start, end, status, 0, pageable);
         }
         return lists;
     }
@@ -134,8 +132,8 @@ public class OrderService {
         return lists;
     }
 
-    public void deleteOrderById(String id) {
-        Order order = orderDao.findByOrderIdAndDelFlag(id, 0);
+    public void deleteOrderById(String orderId) {
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
         order.setDelFlag(1);
         orderDao.save(order);
     }
@@ -145,8 +143,8 @@ public class OrderService {
     }
 
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             System.out.println("order does not exist");
             return new ArrayList<>();
         }
@@ -156,11 +154,11 @@ public class OrderService {
 
     @Transactional
     public String finishPay(String orderId) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             return "order does not exist!";
         }
-        if(order.getStatus() == OrderStatus.NOT_PAYED.ordinal()){
+        if (order.getStatus() == OrderStatus.NOT_PAYED.ordinal()) {
             order.setPayTime(new Date());
             order.setStatus(OrderStatus.PAYED.ordinal());
 
@@ -168,35 +166,46 @@ public class OrderService {
             String userId = order.getUser().getId();
             String recommendorId = order.getUser().getRecommend();
             int credit = order.getRealMoney().intValue();
-            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(),userId,orderId,credit,0);
+            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(), userId, orderId, credit, 0);
             creditHistories.add(self);
-            if(!CommonUtil.isNullOrEmpty(recommendorId)){
-                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(),recommendorId,orderId,(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO),1);
+            if (!CommonUtil.isNullOrEmpty(recommendorId)) {
+                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendorId, orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 1);
                 creditHistories.add(firstRecommendor);
                 User recommendor = userDao.findById(recommendorId);
-                if(!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())){
-                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(),orderId,(int)(credit*ParameterValues.RECOMMENDOR_CREDIT_RATIO*ParameterValues.RECOMMENDOR_CREDIT_RATIO),2);
+                if (!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())) {
+                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(), orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 2);
                     creditHistories.add(secondRecommendor);
                 }
             }
+
+            //增加商品的销售量
+            List<OrderDetail> details = orderDetailDao.findByUserOrder(order);
+            for (OrderDetail detail : details) {
+                Product product = productDao.findById(detail.getProduct().getId());
+                if (product != null) {
+                    product.setSaleNum(product.getSaleNum() + detail.getCount());
+                    productDao.save(product);
+                }
+            }
+
             creditHistoryDao.save(creditHistories);
             orderDao.save(order);
-        }else{
+        } else {
             return "order is not ready for payment!";
         }
         return "ok";
     }
 
     public String deliverProducts(String orderId, String courierNumber) {
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             throw new RuntimeException("order does not exist!");
         }
-        if(order.getStatus() == OrderStatus.PAYED.ordinal()){
+        if (order.getStatus() == OrderStatus.PAYED.ordinal()) {
             order.setStatus(OrderStatus.DELIVERED.ordinal());
             order.setDeliverTime(new Date());
             order.setCourierNumber(courierNumber);
-        }else{
+        } else {
             throw new RuntimeException("order is not payed!");
         }
         orderDao.save(order);
@@ -269,13 +278,36 @@ public class OrderService {
             e.printStackTrace();
             return null;
         }
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             return null;
-        }else{
+        } else {
             order.setServiceTime(serviceDate);
             orderDao.save(order);
             return order;
         }
+    }
+
+    public Page<Order> getOrderListByTimeWithPage(String startDate, String endDate, int status, int pageNum, int pageSize) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date start = sdf.parse(startDate);
+        Date end = sdf.parse(endDate);
+        Sort sort = new Sort(Sort.Direction.DESC, "datetime");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<Order> lists = null;
+        if (status < 0) {
+            lists = orderDao.findAllByDatetimeBetween(start, end, pageable);
+        } else {
+            lists = orderDao.findAllByDatetimeBetweenAndStatus(start, end, status, pageable);
+        }
+        return lists;
+    }
+
+    public boolean checkOrderBelongToUser(String userId, String orderId){
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
+        if(order == null){
+            return false;
+        }
+        return userId.equals(order.getUser().getId());
     }
 }

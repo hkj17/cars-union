@@ -210,7 +210,7 @@ public class ProductService {
 
     private String deleteVehicleRelation(String productId, String vehicleId) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
-        Product product = productDao.findByIdAndDelFlag(productId, 0);
+        Product product = productDao.findById(productId);
         if (CommonUtil.isNullOrEmpty(product)) {
             logger.info("when delete vehicleRelationship, product is not exist.");
             return "product is not exist.";
@@ -370,5 +370,9 @@ public class ProductService {
         }
         productTagDao.delete(productTag);
         return "ok";
+    }
+
+    public ProductTag getProductTagById(String id) {
+        return productTagDao.findOne(id);
     }
 }
