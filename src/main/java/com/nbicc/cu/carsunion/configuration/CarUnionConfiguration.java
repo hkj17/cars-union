@@ -23,7 +23,8 @@ public class CarUnionConfiguration extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/admin/*")
                 .addPathPatterns("/order/*")
                 .addPathPatterns("/product/*")
-                .addPathPatterns("/user/*");
+                .addPathPatterns("/user/*")
+                .addPathPatterns("/advertise/*");
         super.addInterceptors(registry);
     }
 
