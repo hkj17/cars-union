@@ -18,7 +18,7 @@ public class HttpRequestUtil {
      *            请求参数。
      * @return URL 所代表远程资源的响应结果
      */
-    public static String sendGet(String url, Map<String, Object> paramMap) {
+    public static String sendGet(String url, Map<String, Object> paramMap, Map<String,String> propertyMap) {
         String result = "";
         BufferedReader in = null;
         try {
@@ -36,10 +36,15 @@ public class HttpRequestUtil {
             // 打开和URL之间的连接
             URLConnection connection = realUrl.openConnection();
             // 设置通用的请求属性
-            connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-Alive");
-            connection.setRequestProperty("user-agent",
-                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+//            connection.setRequestProperty("accept", "*/*");
+//            connection.setRequestProperty("connection", "Keep-Alive");
+//            connection.setRequestProperty("user-agent",
+//                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            Iterator<Map.Entry<String,String>> propertyIterator = propertyMap.entrySet().iterator();
+            while(propertyIterator.hasNext()){
+                Map.Entry<String,String> entry = propertyIterator.next();
+                connection.setRequestProperty(entry.getKey(),entry.getValue());
+            }
             // 建立实际的连接
             connection.connect();
             // 获取所有响应头字段
