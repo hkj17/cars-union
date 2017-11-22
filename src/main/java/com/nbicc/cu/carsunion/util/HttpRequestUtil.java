@@ -36,10 +36,6 @@ public class HttpRequestUtil {
             // 打开和URL之间的连接
             URLConnection connection = realUrl.openConnection();
             // 设置通用的请求属性
-//            connection.setRequestProperty("accept", "*/*");
-//            connection.setRequestProperty("connection", "Keep-Alive");
-//            connection.setRequestProperty("user-agent",
-//                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             Iterator<Map.Entry<String,String>> propertyIterator = propertyMap.entrySet().iterator();
             while(propertyIterator.hasNext()){
                 Map.Entry<String,String> entry = propertyIterator.next();
@@ -77,21 +73,33 @@ public class HttpRequestUtil {
         return result;
     }
 
-    public static String sendPost(String urlString, String postdata) {
+    public static String sendPost(String url, String postdata,Map<String,Object> paramMap, Map<String,String> propertyMap) {
         String result = "";
         BufferedReader in = null;
         try {
             byte[] postdataBytes = postdata.getBytes("UTF-8");
-            URL url = new URL(urlString);
-            HttpURLConnection httpConn=(HttpURLConnection)url.openConnection();
+            String urlNameString = url;
+            Iterator<Map.Entry<String,Object>> entryIterator = paramMap.entrySet().iterator();
+            if(entryIterator.hasNext()){
+                Map.Entry<String,Object> firstEntry = entryIterator.next();
+                urlNameString += "?" + firstEntry.getKey() + "=" + firstEntry.getValue();
+            }
+            URL realUrl = new URL(urlNameString);
+            HttpURLConnection httpConn=(HttpURLConnection)realUrl.openConnection();
             httpConn.setDoOutput(true);   //需要输出
             httpConn.setDoInput(true);   //需要输入
             httpConn.setUseCaches(false);  //不允许缓存
             httpConn.setRequestMethod("POST");   //设置POST方式连接
             //设置请求属性
-            httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            httpConn.setRequestProperty("Content-Type", "application/Json; charset=UTF-8");
             httpConn.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
             httpConn.setRequestProperty("Charset", "UTF-8");
+
+            Iterator<Map.Entry<String,String>> propertyIterator = propertyMap.entrySet().iterator();
+            while(propertyIterator.hasNext()){
+                Map.Entry<String,String> entry = propertyIterator.next();
+                httpConn.setRequestProperty(entry.getKey(),entry.getValue());
+            }
             //连接,也可以不用明文connect，使用下面的httpConn.getOutputStream()会自动connect
             httpConn.connect();
             //建立输入流，向指向的URL传入参数

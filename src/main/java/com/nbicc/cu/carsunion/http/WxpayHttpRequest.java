@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class WxpayHttpRequest extends HttpRequest {
+public class WxpayHttpRequest extends HttpRequest {
     public WxpayHttpRequest(String url){
         super(url);
     }

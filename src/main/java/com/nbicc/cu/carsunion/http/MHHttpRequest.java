@@ -8,7 +8,7 @@ import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public abstract class MHHttpRequest extends HttpRequest{
+public class MHHttpRequest extends HttpRequest{
 
     private static CloseableHttpClient hc2 = HttpClients.createDefault();
 

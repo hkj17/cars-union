@@ -54,6 +54,6 @@ public class HttpRequest {
     }
 
     private String sendHttpRequestPost(String postdata){
-        return HttpRequestUtil.sendPost(url,postdata);
+        return HttpRequestUtil.sendPost(url,postdata,paramMap,propertyMap);
     }
 }
