@@ -46,10 +46,6 @@ public abstract class WxpayHttpRequest extends HttpRequest {
         return sb.toString();
     }
 
-    public void setParameter(String key, String value){
-        paramMap.put(key, value);
-    }
-
     public String getResponsePOST(){
         createSign();
         String xml = generateXmlBody();
