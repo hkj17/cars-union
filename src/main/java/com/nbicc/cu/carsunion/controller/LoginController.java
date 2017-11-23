@@ -127,10 +127,11 @@ public class LoginController {
                                      @RequestParam(value = "nickname", required = false) String nickname,
                                      @RequestParam(value = "portrait", required = false) String portrait,
                                      @RequestParam(value = "contact") String contact,
+                                     @RequestParam(value = "region",required = false) String region,
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
                                      @RequestParam(value = "recommend", required = false) String recommend) {
-        ResponseCode state = userService.userRegister(redisTemplate, name, nickname, contact, portrait, recommend,
+        ResponseCode state = userService.userRegister(redisTemplate, name, nickname, contact, region, portrait, recommend,
                 password, smsCode);
         return CommonUtil.response(state, null);
     }

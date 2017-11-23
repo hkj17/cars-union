@@ -66,7 +66,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String portrait, String recommend, String password, String smsCode) {
+    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String region, String portrait, String recommend, String password, String smsCode) {
         if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
             return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
@@ -89,6 +89,9 @@ public class UserService {
             user.setNickname(nickName);
         } else {
             user.setNickname(defaultName);
+        }
+        if (!CommonUtil.isNullOrEmpty(region)) {
+            user.setRegion(region);
         }
         if (!CommonUtil.isNullOrEmpty(portrait)) {
             user.setPortraitPath(portrait);
@@ -216,24 +219,24 @@ public class UserService {
         }
     }
 
-    public Set<Vehicle> getVehicleList(String userId) {
+    public List<UserVehicleRelationship> getVehicleList(String userId) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {
-            return new HashSet<Vehicle>();
+            return new ArrayList<UserVehicleRelationship>();
         } else {
-            return user.getVehicles();
+            return userVehicleRelationshipDao.findByUser(user);
         }
     }
 
     @Transactional
-    public boolean addVehicle(String userId, String vehicleId, Boolean isDefault) {
+    public boolean addVehicle(String userId, String vehicleId, String plateNum, Boolean isDefault) {
         User user = userDao.findById(userId);
         Vehicle vehicle = vehicleDao.findById(vehicleId);
         if (user == null || vehicle == null) {
             return false;
         }
 
-        UserVehicleRelationship userVehicleRelationship = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
+        UserVehicleRelationship userVehicleRelationship = userVehicleRelationshipDao.findByUserAndVehicleAndPlateNum(user,vehicle,plateNum);
         if (userVehicleRelationship != null) {
             return false;
         }
@@ -241,6 +244,7 @@ public class UserService {
         userVehicleRelationship = new UserVehicleRelationship();
         userVehicleRelationship.setUser(user);
         userVehicleRelationship.setVehicle(vehicle);
+        userVehicleRelationship.setPlateNum(plateNum);
         if (isDefault) {
             UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
             if (uvr != null) {
@@ -256,14 +260,14 @@ public class UserService {
     }
 
     @Transactional
-    public boolean deleteVehicle(String userId, String vehicleId) {
+    public boolean deleteVehicle(String userId, String vehicleId,String plateNum) {
         User user = userDao.findById(userId);
         Vehicle vehicle = vehicleDao.findById(vehicleId);
         if (user == null || vehicle == null) {
             return false;
         }
 
-        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicleAndPlateNum(user, vehicle,plateNum);
         if (uvr == null) {
             return false;
         } else {
@@ -273,7 +277,7 @@ public class UserService {
     }
 
     @Transactional
-    public boolean setDefaultVehicle(String userId, String vehicleId) {
+    public boolean setDefaultVehicle(String userId, String vehicleId,String plateNum) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {
             return false;
@@ -284,7 +288,7 @@ public class UserService {
         }
 
         UserVehicleRelationship uvr_old = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
-        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicle(user, vehicle);
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicleAndPlateNum(user, vehicle,plateNum);
         if (uvr == null) {
             return false;
         }

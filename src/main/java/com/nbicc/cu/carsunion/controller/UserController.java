@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -103,9 +102,10 @@ public class UserController {
 
     @RequestMapping(value = "/addVehicle", method = RequestMethod.POST)
     public JSONObject addVehicle(@RequestParam(value = "vehicleId") String vehicleId,
+                                 @RequestParam(value = "plateNum") String plateNum,
                                  @RequestParam(value = "default") Boolean isDefault) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = userService.addVehicle(userId,vehicleId,isDefault);
+        boolean state = userService.addVehicle(userId,vehicleId,plateNum,isDefault);
         if(state){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
@@ -114,9 +114,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/deleteVehicle", method = RequestMethod.POST)
-    public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId) {
+    public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId,
+                                    @RequestParam(value = "plateNum") String plateNum) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = userService.deleteVehicle(userId,vehicleId);
+        boolean state = userService.deleteVehicle(userId,vehicleId,plateNum);
         if(state){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
@@ -127,7 +128,7 @@ public class UserController {
     @RequestMapping(value = "/getVehicles", method = RequestMethod.POST)
     public JSONObject getVehicles() {
         String userId = hostHolder.getAdmin().getId();
-        Set<Vehicle> vehicles = userService.getVehicleList(userId);
+        List<UserVehicleRelationship> vehicles = userService.getVehicleList(userId);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",vehicles);
     }
 
@@ -139,9 +140,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/setDefaultVehicle", method = RequestMethod.POST)
-    public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId) {
+    public JSONObject setDefaultVehicle(@RequestParam(value = "vehicleId") String vehicleId,
+                                        @RequestParam(value = "plateNum") String plateNum) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = userService.setDefaultVehicle(userId, vehicleId);
+        boolean state = userService.setDefaultVehicle(userId, vehicleId,plateNum);
         if (state) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {

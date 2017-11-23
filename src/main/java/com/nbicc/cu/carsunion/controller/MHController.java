@@ -55,7 +55,11 @@ public class MHController {
                                   @RequestParam(value = "purchaseDate") String purchaseDate){
         String userId = hostHolder.getAdmin().getId();
         JSONObject json = mhService.bindVehicle(userId, plateNum, vin, brandId, styleId, modelId, engineNum, equipmentCode, purchaseDate);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", json);
+        if(json == null){
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"用户未选择默认车型",null);
+        }else {
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", json);
+        }
     }
 
     @RequestMapping(value = "updateVehicle", method = RequestMethod.POST)
