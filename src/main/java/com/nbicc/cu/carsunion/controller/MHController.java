@@ -75,7 +75,7 @@ public class MHController {
     @RequestMapping(value = "getVehicleDetails", method = RequestMethod.GET)
     public JSONObject getVehicleDetails(){
         UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
-        if(!relationship.getIsBindMh()){
+        if(relationship == null || !relationship.getIsBindMh()){
             return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
         }
         String id = relationship.getMhVehicleId();
@@ -94,7 +94,7 @@ public class MHController {
     public JSONObject controlVehicle(@RequestParam(value = "key") String key,
                                      @RequestParam(value = "value") int value){
         UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
-        if(!relationship.getIsBindMh()){
+        if(relationship == null || !relationship.getIsBindMh()){
             return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
         }
         String hwId = relationship.getMhHwId();
@@ -105,7 +105,7 @@ public class MHController {
     @RequestMapping(value = "getVehiclePosition", method = RequestMethod.GET)
     public JSONObject getVehiclePosition(){
         UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
-        if(!relationship.getIsBindMh()){
+        if(relationship == null || !relationship.getIsBindMh()){
             return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
         }
         String hwId = relationship.getMhHwId();
@@ -116,13 +116,12 @@ public class MHController {
     @RequestMapping(value = "getVehicleStatus", method = RequestMethod.GET)
     public JSONObject getVehicleStatus(){
         UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
-        if(!relationship.getIsBindMh()){
+        if(relationship == null || !relationship.getIsBindMh()){
             return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
         }
         String hwId = relationship.getMhHwId();
         Object[] status = mhService.getMHVehicleStatus(hwId);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",status);
     }
-
 
 }

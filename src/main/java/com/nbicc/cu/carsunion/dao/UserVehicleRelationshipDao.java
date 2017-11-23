@@ -14,6 +14,4 @@ public interface UserVehicleRelationshipDao extends JpaRepository<UserVehicleRel
 
     UserVehicleRelationship findByUserAndIsDefault(User u, Boolean isDefault);
 
-    UserVehicleRelationship findByUserAndIsDefault(String userId, Boolean isDefault);
-
 }

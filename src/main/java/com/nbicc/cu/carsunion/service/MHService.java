@@ -1,6 +1,7 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.util.MHUtil;
@@ -15,6 +16,8 @@ public class MHService {
 
     @Autowired
     private UserVehicleRelationshipDao userVehicleRelationshipDao;
+    @Autowired
+    private UserDao userDao;
 
     public List<JSONObject> getVBrand(){
         String vBrandStr = MHUtil.getMHVBrandList();
@@ -79,6 +82,6 @@ public class MHService {
     }
 
     public UserVehicleRelationship getDefaultMHDevice(String userId) {
-        return userVehicleRelationshipDao.findByUserAndIsDefault(userId,true);
+        return userVehicleRelationshipDao.findByUserAndIsDefault(userDao.findById(userId),true);
     }
 }
