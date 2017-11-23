@@ -3,6 +3,9 @@ package com.nbicc.cu.carsunion.util;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.http.MHHttpRequest;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class MHUtil {
 
     //3.1查询品牌
@@ -79,6 +82,24 @@ public class MHUtil {
         return request.getResponseGET();
     }
 
+    //3.7删除车辆
+    public static String deleteMHVehicle(String id){
+        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/delete");
+        request.setParameter("vehicleId",id);
+        return request.getResponseGET();
+    }
+
+    //3.8车辆控制
+    public static String controlMHVehicle(String hwId,String key,int value){
+        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/controls");
+        JSONObject json = new JSONObject();
+        JSONObject command = new JSONObject();
+        command.put(key,value);
+        json.put("vehicleHwid",hwId);
+        json.put("order",command);
+        return request.getResponsePOST(json.toString());
+    }
+
     //3.9车辆定位
     public static String getMHVehiclePosition(String hwId){
         MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/positions");
@@ -93,9 +114,35 @@ public class MHUtil {
         return request.getResponseGET();
     }
 
+    //TODO: 报错
+    //3.11行程查询
+    public static String getMHVehicleTripList(String hwId,String start,String end){
+        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/trips");
+        request.setParameter("vehicleHwid",hwId);
+        request.setParameter("date_from",start);
+        request.setParameter("date_to",end);
+        return request.getResponseGET();
+    }
+
     //3.13告警类型查询
     public static String getMHAlertTypeList(){
         MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/alerts/types");
+        return request.getResponseGET();
+    }
+
+    //3.15查询车辆参数
+    public static String getMHVehicleSetting(String hwId, List<String> params){
+        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/searchSetting");
+        request.setParameter("vehicleHwid",hwId);
+        StringBuilder sb = new StringBuilder();
+        Iterator<String> iter = params.iterator();
+        if(iter.hasNext()){
+            sb.append(iter.next());
+        }
+        while(iter.hasNext()){
+            sb.append(",").append(iter.next());
+        }
+        request.setParameter("params",sb.toString());
         return request.getResponseGET();
     }
 }
