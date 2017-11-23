@@ -32,9 +32,10 @@ public class UserController {
                                      @RequestParam(value = "nickname", required = false) String nickname,
                                      @RequestParam(value = "portrait", required = false) String portrait,
                                      @RequestParam(value = "contact", required = false) String contact,
+                                     @RequestParam(value = "region", required = false) String region,
                                      @RequestParam(value = "smsCode", required = false) String smsCode) {
         String userId = hostHolder.getAdmin().getId();
-        ResponseCode state = userService.modifyUserInfo(redisTemplate,userId,name,nickname,contact,portrait,smsCode);
+        ResponseCode state = userService.modifyUserInfo(redisTemplate,userId,name,nickname,contact,region,portrait,smsCode);
         return CommonUtil.response(state, null);
     }
 

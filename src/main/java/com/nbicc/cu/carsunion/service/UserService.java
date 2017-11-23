@@ -108,7 +108,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseCode modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String portrait, String smsCode) {
+    public ResponseCode modifyUserInfo(RedisTemplate redisTemplate, String id, String name, String nickName, String contact, String region, String portrait, String smsCode) {
         User user = userDao.findById(id);
         if (CommonUtil.isNullOrEmpty(user)) {
             return new ResponseCode(ResponseType.REQUEST_FAIL,"没有该用户");
@@ -118,6 +118,9 @@ public class UserService {
         }
         if (!CommonUtil.isNullOrEmpty(nickName)) {
             user.setNickname(nickName);
+        }
+        if(!CommonUtil.isNullOrEmpty(region)){
+            user.setRegion(region);
         }
         if (!CommonUtil.isNullOrEmpty(portrait)) {
             user.setPortraitPath(portrait);

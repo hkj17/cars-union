@@ -22,6 +22,9 @@ public class User {
     @Column(name = "contact")
     private String contact;
 
+    @Column(name = "region")
+    private String region;
+
     @Column(name = "portrait_path")
     private String portraitPath;
 
@@ -69,6 +72,14 @@ public class User {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getPortraitPath(){
