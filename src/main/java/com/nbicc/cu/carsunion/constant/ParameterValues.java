@@ -37,8 +37,6 @@ public class ParameterValues {
 
     public final static String ALIPAY_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoQPDMu9oAlDe/ReIUZGQLDpH0UR2ojh5+t6V60fQLuCsgtzFfLbp1nSs8yEbB8bbzuBBGmhf6ZGk8f9rSc+i2EU4xzO0OumDh5PxBp39/KMpChXeO3z7ZEoVZPmrlxOFG4pxbJDnCHSIKVTunkF+9XSDWUeM6e9ETm2Rlo5Z0LuSeZMP8vZmd+9NuT6QVEWwGvCpAcCfet421i9Eky3uebe7b6bs4wzClkkAPWL0cxFUt3ZInPhCYVrSSslGy84W8OHaC2/26aXwL8DIKOvuyIqrcepFOiBldALrrrbNgXAUjJFqekem9PmJOMC9Au+jsskl08+GJ3oyuYTADOXxVQIDAQAB";
 
-//    public final static String ALIPAY_PUBLIC_KEY_TEST = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq/j9j3oHV8vwvK6R2A0AQ+DoQOZm+/97GLByYktamHb6DVZEyiLk5wzpmgFf64zcKY6aKp/qEGYyfY2kdfAYaXpl/wcx3HR+nE3vAgY9BLVFxHYFgopjjLUBfdHJgptfWAysunrFf0Iz6AtvUlv/W5AhXRcvPmX9q19P15xNkDS8kXMddEnxTRae4JStxf8j+c3P44kaZtT7cX8Iy/NM03qdfMcCnDMKvGirrmtP36vd0T95tbDaKVLDTdtIOt4+TD9EAcMCfPfsvFtXS87s3G191KjP+uKbvBw3Wa72vWpafXl/4wWaWLYifrXeJiyTJICiesVQHRXrdxGeVEg7/wIDAQAB";
-
     public final static String QINIU_PUBLIC_DOMAIN_OF_BUCKET = "http://ov2bucobf.bkt.clouddn.com";
 
     public final static String ALIPAY_NOTIFY_UTL = "http://120.26.60.164:7890/cars-union/util/receiveFromAlipay";
@@ -46,4 +44,6 @@ public class ParameterValues {
     public final static String ALIPAY_GATEWAY_URL = "https://openapi.alipay.com/gateway.do";
 
     public final static String ALIPAY_APPID = "2017103109635891";
+
+    public final static String MH_GROUPCODE = "1331054";
 }

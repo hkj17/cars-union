@@ -2,7 +2,9 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
+import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.service.MHService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MHUtil;
@@ -16,8 +18,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/control")
-@Authority
+@Authority(value = AuthorityType.UserValidate)
 public class MHController {
+
+    @Autowired
+    HostHolder hostHolder;
 
     @Autowired
     private MHService mhService;
@@ -46,12 +51,13 @@ public class MHController {
                                   @RequestParam(value = "brandId") String brandId,
                                   @RequestParam(value = "styleId") String styleId,
                                   @RequestParam(value = "modelId") String modelId,
-                                  @RequestParam(value = "groupCode") String groupCode,
                                   @RequestParam(value = "engineNum") String engineNum,
                                   @RequestParam(value = "equipmentCode") String equipmentCode,
                                   @RequestParam(value = "purchaseDate") String purchaseDate){
-        String ret = MHUtil.addMHVehicle(plateNum,vin,brandId,styleId,modelId,groupCode,engineNum,equipmentCode,purchaseDate);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
+        String userId = hostHolder.getAdmin().getId();
+        JSONObject json = mhService.bindVehicle(userId, plateNum, vin, brandId, styleId, modelId, engineNum, equipmentCode, purchaseDate);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", json);
+
     }
 
     @RequestMapping(value = "updateVehicle", method = RequestMethod.POST)
@@ -63,8 +69,8 @@ public class MHController {
                                   @RequestParam(value = "modelId") String modelId,
                                   @RequestParam(value = "engineNum") String engineNum,
                                   @RequestParam(value = "purchaseDate") String purchaseDate){
-        String ret = MHUtil.updateMHVehicle(id,plateNum,vin,brandId,styleId,modelId,engineNum,purchaseDate);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
+        JSONObject result = mhService.updateVehicle(id,plateNum,vin,brandId,styleId,modelId,engineNum,purchaseDate);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",result);
     }
 
     @RequestMapping(value = "getVehicleDetails", method = RequestMethod.POST)
@@ -74,9 +80,14 @@ public class MHController {
     }
 
     @RequestMapping(value = "unbindVehicle", method = RequestMethod.POST)
-    public JSONObject unbindVehicle(@RequestParam(value = "id") String id){
-        String ret = MHUtil.deleteMHVehicle(id);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
+    public JSONObject unbindVehicle(){
+        String userId = hostHolder.getAdmin().getId();
+        boolean state = mhService.unbindVehicle(userId);
+        if(state){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
+        } else {
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
+        }
     }
 
     @RequestMapping(value = "controlVehicle", method = RequestMethod.POST)

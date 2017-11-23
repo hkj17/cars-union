@@ -1,14 +1,30 @@
 package com.nbicc.cu.carsunion.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.ParameterValues;
+import com.nbicc.cu.carsunion.dao.UserDao;
+import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
+import com.nbicc.cu.carsunion.model.ResponseCode;
+import com.nbicc.cu.carsunion.model.User;
+import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
+import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MHUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MHService {
+
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private UserVehicleRelationshipDao userVehicleRelationshipDao;
 
     public List<JSONObject> getVBrand(){
         String vBrandStr = MHUtil.getMHVBrandList();
@@ -47,5 +63,55 @@ public class MHService {
             result.add(tem);
         }
         return result;
+    }
+
+    @Transactional
+    public JSONObject bindVehicle(String userId, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String equipmentCode, String purchaseDate){
+        try {
+            String result = MHUtil.addMHVehicle(plateNum, vin, brandId, styleId, modelId, ParameterValues.MH_GROUPCODE, engineNum, equipmentCode, purchaseDate);
+            System.out.println(result);
+            JSONObject json = JSONObject.parseObject(result);
+            if ("0".equals(json.getString("errno"))) {
+                String mh_vehicle_id = json.getString("id");
+                String mh_hw_id = json.getString("hwId");
+                User user = userDao.findById(userId);
+                UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
+                uvr.setIsBindMh(true);
+                uvr.setMhVehicleId(mh_vehicle_id);
+                uvr.setMhHwId(mh_hw_id);
+                userVehicleRelationshipDao.save(uvr);
+            }
+            return json;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Transactional
+    public boolean unbindVehicle(String userId){
+        User user = userDao.findById(userId);
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user,true);
+        if(uvr == null || !uvr.getIsBindMh() || CommonUtil.isNullOrEmpty(uvr.getMhVehicleId())){
+            return false;
+        }else{
+            String result = MHUtil.deleteMHVehicle(uvr.getMhVehicleId());
+            System.out.println(result);
+            JSONObject json = JSONObject.parseObject(result);
+            if("0".equals(json.getString("errno"))){
+                uvr.setMhHwId(null);
+                uvr.setMhVehicleId(null);
+                uvr.setIsBindMh(false);
+                userVehicleRelationshipDao.save(uvr);
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
+    public JSONObject updateVehicle(String id, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String purchaseDate){
+        String result = MHUtil.updateMHVehicle(id,plateNum,vin,brandId,styleId,modelId,engineNum,purchaseDate);
+        return JSONObject.parseObject(result);
     }
 }
