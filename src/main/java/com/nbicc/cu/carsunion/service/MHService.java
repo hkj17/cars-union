@@ -1,11 +1,9 @@
 package com.nbicc.cu.carsunion.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
-import com.nbicc.cu.carsunion.model.ResponseCode;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -21,10 +19,9 @@ import java.util.List;
 public class MHService {
 
     @Autowired
-    private UserDao userDao;
-
-    @Autowired
     private UserVehicleRelationshipDao userVehicleRelationshipDao;
+    @Autowired
+    private UserDao userDao;
 
     public List<JSONObject> getVBrand(){
         String vBrandStr = MHUtil.getMHVBrandList();
@@ -110,8 +107,33 @@ public class MHService {
         }
     }
 
-    public JSONObject updateVehicle(String id, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String purchaseDate){
-        String result = MHUtil.updateMHVehicle(id,plateNum,vin,brandId,styleId,modelId,engineNum,purchaseDate);
+    public JSONObject updateVehicle(String id, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String purchaseDate) {
+        String result = MHUtil.updateMHVehicle(id, plateNum, vin, brandId, styleId, modelId, engineNum, purchaseDate);
         return JSONObject.parseObject(result);
+    }
+
+    public Object[] getMHVehicleStatus(String hwId) {
+        String statusStr = MHUtil.getMHVehicleStatus(hwId);
+        return JSONObject.parseObject(statusStr).getJSONArray("data").toArray();
+
+    }
+
+    public JSONObject getMHVehiclePosition(String hwId) {
+        String positionStr = MHUtil.getMHVehiclePosition(hwId);
+        return JSONObject.parseObject(positionStr).getJSONObject("data");
+    }
+
+    public JSONObject getMHVehicleDetails(String id) {
+        String ret = MHUtil.getMHVehicleDetails(id);
+        return JSONObject.parseObject(ret).getJSONObject("data");
+    }
+
+    public JSONObject controlMHVehicle(String hwId, String key, int value) {
+        String ret = MHUtil.controlMHVehicle(hwId,key,value);
+        return JSONObject.parseObject(ret);
+    }
+
+    public UserVehicleRelationship getDefaultMHDevice(String userId) {
+        return userVehicleRelationshipDao.findByUserAndIsDefault(userDao.findById(userId),true);
     }
 }
