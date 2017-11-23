@@ -31,7 +31,7 @@ public class AdvertisementController {
     @Authority(value = AuthorityType.AdminValidate)
     @GetMapping("/admin")
     public JSONObject allAdvertisement(@RequestParam("location") int location,
-                                       @RequestParam("pageNum",required = false,defaultValue = "1")int pageNum,
+                                       @RequestParam(value = "pageNum",required = false,defaultValue = "1")int pageNum,
                                        @RequestParam(value = "pageSize",required = false,defaultValue = "10")int pageSize){
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "查询成功",advertisementService.getAllAdvertisement(location,pageNum-1,pageSize));
     }
