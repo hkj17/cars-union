@@ -1,7 +1,10 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
+import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.util.MHUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,6 +12,9 @@ import java.util.List;
 
 @Service
 public class MHService {
+
+    @Autowired
+    private UserVehicleRelationshipDao userVehicleRelationshipDao;
 
     public List<JSONObject> getVBrand(){
         String vBrandStr = MHUtil.getMHVBrandList();
@@ -47,5 +53,32 @@ public class MHService {
             result.add(tem);
         }
         return result;
+    }
+
+
+
+    public Object[] getMHVehicleStatus(String hwId) {
+        String statusStr = MHUtil.getMHVehicleStatus(hwId);
+        return JSONObject.parseObject(statusStr).getJSONArray("data").toArray();
+
+    }
+
+    public JSONObject getMHVehiclePosition(String hwId) {
+        String positionStr = MHUtil.getMHVehiclePosition(hwId);
+        return JSONObject.parseObject(positionStr).getJSONObject("data");
+    }
+
+    public JSONObject getMHVehicleDetails(String id) {
+        String ret = MHUtil.getMHVehicleDetails(id);
+        return JSONObject.parseObject(ret).getJSONObject("data");
+    }
+
+    public JSONObject controlMHVehicle(String hwId, String key, int value) {
+        String ret = MHUtil.controlMHVehicle(hwId,key,value);
+        return JSONObject.parseObject(ret);
+    }
+
+    public UserVehicleRelationship getDefaultMHDevice(String userId) {
+        return userVehicleRelationshipDao.findByUserAndIsDefault(userId,true);
     }
 }

@@ -2,7 +2,10 @@ package com.nbicc.cu.carsunion.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
+import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
+import com.nbicc.cu.carsunion.model.HostHolder;
+import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.service.MHService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MHUtil;
@@ -16,11 +19,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/control")
-@Authority
+@Authority(value = AuthorityType.UserValidate)
 public class MHController {
 
     @Autowired
     private MHService mhService;
+    @Autowired
+    private HostHolder hostHolder;
 
     @RequestMapping(value = "getVBrand", method = RequestMethod.GET)
     public JSONObject getVBrand(){
@@ -67,35 +72,55 @@ public class MHController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
     }
 
-    @RequestMapping(value = "getVehicleDetails", method = RequestMethod.POST)
-    public JSONObject getVehicleDetails(@RequestParam(value = "id") String id){
-        String ret = MHUtil.getMHVehicleDetails(id);
+    @RequestMapping(value = "getVehicleDetails", method = RequestMethod.GET)
+    public JSONObject getVehicleDetails(){
+        UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
+        if(!relationship.getIsBindMh()){
+            return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
+        }
+        String id = relationship.getMhVehicleId();
+        JSONObject ret = mhService.getMHVehicleDetails(id);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
     }
 
+
     @RequestMapping(value = "unbindVehicle", method = RequestMethod.POST)
-    public JSONObject unbindVehicle(@RequestParam(value = "id") String id){
+    public JSONObject unbindVehicle(@RequestParam("id")String id){
         String ret = MHUtil.deleteMHVehicle(id);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
     }
 
     @RequestMapping(value = "controlVehicle", method = RequestMethod.POST)
-    public JSONObject controlVehicle(@RequestParam(value = "hwId") String hwId,
-                                     @RequestParam(value = "key") String key,
+    public JSONObject controlVehicle(@RequestParam(value = "key") String key,
                                      @RequestParam(value = "value") int value){
-        String ret = MHUtil.controlMHVehicle(hwId,key,value);
+        UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
+        if(!relationship.getIsBindMh()){
+            return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
+        }
+        String hwId = relationship.getMhHwId();
+        JSONObject ret = mhService.controlMHVehicle(hwId,key,value);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
     }
 
-    @RequestMapping(value = "getVehiclePosition", method = RequestMethod.POST)
-    public JSONObject getVehiclePosition(@RequestParam(value = "hwId") String hwId){
-        String position = MHUtil.getMHVehiclePosition(hwId);
+    @RequestMapping(value = "getVehiclePosition", method = RequestMethod.GET)
+    public JSONObject getVehiclePosition(){
+        UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
+        if(!relationship.getIsBindMh()){
+            return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
+        }
+        String hwId = relationship.getMhHwId();
+        JSONObject position = mhService.getMHVehiclePosition(hwId);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",position);
     }
 
-    @RequestMapping(value = "getVehicleStatus", method = RequestMethod.POST)
-    public JSONObject getVehicleStatus(@RequestParam(value = "hwId") String hwId){
-        String status = MHUtil.getMHVehicleStatus(hwId);
+    @RequestMapping(value = "getVehicleStatus", method = RequestMethod.GET)
+    public JSONObject getVehicleStatus(){
+        UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
+        if(!relationship.getIsBindMh()){
+            return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
+        }
+        String hwId = relationship.getMhHwId();
+        Object[] status = mhService.getMHVehicleStatus(hwId);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",status);
     }
 

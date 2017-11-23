@@ -20,6 +20,15 @@ public class UserVehicleRelationship {
     @Column(name = "is_default")
     private Boolean isDefault;
 
+    @Column(name = "is_bind_mh")
+    private Boolean isBindMh;
+
+    @Column(name = "mh_vehicle_id")
+    private String mhVehicleId;
+
+    @Column(name = "mh_hw_id")
+    private String mhHwId;
+
     public Long getId() {
         return id;
     }
@@ -50,5 +59,37 @@ public class UserVehicleRelationship {
 
     public void setIsDefault(Boolean isDefault){
         this.isDefault = isDefault;
+    }
+
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
+    }
+
+    public Boolean getIsBindMh() {
+        return isBindMh;
+    }
+
+    public void setIsBindMh(Boolean bindMh) {
+        isBindMh = bindMh;
+    }
+
+    public String getMhVehicleId() {
+        return mhVehicleId;
+    }
+
+    public void setMhVehicleId(String mhVehicleId) {
+        this.mhVehicleId = mhVehicleId;
+    }
+
+    public String getMhHwId() {
+        return mhHwId;
+    }
+
+    public void setMhHwId(String mhHwId) {
+        this.mhHwId = mhHwId;
     }
 }
