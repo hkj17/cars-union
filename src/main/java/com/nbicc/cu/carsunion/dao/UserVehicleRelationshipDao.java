@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UserVehicleRelationshipDao extends JpaRepository<UserVehicleRelationship, Long>{
-    UserVehicleRelationship findByUserAndVehicle(User user, Vehicle vehicle);
+    UserVehicleRelationship findByUserAndVehicleAndPlateNum(User user, Vehicle vehicle,String plateNum);
 
     List<UserVehicleRelationship> findByUser(User u);
 

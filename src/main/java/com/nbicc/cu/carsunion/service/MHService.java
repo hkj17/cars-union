@@ -64,25 +64,27 @@ public class MHService {
 
     @Transactional
     public JSONObject bindVehicle(String userId, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String equipmentCode, String purchaseDate){
-        try {
-            String result = MHUtil.addMHVehicle(plateNum, vin, brandId, styleId, modelId, ParameterValues.MH_GROUPCODE, engineNum, equipmentCode, purchaseDate);
-            System.out.println(result);
-            JSONObject json = JSONObject.parseObject(result);
-            if ("0".equals(json.getString("errno"))) {
-                String mh_vehicle_id = json.getString("id");
-                String mh_hw_id = json.getString("hwId");
-                User user = userDao.findById(userId);
-                UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
-                uvr.setIsBindMh(true);
-                uvr.setMhVehicleId(mh_vehicle_id);
-                uvr.setMhHwId(mh_hw_id);
-                userVehicleRelationshipDao.save(uvr);
-            }
-            return json;
-        }catch (Exception e){
-            e.printStackTrace();
+        User user = userDao.findById(userId);
+        if(CommonUtil.isNullOrEmpty(user)){
             return null;
         }
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
+        if(CommonUtil.isNullOrEmpty(uvr)){
+            return null;
+        }
+
+        String result = MHUtil.addMHVehicle(plateNum, vin, brandId, styleId, modelId, ParameterValues.MH_GROUPCODE, engineNum, equipmentCode, purchaseDate);
+        System.out.println(result);
+        JSONObject json = JSONObject.parseObject(result);
+        if ("0".equals(json.getString("errno"))) {
+            String mh_vehicle_id = json.getString("id");
+            String mh_hw_id = json.getString("hwId");
+            uvr.setIsBindMh(true);
+            uvr.setMhVehicleId(mh_vehicle_id);
+            uvr.setMhHwId(mh_hw_id);
+            userVehicleRelationshipDao.save(uvr);
+        }
+        return json;
     }
 
     @Transactional

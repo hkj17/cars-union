@@ -17,6 +17,9 @@ public class UserVehicleRelationship {
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
+    @Column(name = "plate_num")
+    private String plateNum;
+
     @Column(name = "is_default")
     private Boolean isDefault;
 
@@ -51,6 +54,14 @@ public class UserVehicleRelationship {
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
+    }
+
+    public String getPlateNum() {
+        return plateNum;
+    }
+
+    public void setPlateNum(String plateNum) {
+        this.plateNum = plateNum;
     }
 
     public Boolean getIsDefault(){
