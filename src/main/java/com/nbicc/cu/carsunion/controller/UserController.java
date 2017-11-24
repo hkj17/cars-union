@@ -117,12 +117,8 @@ public class UserController {
     public JSONObject deleteVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                     @RequestParam(value = "plateNum") String plateNum) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = userService.deleteVehicle(userId,vehicleId,plateNum);
-        if(state){
-            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
-        } else {
-            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
-        }
+        ResponseCode code = userService.deleteVehicle(userId,vehicleId,plateNum);
+        return CommonUtil.response(code,null);
     }
 
     @RequestMapping(value = "/getVehicles", method = RequestMethod.POST)
@@ -135,8 +131,8 @@ public class UserController {
     @RequestMapping(value = "/getDefaultVehicle", method = RequestMethod.POST)
     public JSONObject getDefaultVehicle() {
         String userId = hostHolder.getAdmin().getId();
-        Vehicle vehicle = userService.getDefaultVehicle(userId);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",vehicle);
+        UserVehicleRelationship uvr = userService.getDefaultVehicle(userId);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",uvr);
     }
 
     @RequestMapping(value = "/setDefaultVehicle", method = RequestMethod.POST)

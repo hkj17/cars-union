@@ -6,5 +6,6 @@ public enum ResponseType {
     NOT_AUTHORIZED,
     FAIL_SMS_VERIFICATION,
     PHONE_ALREADY_REGISTER,
-    NOT_BIND_MH
+    NOT_BIND_MH,
+    BINDED_MH
 }

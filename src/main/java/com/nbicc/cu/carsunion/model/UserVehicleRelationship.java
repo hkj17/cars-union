@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -40,6 +42,7 @@ public class UserVehicleRelationship {
         this.id = id;
     }
 
+    @JsonIgnore
     public User getUser(){
         return user;
     }

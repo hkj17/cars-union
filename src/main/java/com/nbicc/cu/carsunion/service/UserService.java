@@ -260,19 +260,21 @@ public class UserService {
     }
 
     @Transactional
-    public boolean deleteVehicle(String userId, String vehicleId,String plateNum) {
+    public ResponseCode deleteVehicle(String userId, String vehicleId,String plateNum) {
         User user = userDao.findById(userId);
         Vehicle vehicle = vehicleDao.findById(vehicleId);
         if (user == null || vehicle == null) {
-            return false;
+            return new ResponseCode(ResponseType.REQUEST_FAIL,"找不到用户或车型");
         }
 
         UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndVehicleAndPlateNum(user, vehicle,plateNum);
         if (uvr == null) {
-            return false;
+            return new ResponseCode(ResponseType.REQUEST_FAIL,"找不到车牌号");
+        }else if(uvr.getIsBindMh()){
+            return new ResponseCode(ResponseType.BINDED_MH,"已绑定迈鸿设备，请先解绑");
         } else {
             userVehicleRelationshipDao.delete(uvr);
-            return true;
+            return new ResponseCode(ResponseType.REQUEST_SUCCESS,"删除成功");
         }
     }
 
@@ -299,16 +301,12 @@ public class UserService {
         return true;
     }
 
-    public Vehicle getDefaultVehicle(String userId) {
+    public UserVehicleRelationship getDefaultVehicle(String userId) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {
             return null;
         }
-        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
-        if (CommonUtil.isNullOrEmpty(uvr)) {
-            return null;
-        }
-        return uvr.getVehicle();
+        return userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
     }
 
     public List<Favorite> getFavoriteList(String userId){
