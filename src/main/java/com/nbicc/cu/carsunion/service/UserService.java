@@ -245,6 +245,7 @@ public class UserService {
         userVehicleRelationship.setUser(user);
         userVehicleRelationship.setVehicle(vehicle);
         userVehicleRelationship.setPlateNum(plateNum);
+        userVehicleRelationship.setIsBindMh(false);
         if (isDefault) {
             UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user, true);
             if (uvr != null) {
@@ -295,9 +296,11 @@ public class UserService {
             return false;
         }
         uvr.setIsDefault(true);
-        uvr_old.setIsDefault(false);
         userVehicleRelationshipDao.save(uvr);
-        userVehicleRelationshipDao.save(uvr_old);
+        if(!CommonUtil.isNullOrEmpty(uvr_old)) {
+            uvr_old.setIsDefault(false);
+            userVehicleRelationshipDao.save(uvr_old);
+        }
         return true;
     }
 

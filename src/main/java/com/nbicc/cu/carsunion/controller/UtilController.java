@@ -124,6 +124,12 @@ public class UtilController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"查询成功",regionalInfoList);
     }
 
+    @RequestMapping(value = "/getAllCities", method = RequestMethod.GET)
+    public JSONObject getAllCities(){
+        List<RegionalInfo> regionalInfoList = httpRequest.getAllCities();
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"查询成功",regionalInfoList);
+    }
+
     //alipay sign the orderId
     @RequestMapping(value = "/signForOrder", method = RequestMethod.POST)
     public JSONObject SignForOrder(@RequestParam(value = "orderId") String orderId){

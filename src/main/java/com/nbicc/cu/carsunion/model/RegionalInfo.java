@@ -2,6 +2,8 @@ package com.nbicc.cu.carsunion.model;
 
 public class RegionalInfo {
     private String name;
+    private String pinyin;
+    private char initial;
     private String longitude;
     private String latitude;
 
@@ -11,6 +13,22 @@ public class RegionalInfo {
 
     public void setName(String name){
         this.name = name;
+    }
+
+    public String getPinyin() {
+        return pinyin;
+    }
+
+    public void setPinyin(String pinyin) {
+        this.pinyin = pinyin;
+    }
+
+    public char getInitial() {
+        return initial;
+    }
+
+    public void setInitial(char initial) {
+        this.initial = initial;
     }
 
     public String getLongitude(){
