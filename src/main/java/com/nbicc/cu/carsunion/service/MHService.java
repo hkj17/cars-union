@@ -114,24 +114,35 @@ public class MHService {
         return JSONObject.parseObject(result);
     }
 
-    public Object[] getMHVehicleStatus(String hwId) {
+    public JSONObject getMHVehicleStatus(String hwId) {
         String statusStr = MHUtil.getMHVehicleStatus(hwId);
-        return JSONObject.parseObject(statusStr).getJSONArray("data").toArray();
-
+        if("".equals(statusStr)) {
+            return null;
+        }
+        return JSONObject.parseObject(statusStr);
     }
 
     public JSONObject getMHVehiclePosition(String hwId) {
         String positionStr = MHUtil.getMHVehiclePosition(hwId);
-        return JSONObject.parseObject(positionStr).getJSONObject("data");
+        if("".equals(positionStr)) {
+            return null;
+        }
+        return JSONObject.parseObject(positionStr);
     }
 
     public JSONObject getMHVehicleDetails(String id) {
         String ret = MHUtil.getMHVehicleDetails(id);
-        return JSONObject.parseObject(ret).getJSONObject("data");
+        if("".equals(ret)) {
+            return null;
+        }
+        return JSONObject.parseObject(ret);
     }
 
     public JSONObject controlMHVehicle(String hwId, String key, int value) {
         String ret = MHUtil.controlMHVehicle(hwId,key,value);
+        if("".equals(ret)) {
+            return null;
+        }
         return JSONObject.parseObject(ret);
     }
 
