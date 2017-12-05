@@ -86,7 +86,7 @@ public class MHController {
         if(ret != null && "0".equals(ret.getString("errno"))){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret.getJSONObject("data"));
         }else{
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败",null);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
         }
     }
 
@@ -114,7 +114,7 @@ public class MHController {
         if(ret != null && "0".equals(ret.getString("errno"))){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret.getJSONObject("data"));
         }else{
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败",null);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
         }
     }
 
@@ -129,7 +129,7 @@ public class MHController {
         if(position != null && "0".equals(position.getString("errno"))){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",position.getJSONObject("data"));
         }else{
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败",null);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
         }
     }
 
@@ -144,7 +144,7 @@ public class MHController {
         if(status != null && "0".equals(status.getString("errno"))){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",status.getJSONArray("data"));
         }else{
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败",null);
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
         }
     }
 }
