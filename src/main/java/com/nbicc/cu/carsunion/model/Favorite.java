@@ -1,6 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -41,6 +42,7 @@ public class Favorite {
         this.id = id;
     }
 
+    @JsonIgnore
     public User getUser() {
         return user;
     }

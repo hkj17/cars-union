@@ -116,7 +116,12 @@ public class MHService {
 
     public Object[] getMHVehicleStatus(String hwId) {
         String statusStr = MHUtil.getMHVehicleStatus(hwId);
-        return JSONObject.parseObject(statusStr).getJSONArray("data").toArray();
+        JSONObject json = JSONObject.parseObject(statusStr);
+        if("0".equals(json.getString("errno"))) {
+            return json.getJSONArray("data").toArray();
+        }else{
+            return new Object[]{};
+        }
 
     }
 
