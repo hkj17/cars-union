@@ -28,9 +28,6 @@ public class User {
     @Column(name = "portrait_path")
     private String portraitPath;
 
-    @Column(name = "credit")
-    private int credit;
-
     @Column(name = "recommend")
     private String recommend;
 
@@ -88,14 +85,6 @@ public class User {
 
     public void setPortraitPath(String portraitPath){
         this.portraitPath = portraitPath;
-    }
-
-    public int getCredit(){
-        return credit;
-    }
-
-    public void setCredit(int credit){
-        this.credit = credit;
     }
 
     public String getRecommend(){

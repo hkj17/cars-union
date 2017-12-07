@@ -1,15 +1,14 @@
 package com.nbicc.cu.carsunion.util;
 
-import com.nbicc.cu.carsunion.enumtype.OrderStatus;
-
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class UnitTest {
 
     public static void main(String[] args){
-        BigDecimal decimal = new BigDecimal("0.01");
-        DecimalFormat df=new DecimalFormat("0.00");
-        System.out.println(df.format(decimal));
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+        System.out.println("calendar: " + calendar.getTime());
+        System.out.println("date: " + date);
     }
 }

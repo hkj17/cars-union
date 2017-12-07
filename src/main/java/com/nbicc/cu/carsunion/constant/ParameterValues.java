@@ -46,4 +46,10 @@ public class ParameterValues {
     public final static String ALIPAY_APPID = "2017103109635891";
 
     public final static String MH_GROUPCODE = "1331054";
+
+    //普通每天签到积分
+    public static int SIGN_COMMON_CREDIT = 1;
+
+    //连续签到X天翻倍
+    public static int CONTINUITY_SIGN_DAYS = 7;
 }

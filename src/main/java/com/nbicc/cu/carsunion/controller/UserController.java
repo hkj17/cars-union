@@ -193,10 +193,4 @@ public class UserController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",vipLevel);
     }
 
-    @RequestMapping(value = "/getCreditHistory", method = RequestMethod.POST)
-    public JSONObject getCreditHistory(@RequestParam(value = "source") int source){
-        String userId = hostHolder.getAdmin().getId();
-        List<CreditHistory> creditHistoryList = userService.getUserCreditHistory(userId,source);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",creditHistoryList);
-    }
 }

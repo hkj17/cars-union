@@ -20,6 +20,9 @@ public class VipLevel {
     @Column(name = "discount")
     private double discount;
 
+    @Column
+    private String vipName;
+
     public int getCreditLower(){
         return creditLower;
     }
@@ -50,5 +53,13 @@ public class VipLevel {
 
     public void setDiscount(double discount){
         this.discount = discount;
+    }
+
+    public String getVipName() {
+        return vipName;
+    }
+
+    public void setVipName(String vipName) {
+        this.vipName = vipName;
     }
 }

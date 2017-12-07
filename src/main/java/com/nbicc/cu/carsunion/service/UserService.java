@@ -44,6 +44,9 @@ public class UserService {
     @Autowired
     ProductDao productDao;
 
+    @Autowired
+    private UserCreditDao userCreditDao;
+
     public String validateToken(RedisTemplate redisTemplate, String token) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
         return (String) valueOperations.get("token" + token);
@@ -99,7 +102,6 @@ public class UserService {
         if (!CommonUtil.isNullOrEmpty(recommend)) {
             user.setRecommend(recommend);
         }
-        user.setCredit(0);
         userDao.save(user);
         Admin admin = new Admin();
         admin.setUserName(contact);
@@ -399,11 +401,7 @@ public class UserService {
         if (CommonUtil.isNullOrEmpty(user)) {
             return null;
         } else {
-            return vipLevelDao.findVipLevelByRange(user.getCredit());
+            return vipLevelDao.findVipLevelByRange(userCreditDao.findByUserId(userId).getTotalCredit());
         }
-    }
-
-    public List<CreditHistory> getUserCreditHistory(String userId, int source){
-        return creditHistoryDao.findByUserIdAndAndSource(userId,source);
     }
 }

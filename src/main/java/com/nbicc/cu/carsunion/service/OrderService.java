@@ -43,6 +43,8 @@ public class OrderService {
     private CreditHistoryDao creditHistoryDao;
     @Autowired
     private VipLevelDao vipLevelDao;
+    @Autowired
+    private UserCreditDao userCreditDao;
 
 //    @Autowired
 //    @PersistenceContext
@@ -71,7 +73,7 @@ public class OrderService {
         String id = UUID.randomUUID().toString().replace("-", "");
         User user = userDao.findById(userId);
         Date date = new Date();
-        double discount = getDiscount(user.getCredit());
+        double discount = getDiscount(userCreditDao.findByUserId(userId).getTotalCredit());
         BigDecimal realMoney = totalMoney.multiply(BigDecimal.valueOf(discount));
         Merchant merchant = null;
         Address address = null;
@@ -166,14 +168,14 @@ public class OrderService {
             String userId = order.getUser().getId();
             String recommendorId = order.getUser().getRecommend();
             int credit = order.getRealMoney().intValue();
-            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(), userId, orderId, credit, 0);
+            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(), userId, orderId, credit, 0,new Date());
             creditHistories.add(self);
             if (!CommonUtil.isNullOrEmpty(recommendorId)) {
-                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendorId, orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 1);
+                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendorId, orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 1,new Date());
                 creditHistories.add(firstRecommendor);
                 User recommendor = userDao.findById(recommendorId);
                 if (!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())) {
-                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(), orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 2);
+                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(), orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 2,new Date());
                     creditHistories.add(secondRecommendor);
                 }
             }
