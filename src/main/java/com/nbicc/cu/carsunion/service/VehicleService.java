@@ -66,7 +66,7 @@ public class VehicleService {
         } else {
             String currPath = CommonUtil.isNullOrEmpty(path) ? "" : path + ",";
             currPath += id;
-            return vehicleDao.findByPath(currPath);
+            return vehicleDao.findByPathOrderByNameAsc(currPath);
         }
     }
 
@@ -82,18 +82,26 @@ public class VehicleService {
         return vehicleDao.findVehicleFullName(idList);
     }
 
+    //获取车型属性图，（已优化）手工查找匹配
     public List<VehicleTreeModel> getVehicleTrees() {
         List<VehicleTreeModel> result = new ArrayList<>();
-        List<Vehicle> lists = vehicleDao.findRootVehicles();
-        for (Vehicle vehicle : lists) {
+        List<List<Vehicle>> vehicles = new ArrayList<>(5);
+        for(int i=0; i<5; ++i){
+            vehicles.add(vehicleDao.findByLevelOrderByName(i));
+        }
+        List<Vehicle> vehicles1 = vehicles.get(0);
+        for (Vehicle vehicle : vehicles1) {
             VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getLogo(), vehicle.getPinyin(), vehicle.getPath(), vehicle.getLevel());
-            setVehicleChild(model);
+            setVehicleChild(model,vehicles);
             result.add(model);
         }
         return result;
     }
 
-    private void setVehicleChild(VehicleTreeModel model1) {
+    private void setVehicleChild(VehicleTreeModel model1, List<List<Vehicle>> vehicles) {
+        if(4 == (model1.getLevel())){
+            return;
+        }
         List<VehicleTreeModel> result = new ArrayList<>();
         String path;
         if (model1.getLevel() == 0) {
@@ -101,15 +109,25 @@ public class VehicleService {
         } else {
             path = model1.getPath() + "," + model1.getId();
         }
-        List<Vehicle> lists = vehicleDao.findByPath(path);
+        List<Vehicle> lists = findVehicleByPathOrderByNameAsc(path,vehicles.get(model1.getLevel()+1));
         if (lists.size() == 0) {
             return;
         }
         for (Vehicle vehicle : lists) {
             VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getLogo(), null, vehicle.getPath(), vehicle.getLevel());
-            setVehicleChild(model);
+            setVehicleChild(model,vehicles);
             result.add(model);
         }
         model1.setChild(result);
+    }
+
+    private List<Vehicle> findVehicleByPathOrderByNameAsc(String path, List<Vehicle> vehicles) {
+        List<Vehicle> result = new ArrayList<>();
+        for(Vehicle v : vehicles){
+            if(path.equals(v.getPath())){
+                result.add(v);
+            }
+        }
+        return result;
     }
 }

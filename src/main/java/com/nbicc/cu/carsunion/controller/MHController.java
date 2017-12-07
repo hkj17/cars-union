@@ -83,7 +83,11 @@ public class MHController {
         }
         String id = relationship.getMhVehicleId();
         JSONObject ret = mhService.getMHVehicleDetails(id);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
+        if(ret != null && "0".equals(ret.getString("errno"))){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret.getJSONObject("data"));
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
+        }
     }
 
 
@@ -107,7 +111,11 @@ public class MHController {
         }
         String hwId = relationship.getMhHwId();
         JSONObject ret = mhService.controlMHVehicle(hwId,key,value);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret);
+        if(ret != null && "0".equals(ret.getString("errno"))){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret.getJSONObject("data"));
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
+        }
     }
 
     @RequestMapping(value = "getVehiclePosition", method = RequestMethod.GET)
@@ -118,7 +126,11 @@ public class MHController {
         }
         String hwId = relationship.getMhHwId();
         JSONObject position = mhService.getMHVehiclePosition(hwId);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",position);
+        if(position != null && "0".equals(position.getString("errno"))){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",position.getJSONObject("data"));
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
+        }
     }
 
     @RequestMapping(value = "getVehicleStatus", method = RequestMethod.GET)
@@ -128,7 +140,11 @@ public class MHController {
             return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
         }
         String hwId = relationship.getMhHwId();
-        Object[] status = mhService.getMHVehicleStatus(hwId);
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",status);
+        JSONObject status = mhService.getMHVehicleStatus(hwId);
+        if(status != null && "0".equals(status.getString("errno"))){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",status.getJSONArray("data"));
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
+        }
     }
 }

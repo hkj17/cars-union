@@ -21,10 +21,10 @@ public class CreditHistory {
     @Column(name = "source")
     private int source;
 
-    public CreditHistory(){
+    public CreditHistory() {
     }
 
-    public CreditHistory(String id, String userId, String orderId, int credit, int source){
+    public CreditHistory(String id, String userId, String orderId, int credit, int source) {
         this.id = id;
         this.userId = userId;
         this.orderId = orderId;
