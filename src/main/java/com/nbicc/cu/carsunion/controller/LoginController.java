@@ -130,8 +130,8 @@ public class LoginController {
                                      @RequestParam(value = "region",required = false) String region,
                                      @RequestParam(value = "password") String password,
                                      @RequestParam(value = "smsCode") String smsCode,
-                                     @RequestParam(value = "recommend", required = false) String recommend) {
-        ResponseCode state = userService.userRegister(redisTemplate, name, nickname, contact, region, portrait, recommend,
+                                     @RequestParam(value = "shareCode", required = false) String shareCode) {
+        ResponseCode state = userService.userRegister(redisTemplate, name, nickname, contact, region, portrait, shareCode,
                 password, smsCode);
         return CommonUtil.response(state, null);
     }

@@ -14,6 +14,8 @@ public interface UserDao extends JpaRepository<User, String> {
 
     User findByContact(String contact);
 
+    User findByShareCode(String shareCode);
+
     @Query("SELECT shareCode FROM User where shareCode is not null")
     List<String> findAllShareCode();
 }

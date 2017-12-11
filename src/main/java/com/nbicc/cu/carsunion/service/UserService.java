@@ -69,7 +69,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String region, String portrait, String recommend, String password, String smsCode) {
+    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String region, String portrait, String shareCode, String password, String smsCode) {
         if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
             return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
@@ -99,8 +99,11 @@ public class UserService {
         if (!CommonUtil.isNullOrEmpty(portrait)) {
             user.setPortraitPath(portrait);
         }
-        if (!CommonUtil.isNullOrEmpty(recommend)) {
-            user.setRecommend(recommend);
+        if (!CommonUtil.isNullOrEmpty(shareCode)) {
+            User recommendor = userDao.findByShareCode(shareCode);
+            if(!CommonUtil.isNullOrEmpty(recommendor)) {
+                user.setRecommend(recommendor.getId());
+            }
         }
         userDao.save(user);
         Admin admin = new Admin();
@@ -415,9 +418,9 @@ public class UserService {
         if(CommonUtil.isNullOrEmpty(shareCode)){
             //生成8位邀请码
             List<String> shareCodes = userDao.findAllShareCode();
-            shareCode = UUID.randomUUID().toString().replace("-","").substring(0,8);
+            shareCode = CommonUtil.generateUUID32().substring(0,8);
             while (shareCodes.contains(shareCode)){
-                shareCode = UUID.randomUUID().toString().replace("-","").substring(0,8);
+                shareCode = CommonUtil.generateUUID32().substring(0,8);
             }
         }
         user.setShareCode(shareCode);
