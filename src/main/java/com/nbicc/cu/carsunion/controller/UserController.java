@@ -199,8 +199,8 @@ public class UserController {
     @PostMapping("/generateShareCode")
     public JSONObject generateInviteCode(@RequestParam(value = "shareCode",defaultValue = "") String shareCode){
         String result = userService.generateInviteCode(hostHolder.getAdmin().getId(),shareCode);
-        if("已经存在分享码".equals(result)){
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"已经存在分享码",null);
+        if("已经存在分享码".equals(result) || "分享码重复，请更换".equals(result)){
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,result,null);
         }else{
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"分享码生成成功",result);
         }
