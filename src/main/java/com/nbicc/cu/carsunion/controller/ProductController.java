@@ -115,14 +115,15 @@ public class ProductController {
         }
     }
 
-    //根据车型或商品类别获取商品，带分页
+    //根据车型或商品类别以及关键字查询获取商品，带分页
     @RequestMapping(value = "getProductByClassAndVehicle", method = RequestMethod.POST)
     public JSONObject getProductByClassAndVehicle(@RequestParam(value = "vehicleId") String vehicleId,
                                                   @RequestParam(value = "classId") String classId,
+                                                  @RequestParam(value = "searchStr",defaultValue = "") String searchStr,
                                                   @RequestParam(value = "onSale", defaultValue = "0") int onSale,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        Page<Product> lists = productService.getProductByClassIdAndVehicleIdWithPage(classId, vehicleId,onSale,
+        Page<Product> lists = productService.getProductByClassIdAndVehicleIdWithPage(classId, vehicleId, searchStr, onSale,
                 pageNum - 1, pageSize);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", lists);
     }

@@ -131,18 +131,18 @@ public class ProductService {
         return products;
     }
 
-    public Page<Product> getProductByClassIdWithPage(String classId, int onSale, int pageNum, int pageSize) {
+    public Page<Product> getProductByClassIdWithPage(String classId,String searchStr, int onSale, int pageNum, int pageSize) {
         Page<Product> products;
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         if (CommonUtil.isNullOrEmpty(classId)) {
-            products = productDao.findAllByOnSaleAndDelFlag(onSale,0,pageable);
+            products = productDao.findAllByNameLikeAndOnSaleAndDelFlag("%" + searchStr + "%",onSale,0,pageable);
         } else {
             ProductClass productClass = productClassDao.getById(classId);
             if (CommonUtil.isNullOrEmpty(productClass)) {
                 return null;
             }
-            products = productDao.findByClassIdLikeAndOnSaleAndDelFlag("%" + classId + "%", onSale,0, pageable);
+            products = productDao.findByClassIdLikeAndNameLikeAndOnSaleAndDelFlag("%" + classId + "%","%" + searchStr + "%", onSale,0, pageable);
         }
         return products;
     }
@@ -278,14 +278,14 @@ public class ProductService {
     }
 
 
-    public Page<Product> getProductByClassIdAndVehicleIdWithPage(String classId, String vehicleId, int onSale, int pageNum, int pageSize) {
+    public Page<Product> getProductByClassIdAndVehicleIdWithPage(String classId, String vehicleId,String searchStr, int onSale, int pageNum, int pageSize) {
         Vehicle vehicle = vehicleDao.findOne(vehicleId);
         if (CommonUtil.isNullOrEmpty(vehicle)) {
-            return getProductByClassIdWithPage(classId, onSale, pageNum, pageSize);
+            return getProductByClassIdWithPage(classId,searchStr, onSale, pageNum, pageSize);
         }
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Product> products = productDao.findByClassIdAndVehicle(vehicle, "%" + classId + "%", onSale, pageable);
+        Page<Product> products = productDao.findByClassIdAndVehicleAndSearchStr(vehicle, "%" + classId + "%","%" + searchStr + "%", onSale, pageable);
         return products;
     }
 

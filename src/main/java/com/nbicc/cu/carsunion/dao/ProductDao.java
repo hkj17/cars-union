@@ -25,10 +25,10 @@ public interface ProductDao extends JpaRepository<Product,String>,PagingAndSorti
 
 //    Page<Product> findAllByDelFlag(int delFlag, Pageable pageable);
 
-    Page<Product> findByClassIdLikeAndOnSaleAndDelFlag(String classId,int onSale, int delFlag, Pageable pageable);
+    Page<Product> findByClassIdLikeAndNameLikeAndOnSaleAndDelFlag(String classId,String name, int onSale, int delFlag, Pageable pageable);
 
-    @Query("select vpr.product from VehicleProductRelationship vpr where vpr.vehicle = ?1 and vpr.product.classId like ?2 and vpr.product.delFlag = 0 and vpr.product.onSale = ?3")
-    Page<Product> findByClassIdAndVehicle(Vehicle vehicle, String classId, int onSale, Pageable pageable);
+    @Query("select vpr.product from VehicleProductRelationship vpr where vpr.vehicle = ?1 and vpr.product.classId like ?2 and vpr.product.name like ?3 and vpr.product.delFlag = 0 and vpr.product.onSale = ?4")
+    Page<Product> findByClassIdAndVehicleAndSearchStr(Vehicle vehicle, String classId,String searchStr, int onSale, Pageable pageable);
 
-    Page<Product> findAllByOnSaleAndDelFlag(int onSale, int delFlag, Pageable pageable);
+    Page<Product> findAllByNameLikeAndOnSaleAndDelFlag(String name, int onSale, int delFlag, Pageable pageable);
 }
