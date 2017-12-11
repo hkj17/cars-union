@@ -1,21 +1,22 @@
 package com.nbicc.cu.carsunion.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 public class UserPresentHistory {
     @Id
     @Column(name = "id")
+    @GeneratedValue
     private long id;
 
-    @Column(name = "user_id")
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "present_id")
-    private long presentId;
+    @ManyToOne
+    @JoinColumn(name = "present_id")
+    private Present present;
 
     @Column(name = "num")
     private int num;
@@ -32,6 +33,19 @@ public class UserPresentHistory {
     @Column(name = "date")
     private Date date;
 
+    public UserPresentHistory() {
+    }
+
+    public UserPresentHistory(User user, Present present, int num, int totalCredit, String address, boolean sendMark, Date date) {
+        this.user = user;
+        this.present = present;
+        this.num = num;
+        this.totalCredit = totalCredit;
+        this.address = address;
+        this.sendMark = sendMark;
+        this.date = date;
+    }
+
     public long getId() {
         return id;
     }
@@ -40,20 +54,20 @@ public class UserPresentHistory {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public long getPresentId() {
-        return presentId;
+    public Present getPresent() {
+        return present;
     }
 
-    public void setPresentId(long presentId) {
-        this.presentId = presentId;
+    public void setPresent(Present present) {
+        this.present = present;
     }
 
     public int getNum() {
