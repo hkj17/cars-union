@@ -170,13 +170,22 @@ public class OrderService {
             int credit = order.getRealMoney().intValue();
             CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(), userId, orderId, credit, 0,new Date());
             creditHistories.add(self);
+
+            //用户积分更新
+            updateUserCredit(userId,credit);
+
             if (!CommonUtil.isNullOrEmpty(recommendorId)) {
                 CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendorId, orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 1,new Date());
                 creditHistories.add(firstRecommendor);
                 User recommendor = userDao.findById(recommendorId);
+                //用户积分更新
+                updateUserCredit(recommendorId,(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO));
+
                 if (!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())) {
                     CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(), orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 2,new Date());
                     creditHistories.add(secondRecommendor);
+                    //用户积分更新
+                    updateUserCredit(recommendor.getRecommend(),(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO));
                 }
             }
 
@@ -196,6 +205,16 @@ public class OrderService {
             return "order is not ready for payment!";
         }
         return "ok";
+    }
+
+    //用户总积分和消费积分更新
+    private void updateUserCredit(String userId, int credit) {
+        UserCredit userCredit = userCreditDao.findByUserId(userId);
+        if(userCredit != null){
+            userCredit.setShoppingCredit(userCredit.getShoppingCredit() + credit);
+            userCredit.setTotalCredit(userCredit.getTotalCredit() + credit);
+            userCreditDao.save(userCredit);
+        }
     }
 
     public String deliverProducts(String orderId, String courierNumber) {

@@ -412,12 +412,16 @@ public class UserService {
         if(!CommonUtil.isNullOrEmpty(user.getShareCode())){
             return "已经存在分享码";
         }
+        List<String> shareCodes = userDao.findAllShareCode();
         if(CommonUtil.isNullOrEmpty(shareCode)){
             //生成8位邀请码
-            List<String> shareCodes = userDao.findAllShareCode();
             shareCode = UUID.randomUUID().toString().replace("-","").substring(0,8);
             while (shareCodes.contains(shareCode)){
                 shareCode = UUID.randomUUID().toString().replace("-","").substring(0,8);
+            }
+        }else{
+            if(shareCodes.contains(shareCode)){
+                return "分享码重复，请更换";
             }
         }
         user.setShareCode(shareCode);
