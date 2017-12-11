@@ -404,4 +404,24 @@ public class UserService {
             return vipLevelDao.findVipLevelByRange(userCreditDao.findByUserId(userId).getTotalCredit());
         }
     }
+
+
+
+    public String generateInviteCode(String userId, String shareCode) {
+        User user = userDao.findById(userId);
+        if(!CommonUtil.isNullOrEmpty(user.getShareCode())){
+            return "已经存在分享码";
+        }
+        if(CommonUtil.isNullOrEmpty(shareCode)){
+            //生成8位邀请码
+            List<String> shareCodes = userDao.findAllShareCode();
+            shareCode = UUID.randomUUID().toString().replace("-","").substring(0,8);
+            while (shareCodes.contains(shareCode)){
+                shareCode = UUID.randomUUID().toString().replace("-","").substring(0,8);
+            }
+        }
+        user.setShareCode(shareCode);
+        userDao.save(user);
+        return shareCode;
+    }
 }

@@ -31,6 +31,9 @@ public class User {
     @Column(name = "recommend")
     private String recommend;
 
+    @Column
+    private String shareCode;
+
 
     @OneToMany(mappedBy = "user")
     private List<Address> addressList;
@@ -110,5 +113,13 @@ public class User {
 
     public void setVehicles(Set<Vehicle> vehicles){
         this.vehicles = vehicles;
+    }
+
+    public String getShareCode() {
+        return shareCode;
+    }
+
+    public void setShareCode(String shareCode) {
+        this.shareCode = shareCode;
     }
 }

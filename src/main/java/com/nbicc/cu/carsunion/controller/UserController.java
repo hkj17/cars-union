@@ -193,4 +193,17 @@ public class UserController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",vipLevel);
     }
 
+    /**
+     * 用户生成邀请码
+     */
+    @PostMapping("/generateShareCode")
+    public JSONObject generateInviteCode(@RequestParam(value = "shareCode",defaultValue = "") String shareCode){
+        String result = userService.generateInviteCode(hostHolder.getAdmin().getId(),shareCode);
+        if("已经存在分享码".equals(result)){
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"已经存在分享码",null);
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"分享码生成成功",result);
+        }
+    }
+
 }
