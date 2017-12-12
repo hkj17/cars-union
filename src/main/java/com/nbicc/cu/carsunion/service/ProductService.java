@@ -3,7 +3,8 @@ package com.nbicc.cu.carsunion.service;
 import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -21,7 +25,7 @@ import java.util.*;
 @Service
 public class ProductService {
 
-    private Logger logger = Logger.getLogger(ProductService.class);
+    private static Logger logger = LogManager.getLogger(ProductService.class);
 
     @Autowired
     private ProductClassDao productClassDao;

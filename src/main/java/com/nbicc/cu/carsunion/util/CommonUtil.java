@@ -6,9 +6,7 @@ import com.nbicc.cu.carsunion.model.ResponseCode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -87,5 +85,26 @@ public class CommonUtil {
     public static Date String2Date(String date) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.parse(date);
+    }
+
+    public static String getKeyValueForMap(Map map){
+        Iterator<Map.Entry<String, String[]>> it = map.entrySet().iterator();
+        StringBuilder sb = new StringBuilder();
+        while (it.hasNext()) {
+            Map.Entry<String, String[]> entry =  it.next();
+            String key = entry.getKey();
+            String[] value = entry.getValue();
+            sb.append(key + " : " + StringArrayToString(value)).append(" | ");
+        }
+        return sb.toString();
+    }
+
+    public static String StringArrayToString(String[] strings){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0;i<strings.length;i++)
+        {
+            sb.append(strings[i]).append(";");
+        }
+        return sb.toString();
     }
 }

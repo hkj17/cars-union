@@ -5,7 +5,8 @@ import com.nbicc.cu.carsunion.dao.*;
 import com.nbicc.cu.carsunion.enumtype.OrderStatus;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +51,7 @@ public class OrderService {
 //    @PersistenceContext
 //    private EntityManager em;
 
-    private Logger logger = Logger.getLogger(OrderService.class);
+    private static Logger logger = LogManager.getLogger(OrderService.class);
 
     @Transactional
     public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList, boolean isFromSc) {

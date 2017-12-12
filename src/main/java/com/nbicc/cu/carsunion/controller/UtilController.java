@@ -22,7 +22,8 @@ import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -45,7 +46,7 @@ import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 @RequestMapping("/util")
 @Authority
 public class UtilController {
-    private static final Logger logger = Logger.getLogger(UtilController.class);
+    private static Logger logger = LogManager.getLogger(UtilController.class);
 
     RegionalInfoHttpRequest httpRequest = new RegionalInfoHttpRequest();
 
@@ -216,11 +217,17 @@ public class UtilController {
         }
     }
 
-//    @GetMapping("/testFinishPay/{orderId}")
-//    public String testFinishPay(@PathVariable("orderId")String orderId){
+    @GetMapping("/testFinishPay/{orderId}")
+    public String testFinishPay(@PathVariable("orderId")String orderId){
 //        orderService.finishPay(orderId);
 //        return "ok";
-//    }
+        throw new RuntimeException("null");
+    }
+
+    @PostMapping("/testLogs")
+    public String testLogs(@RequestParam("id") String id){
+        throw new RuntimeException(id + " is wrong!");
+    }
 
 
 }

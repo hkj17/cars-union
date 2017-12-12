@@ -76,13 +76,13 @@ public class PresentService {
     }
 
     public Page<Present> getAllPresentList(int pageNum, int pageSize){
-        Sort sort = new Sort(Sort.Direction.ASC, "id");
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         return presentDao.findByDelFlag(false,pageable);
     }
 
     public Page<Present> getOnSalePresentList(int pageNum, int pageSize){
-        Sort sort = new Sort(Sort.Direction.ASC, "id");
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         return presentDao.findByDelFlagAndOnSale(false,true,pageable);
     }
@@ -94,7 +94,7 @@ public class PresentService {
     @Transactional(rollbackFor = Exception.class)
     public boolean exchange(String userId, long presentId, int num, String address) {
         User user = userDao.findById(userId);
-        Present present = presentDao.findById(presentId);
+        Present present = presentDao.findByIdAndOnSaleAndDelFlag(presentId,true,false);
         if(user == null || present == null || present.getTotalQuantity() < num){
             return false;
         }

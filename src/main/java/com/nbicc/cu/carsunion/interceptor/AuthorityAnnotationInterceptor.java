@@ -8,7 +8,8 @@ import com.nbicc.cu.carsunion.model.Admin;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.service.AdminService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -28,8 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
 
-    private static final Logger logger = Logger.getLogger(AuthorityAnnotationInterceptor.class);
-
+    private static Logger logger = LogManager.getLogger(AuthorityAnnotationInterceptor.class);
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
