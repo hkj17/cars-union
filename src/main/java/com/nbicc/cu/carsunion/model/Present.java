@@ -1,13 +1,17 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
 public class Present {
     @Id
     @Column(name = "id")
+    @GeneratedValue
     private long id;
 
     @Column(name = "name")
@@ -76,6 +80,7 @@ public class Present {
         this.onSale = onSale;
     }
 
+    @JsonIgnore
     public boolean getDelFlag() {
         return delFlag;
     }

@@ -31,6 +31,21 @@ public class CommonUtil {
         return jsonObject;
     }
 
+    public static JSONObject response(boolean state){
+        JSONObject jsonObject=new JSONObject();
+        if(state){
+            jsonObject.put("result_code",ResponseType.REQUEST_SUCCESS.ordinal());
+            jsonObject.put("message","操作成功");
+            jsonObject.put("data",null);
+            return jsonObject;
+        }else{
+            jsonObject.put("result_code",ResponseType.REQUEST_FAIL.ordinal());
+            jsonObject.put("message","操作失败");
+            jsonObject.put("data",null);
+            return jsonObject;
+        }
+    }
+
     public static boolean isNullOrEmpty(Collection<?> collection) {
         return (collection == null || collection.isEmpty());
     }

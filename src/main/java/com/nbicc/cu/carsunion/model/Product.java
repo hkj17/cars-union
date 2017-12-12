@@ -178,6 +178,7 @@ public class Product {
         this.saleNum = saleNum;
     }
 
+    @JsonIgnore
     public int getDelFlag() {
         return delFlag;
     }
