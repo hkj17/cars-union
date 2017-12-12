@@ -33,6 +33,9 @@ public class PresentService {
 
     @Transactional
     public boolean addPresent(String name, String photo, int creditValue, int quantity, boolean onsale){
+        if(quantity<0) {
+            return false;
+        }
         Present present = new Present();
         present.setName(name);
         present.setPhoto(photo);
@@ -112,11 +115,24 @@ public class PresentService {
         userCredit.setUsedCredit(userCredit.getUsedCredit() + needCredit);
         userCreditDao.save(userCredit);
         int result = presentDao.updateStock(present.getTotalQuantity() - num,presentId,present.getTotalQuantity());
-        System.out.println("-------result: " + result);
         if(result == 1){
             return true;
         }else{
             throw new RuntimeException("兑换失败，请重试！");
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateStock(long id, int quantity){
+        Present present = presentDao.findByIdAndDelFlag(id,false);
+        if(present == null || quantity < 0){
+            return false;
+        }
+        int result = presentDao.updateStock(quantity,id,present.getTotalQuantity());
+        if(result == 1){
+            return true;
+        }else{
+            throw new RuntimeException("更新失败，请重试！");
         }
     }
 

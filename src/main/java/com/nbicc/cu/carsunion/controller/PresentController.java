@@ -86,6 +86,14 @@ public class PresentController {
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", present);
     }
 
+    @Authority(AuthorityType.AdminValidate)
+    @PostMapping(value = "updateStock")
+    public JSONObject updateStock(@RequestParam(value = "id") long id,
+                                   @RequestParam(value = "quantity") int quantity){
+        boolean state = presentService.updateStock(id,quantity);
+        return CommonUtil.response(state);
+    }
+
     @PostMapping("/exchange")
     @Authority(AuthorityType.UserValidate)
     public JSONObject exchange(@RequestParam("presentId")long presentId,
