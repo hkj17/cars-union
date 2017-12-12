@@ -4,6 +4,8 @@ import com.nbicc.cu.carsunion.model.Present;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
@@ -14,4 +16,10 @@ public interface PresentDao extends JpaRepository<Present,Long>,PagingAndSorting
     public Page<Present> findByDelFlag(boolean delFlag,Pageable pageable);
 
     public Page<Present> findByDelFlagAndOnSale(boolean delFlag, boolean onSale,Pageable pageable);
+
+    public Present findById(long id);
+
+    @Query("update Present set totalQuantity = ?1 where id = ?2 and totalQuantity = ?3 and delFlag = 0 and onSale = true ")
+    @Modifying
+    public int updateStock(int newValue,long presentId, int oldValue);
 }
