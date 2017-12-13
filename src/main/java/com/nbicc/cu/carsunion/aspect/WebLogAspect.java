@@ -1,6 +1,9 @@
 package com.nbicc.cu.carsunion.aspect;
 
-import org.apache.log4j.Logger;
+
+import com.nbicc.cu.carsunion.util.CommonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,7 +14,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 
 /**
  * Created by bigmao on 2017/8/25.
@@ -21,7 +23,7 @@ import java.util.Arrays;
 @Component
 public class WebLogAspect {
 
-    private Logger logger = Logger.getLogger(WebLogAspect.class);
+    private static Logger logger = LogManager.getLogger(WebLogAspect.class);
 
     ThreadLocal<Long> startTime = new ThreadLocal<>();
 
@@ -39,14 +41,15 @@ public class WebLogAspect {
         logger.info("HTTP_METHOD : " + request.getMethod());
         logger.info("IP : " + request.getRemoteAddr());
         logger.info("CLASS_METHOD : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
-        logger.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));
+        logger.info("ARGS : " + CommonUtil.getKeyValueForMap(request.getParameterMap()));
 
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) throws Throwable {
         // 处理完请求，返回内容
-        logger.info("RESPONSE : " + ret);
+        //影响响应速率，暂不记录
+//        logger.info("RESPONSE : " + ret);
         logger.info("SPEND TIME : " + (System.currentTimeMillis() - startTime.get()) + "ms");
     }
 

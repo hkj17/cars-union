@@ -22,7 +22,8 @@ import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -45,7 +46,7 @@ import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
 @RequestMapping("/util")
 @Authority
 public class UtilController {
-    private static final Logger logger = Logger.getLogger(UtilController.class);
+    private static Logger logger = LogManager.getLogger(UtilController.class);
 
     RegionalInfoHttpRequest httpRequest = new RegionalInfoHttpRequest();
 
@@ -111,7 +112,7 @@ public class UtilController {
                 return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Send Message Exception: " + e.getMessage());
             return null;
         }
     }
@@ -175,8 +176,10 @@ public class UtilController {
             String orderString = response.getBody();
             result.put("orderString",orderString);
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            logger.error("SignForOrder AlipayApiException : " + e.getErrMsg());
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "请求失败",e.getErrMsg());
         }
+        logger.info("--------Order[" + orderId + "] is signed OK by Alipay!" + "  orderString is : " + result.getString("orderString"));
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "请求成功",result);
     }
 
@@ -204,14 +207,14 @@ public class UtilController {
             boolean flag = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "utf-8", "RSA2");
             if(flag){
                 orderService.finishPay(orderId);
-                logger.info("-------- OrderId : " + orderId + "  is payed");
+                logger.info("-------- Order[" + orderId + "]  is payed");
                 return "success";
             }else{
-                logger.info("-------- OrderId : " + orderId + "  is not payed");
+                logger.info("-------- Order[" + orderId + "]  is fail (not pay)");
                 return "failure";
             }
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            logger.error("ReceiveFromAlipay AlipayApiException : " + e.getErrMsg());
             return "failure";
         }
     }
@@ -221,6 +224,11 @@ public class UtilController {
 //        orderService.finishPay(orderId);
 //        return "ok";
 //    }
-
+//
+//    @PostMapping("/testLogs")
+//    public String testLogs(@RequestParam("id") String id){
+//        throw new RuntimeException(id + " is wrong!");
+//    }
+//
 
 }

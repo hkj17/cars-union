@@ -12,6 +12,8 @@ import com.nbicc.cu.carsunion.model.VehicleProductRelationship;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,8 @@ import java.util.List;
 @RequestMapping("/product")
 @Authority
 public class ProductController {
+
+    private static Logger logger = LogManager.getLogger(ProductController.class);
 
     @Autowired
     private ProductService productService;
@@ -181,6 +185,7 @@ public class ProductController {
             result = productService.addVehicleRelationshipBatch(productId, vehicles);
         } catch (RuntimeException e) {
             result = "add wrong";
+            logger.error("addVehicleRelationship Exception! ");
         }
         if ("ok".equals(result)) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);
@@ -200,6 +205,7 @@ public class ProductController {
             result = productService.deleteVehicleRelationshipBatch(productId, vehicles);
         } catch (RuntimeException e) {
             result = "delete wrong";
+            logger.error("deleteVehicleRelationship Exception! ");
         }
         if ("ok".equals(result)) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, result,null);

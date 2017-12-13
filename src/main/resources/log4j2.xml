@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <RollingFile name="RollingFile" fileName="logs/applog4j2.log"
+                     filePattern="logs/$${date:yyyy-MM}/carsunion-log-%d{MM-dd-yyyy}.log">
+            <PatternLayout pattern="%d{yyyy.MM.dd 'at' HH:mm:ss z} %-5level %L %M - %msg%xEx%n"/>
+            <Policies>
+                <!-- 每天更新一次 -->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1" />
+            </Policies>
+        </RollingFile>
+    </appenders>
+    <loggers>
+        <root level="info">
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>
+</configuration>

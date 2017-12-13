@@ -5,6 +5,8 @@ import com.nbicc.cu.carsunion.model.Vehicle;
 import com.nbicc.cu.carsunion.model.VehicleTreeModel;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.PinyinUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,9 @@ import java.util.List;
 
 @Service
 public class VehicleService {
+
+    private static Logger logger = LogManager.getLogger(VehicleService.class);
+
     @Autowired
     VehicleDao vehicleDao;
 
@@ -86,15 +91,18 @@ public class VehicleService {
     public List<VehicleTreeModel> getVehicleTrees() {
         List<VehicleTreeModel> result = new ArrayList<>();
         List<List<Vehicle>> vehicles = new ArrayList<>(5);
+        logger.info("---start search vehicle---");
         for(int i=0; i<5; ++i){
             vehicles.add(vehicleDao.findByLevelOrderByName(i));
         }
+        logger.info("---end search vehicle---");
         List<Vehicle> vehicles1 = vehicles.get(0);
         for (Vehicle vehicle : vehicles1) {
             VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getLogo(), vehicle.getPinyin(), vehicle.getPath(), vehicle.getLevel());
             setVehicleChild(model,vehicles);
             result.add(model);
         }
+        logger.info("---return---");
         return result;
     }
 
