@@ -91,18 +91,18 @@ public class VehicleService {
     public List<VehicleTreeModel> getVehicleTrees() {
         List<VehicleTreeModel> result = new ArrayList<>();
         List<List<Vehicle>> vehicles = new ArrayList<>(5);
-        logger.info("---start search vehicle---");
+//        logger.info("---start search vehicle---");
         for(int i=0; i<5; ++i){
             vehicles.add(vehicleDao.findByLevelOrderByName(i));
         }
-        logger.info("---end search vehicle---");
+//        logger.info("---end search vehicle---");
         List<Vehicle> vehicles1 = vehicles.get(0);
         for (Vehicle vehicle : vehicles1) {
             VehicleTreeModel model = new VehicleTreeModel(vehicle.getId(), vehicle.getName(), vehicle.getLogo(), vehicle.getPinyin(), vehicle.getPath(), vehicle.getLevel());
             setVehicleChild(model,vehicles);
             result.add(model);
         }
-        logger.info("---return---");
+//        logger.info("---return---");
         return result;
     }
 

@@ -33,24 +33,23 @@ public class WebLogAspect {
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) throws Throwable {
         startTime.set(System.currentTimeMillis());
-        //接收到请求，记录请求内容
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-
-        logger.info("URL : " + request.getRequestURL().toString());
-        logger.info("HTTP_METHOD : " + request.getMethod());
-        logger.info("IP : " + request.getRemoteAddr());
-        logger.info("CLASS_METHOD : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
-        logger.info("ARGS : " + CommonUtil.getKeyValueForMap(request.getParameterMap()));
-
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) throws Throwable {
-        // 处理完请求，返回内容
         //影响响应速率，暂不记录
 //        logger.info("RESPONSE : " + ret);
-        logger.info("SPEND TIME : " + (System.currentTimeMillis() - startTime.get()) + "ms");
+        StringBuilder sb = new StringBuilder();
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+
+        sb.append(request.getMethod()).append(" " + request.getRequestURL().toString()).append(" || ")
+                .append("IP : " + request.getRemoteAddr()).append(" || ")
+                .append("ARGS : " + CommonUtil.getKeyValueForMap(request.getParameterMap())).append(" || ")
+                .append("SPEND TIME : " + (System.currentTimeMillis() - startTime.get()) + "ms");
+
+        logger.info(sb.toString());
     }
 
 }
