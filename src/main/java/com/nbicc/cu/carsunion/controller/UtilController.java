@@ -112,7 +112,7 @@ public class UtilController {
                 return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败",null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Send Message Exception: " + e.getMessage());
             return null;
         }
     }
@@ -176,8 +176,10 @@ public class UtilController {
             String orderString = response.getBody();
             result.put("orderString",orderString);
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            logger.error("SignForOrder AlipayApiException : " + e.getErrMsg());
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "请求失败",e.getErrMsg());
         }
+        logger.info("--------Order[" + orderId + "] is signed OK by Alipay!" + "  orderString is : " + result.getString("orderString"));
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "请求成功",result);
     }
 
@@ -205,29 +207,28 @@ public class UtilController {
             boolean flag = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "utf-8", "RSA2");
             if(flag){
                 orderService.finishPay(orderId);
-                logger.info("-------- OrderId : " + orderId + "  is payed");
+                logger.info("-------- Order[" + orderId + "]  is payed");
                 return "success";
             }else{
-                logger.info("-------- OrderId : " + orderId + "  is not payed");
+                logger.info("-------- Order[" + orderId + "]  is fail (not pay)");
                 return "failure";
             }
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            logger.error("ReceiveFromAlipay AlipayApiException : " + e.getErrMsg());
             return "failure";
         }
     }
 
-    @GetMapping("/testFinishPay/{orderId}")
-    public String testFinishPay(@PathVariable("orderId")String orderId){
+//    @GetMapping("/testFinishPay/{orderId}")
+//    public String testFinishPay(@PathVariable("orderId")String orderId){
 //        orderService.finishPay(orderId);
 //        return "ok";
-        throw new RuntimeException("null");
-    }
-
-    @PostMapping("/testLogs")
-    public String testLogs(@RequestParam("id") String id){
-        throw new RuntimeException(id + " is wrong!");
-    }
-
+//    }
+//
+//    @PostMapping("/testLogs")
+//    public String testLogs(@RequestParam("id") String id){
+//        throw new RuntimeException(id + " is wrong!");
+//    }
+//
 
 }

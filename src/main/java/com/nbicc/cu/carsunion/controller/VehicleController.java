@@ -10,6 +10,8 @@ import com.nbicc.cu.carsunion.model.VehicleTreeModel;
 import com.nbicc.cu.carsunion.service.ProductService;
 import com.nbicc.cu.carsunion.service.VehicleService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ import java.util.List;
 @RequestMapping("/vehicle")
 @Authority
 public class VehicleController {
+
+    private static Logger logger = LogManager.getLogger(VehicleController.class);
 
     @Autowired
     VehicleService vehicleService;
@@ -85,6 +89,7 @@ public class VehicleController {
         try {
             result = productService.addProductForVehicle(vehicleId, product);
         } catch (RuntimeException e) {
+            logger.error("addProductForVehicle Exception! ");
             result = "add wrong";
         }
         if ("ok".equals(result)) {
@@ -104,6 +109,7 @@ public class VehicleController {
         try {
             result = productService.deleteProductFroVehicle(vehicleId, product);
         } catch (RuntimeException e) {
+            logger.error("addProductForVehicle Exception! ");
             result = "delete wrong";
         }
         if ("ok".equals(result)) {

@@ -10,6 +10,8 @@ import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,8 @@ import java.util.List;
 @RequestMapping("/merchant")
 @Authority
 public class MerchantController {
+
+    private static Logger logger = LogManager.getLogger(MerchantController.class);
 
     @Autowired
     OrderService orderService;
@@ -45,7 +49,8 @@ public class MerchantController {
             orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId, startDate, endDate,
                     pageNum - 1, pageSize);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("Date ParseException: " + e.getMessage());
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误!",null);
         }
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", orders);
     }

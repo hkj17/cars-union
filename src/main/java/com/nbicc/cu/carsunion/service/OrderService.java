@@ -297,7 +297,7 @@ public class OrderService {
         try {
             serviceDate = CommonUtil.String2Date(serviceTime);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("SetServiceTime ParseException : " + e.getMessage());
             return null;
         }
         Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);

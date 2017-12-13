@@ -7,6 +7,8 @@ import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,8 @@ import java.util.Map;
 @RequestMapping("/order")
 @Authority(value = AuthorityType.UserValidate)
 public class OrderController {
+
+    private static Logger logger = LogManager.getLogger(OrderController.class);
 
     @Autowired
     private OrderService orderService;
@@ -94,7 +98,7 @@ public class OrderController {
                 order.setUser(null);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("Date ParseException: " + e.getMessage());
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误!",null);
         }
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",orders);
