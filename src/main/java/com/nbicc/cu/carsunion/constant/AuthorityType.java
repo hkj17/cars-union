@@ -17,5 +17,5 @@ public enum AuthorityType {
     NoValidate,
 
     // 不验证权限,类似用户权限
-    NoAuthority
+    LoginAthority
 }
