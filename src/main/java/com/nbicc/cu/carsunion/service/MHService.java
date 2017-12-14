@@ -8,6 +8,8 @@ import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MHUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,8 @@ import java.util.List;
 
 @Service
 public class MHService {
+
+    private static Logger logger = LogManager.getLogger(MHService.class);
 
     @Autowired
     private UserVehicleRelationshipDao userVehicleRelationshipDao;
@@ -74,7 +78,7 @@ public class MHService {
         }
 
         String result = MHUtil.addMHVehicle(plateNum, vin, brandId, styleId, modelId, ParameterValues.MH_GROUPCODE, engineNum, equipmentCode, purchaseDate);
-        System.out.println(result);
+//        System.out.println(result);
         JSONObject json = JSONObject.parseObject(result);
         if ("0".equals(json.getString("errno"))) {
             String mh_vehicle_id = json.getString("id");
@@ -84,6 +88,7 @@ public class MHService {
             uvr.setMhHwId(mh_hw_id);
             userVehicleRelationshipDao.save(uvr);
         }
+        logger.info("bindVehicle result : " + result);
         return json;
     }
 
@@ -95,8 +100,9 @@ public class MHService {
             return false;
         }else{
             String result = MHUtil.deleteMHVehicle(uvr.getMhVehicleId());
-            System.out.println(result);
+//            System.out.println(result);
             JSONObject json = JSONObject.parseObject(result);
+            logger.info("unbindVehicle result : " + result);
             if("0".equals(json.getString("errno"))){
                 uvr.setMhHwId(null);
                 uvr.setMhVehicleId(null);
@@ -111,11 +117,13 @@ public class MHService {
 
     public JSONObject updateVehicle(String id, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String purchaseDate) {
         String result = MHUtil.updateMHVehicle(id, plateNum, vin, brandId, styleId, modelId, engineNum, purchaseDate);
+        logger.info("updateVehicle result : " + result);
         return JSONObject.parseObject(result);
     }
 
     public JSONObject getMHVehicleStatus(String hwId) {
         String statusStr = MHUtil.getMHVehicleStatus(hwId);
+        logger.info("getMHVehicleStatus result : " + statusStr);
         if("".equals(statusStr)) {
             return null;
         }
@@ -124,6 +132,7 @@ public class MHService {
 
     public JSONObject getMHVehiclePosition(String hwId) {
         String positionStr = MHUtil.getMHVehiclePosition(hwId);
+        logger.info("getMHVehiclePosition result : " + positionStr);
         if("".equals(positionStr)) {
             return null;
         }
@@ -132,6 +141,7 @@ public class MHService {
 
     public JSONObject getMHVehicleDetails(String id) {
         String ret = MHUtil.getMHVehicleDetails(id);
+        logger.info("getMHVehicleDetails result : " + ret);
         if("".equals(ret)) {
             return null;
         }
@@ -140,6 +150,7 @@ public class MHService {
 
     public JSONObject controlMHVehicle(String hwId, String key, int value) {
         String ret = MHUtil.controlMHVehicle(hwId,key,value);
+        logger.info("controlMHVehicle result : " + ret + " || hwId : " + hwId + " key:value : " + key + ":" + value);
         if("".equals(ret)) {
             return null;
         }

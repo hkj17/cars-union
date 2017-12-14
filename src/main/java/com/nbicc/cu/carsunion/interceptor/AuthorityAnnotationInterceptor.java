@@ -71,29 +71,29 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                         }
                         if (AuthorityType.NoValidate == authority.value()) {
                             // 标记为不验证,放行
-                            logger.info("---NoValidate---");
+//                            logger.info("---NoValidate---");
                             return true;
                         } else if (AuthorityType.NoAuthority == authority.value()) {
                             // 不验证权限，验证是否登录
-                            logger.info("---NoAuthority---");
+//                            logger.info("---NoAuthority---");
                             if(admin != null) {
                                 return true;
                             }
                         } else if (AuthorityType.UserValidate == authority.value()){
                             // 验证用户权限
-                            logger.info("---UserValidate---");
+//                            logger.info("---UserValidate---");
                             if(admin != null && admin.getAuthority() == 2) {
                                 return true;
                             }
                         } else if (AuthorityType.MerchantValidate == authority.value()){
                             // 验证商家权限
-                            logger.info("---MerchantValidate---");
+//                            logger.info("---MerchantValidate---");
                             if(admin != null && admin.getAuthority() == 1) {
                                 return true;
                             }
                         } else if (AuthorityType.AdminValidate == authority.value()) {
                             //验证超级管理员权限
-                            logger.info("---AdminValidate---");
+//                            logger.info("---AdminValidate---");
                             if(admin != null && admin.getAuthority() == 0) {
                                 return true;
                             }
@@ -105,6 +105,7 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                     return false;
                 }
             } catch (Exception e) {
+                logger.error("AuthorityAnnotationInterceptor Exception : " + e.getMessage());
             }
         }
         return false;
