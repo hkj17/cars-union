@@ -66,7 +66,7 @@ public class MHService {
         return result;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject bindVehicle(String userId, String plateNum, String vin, String brandId, String styleId, String modelId, String engineNum, String equipmentCode, String purchaseDate){
         User user = userDao.findById(userId);
         if(CommonUtil.isNullOrEmpty(user)){
@@ -78,7 +78,6 @@ public class MHService {
         }
 
         String result = MHUtil.addMHVehicle(plateNum, vin, brandId, styleId, modelId, ParameterValues.MH_GROUPCODE, engineNum, equipmentCode, purchaseDate);
-//        System.out.println(result);
         JSONObject json = JSONObject.parseObject(result);
         if ("0".equals(json.getString("errno"))) {
             String mh_vehicle_id = json.getString("id");
@@ -92,7 +91,7 @@ public class MHService {
         return json;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean unbindVehicle(String userId){
         User user = userDao.findById(userId);
         UserVehicleRelationship uvr = userVehicleRelationshipDao.findByUserAndIsDefault(user,true);
@@ -100,7 +99,6 @@ public class MHService {
             return false;
         }else{
             String result = MHUtil.deleteMHVehicle(uvr.getMhVehicleId());
-//            System.out.println(result);
             JSONObject json = JSONObject.parseObject(result);
             logger.info("unbindVehicle result : " + result);
             if("0".equals(json.getString("errno"))){

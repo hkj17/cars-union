@@ -31,9 +31,9 @@ public class PresentService {
     @Autowired
     private UserPresentHistoryDao userPresentHistoryDao;
 
-    @Transactional
-    public boolean addPresent(String name, String photo, int creditValue, int quantity, boolean onsale){
-        if(quantity<0) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addPresent(String name, String photo, int creditValue, int quantity, boolean onsale) {
+        if (quantity < 0) {
             return false;
         }
         Present present = new Present();
@@ -47,20 +47,20 @@ public class PresentService {
         return true;
     }
 
-    @Transactional
-    public boolean deletePresent(long id){
-        Present present = presentDao.findByIdAndDelFlag(id,false);
-        if(CommonUtil.isNullOrEmpty(present))
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deletePresent(long id) {
+        Present present = presentDao.findByIdAndDelFlag(id, false);
+        if (CommonUtil.isNullOrEmpty(present))
             return false;
         present.setDelFlag(true);
         presentDao.save(present);
         return true;
     }
 
-    @Transactional
-    public boolean editPresent(long id,String name,String photo,int creditValue){
-        Present present = presentDao.findByIdAndDelFlag(id,false);
-        if(CommonUtil.isNullOrEmpty(present))
+    @Transactional(rollbackFor = Exception.class)
+    public boolean editPresent(long id, String name, String photo, int creditValue) {
+        Present present = presentDao.findByIdAndDelFlag(id, false);
+        if (CommonUtil.isNullOrEmpty(present))
             return false;
         present.setName(name);
         present.setPhoto(photo);
@@ -69,25 +69,25 @@ public class PresentService {
         return true;
     }
 
-    public boolean editPresentOnSale(long id, boolean onSale){
-        Present present = presentDao.findByIdAndDelFlag(id,false);
-        if(CommonUtil.isNullOrEmpty(present))
+    public boolean editPresentOnSale(long id, boolean onSale) {
+        Present present = presentDao.findByIdAndDelFlag(id, false);
+        if (CommonUtil.isNullOrEmpty(present))
             return false;
         present.setOnSale(onSale);
         presentDao.save(present);
         return true;
     }
 
-    public Page<Present> getAllPresentList(int pageNum, int pageSize){
+    public Page<Present> getAllPresentList(int pageNum, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        return presentDao.findByDelFlag(false,pageable);
+        return presentDao.findByDelFlag(false, pageable);
     }
 
-    public Page<Present> getOnSalePresentList(int pageNum, int pageSize){
+    public Page<Present> getOnSalePresentList(int pageNum, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        return presentDao.findByDelFlagAndOnSale(false,true,pageable);
+        return presentDao.findByDelFlagAndOnSale(false, true, pageable);
     }
 
     public Present getPresentById(long id) {
@@ -97,41 +97,40 @@ public class PresentService {
     @Transactional(rollbackFor = Exception.class)
     public boolean exchange(String userId, long presentId, int num, String address) {
         User user = userDao.findById(userId);
-        Present present = presentDao.findByIdAndOnSaleAndDelFlag(presentId,true,false);
-        if(user == null || present == null || present.getTotalQuantity() < num){
+        Present present = presentDao.findByIdAndOnSaleAndDelFlag(presentId, true, false);
+        if (user == null || present == null || present.getTotalQuantity() < num) {
             return false;
         }
         int needCredit = num * present.getCreditValue();
         //检测积分是否足够
         UserCredit userCredit = userCreditDao.findByUserId(userId);
-        if((userCredit.getTotalCredit()-userCredit.getUsedCredit()) < needCredit){
+        if ((userCredit.getTotalCredit() - userCredit.getUsedCredit()) < needCredit) {
             return false;
         }
 
         //生成兑换记录，扣除积分,减库存
-        UserPresentHistory userPresentHistory = new UserPresentHistory(user,present,num,
-                needCredit,address,false,new Date());
+        int result = presentDao.updateStock(present.getTotalQuantity() - num, presentId, present.getTotalQuantity());
+        if (result != 1) {
+            throw new RuntimeException("兑换失败，请重试！");
+        }
+        UserPresentHistory userPresentHistory = new UserPresentHistory(user, present, num,
+                needCredit, address, false, new Date());
         userPresentHistoryDao.save(userPresentHistory);
         userCredit.setUsedCredit(userCredit.getUsedCredit() + needCredit);
         userCreditDao.save(userCredit);
-        int result = presentDao.updateStock(present.getTotalQuantity() - num,presentId,present.getTotalQuantity());
-        if(result == 1){
-            return true;
-        }else{
-            throw new RuntimeException("兑换失败，请重试！");
-        }
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateStock(long id, int quantity){
-        Present present = presentDao.findByIdAndDelFlag(id,false);
-        if(present == null || quantity < 0){
+    public boolean updateStock(long id, int quantity) {
+        Present present = presentDao.findByIdAndDelFlag(id, false);
+        if (present == null || quantity < 0) {
             return false;
         }
-        int result = presentDao.updateStock(quantity,id,present.getTotalQuantity());
-        if(result == 1){
+        int result = presentDao.updateStock(quantity, id, present.getTotalQuantity());
+        if (result == 1) {
             return true;
-        }else{
+        } else {
             throw new RuntimeException("更新失败，请重试！");
         }
     }
@@ -139,22 +138,22 @@ public class PresentService {
     public Page<UserPresentHistory> history(String userId, int pageNum, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "date");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        return userPresentHistoryDao.findByUserId(userId,pageable);
+        return userPresentHistoryDao.findByUserId(userId, pageable);
     }
 
     public Page<UserPresentHistory> historyByAdmin(Long presentId, int pageNum, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "date");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        if(presentId.equals(-1L)){
+        if (presentId.equals(-1L)) {
             return userPresentHistoryDao.findAll(pageable);
-        }else{
-            return userPresentHistoryDao.findByPresentId(presentId,pageable);
+        } else {
+            return userPresentHistoryDao.findByPresentId(presentId, pageable);
         }
     }
 
     public boolean sendMark(long id) {
         UserPresentHistory userPresentHistory = userPresentHistoryDao.findOne(id);
-        if(userPresentHistory == null){
+        if (userPresentHistory == null) {
             return false;
         }
         userPresentHistory.setSendMark(true);

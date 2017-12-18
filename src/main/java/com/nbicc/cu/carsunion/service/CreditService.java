@@ -36,92 +36,160 @@ public class CreditService {
     @Autowired
     private CreditHistoryDao creditHistoryDao;
 
-    public int userSign(String userId) {
+
+    /**
+     * 用户签到，判断是否已签到，连续签到还是非连续签到
+     *
+     * @param userId
+     * @return true/false
+     */
+    public boolean userSign(String userId) {
         //查询最新一条签到记录
         UserSignHistory userSignHistory = userSignHistoryDao.findFirstByUserIdOrderByDateDesc(userId);
         Date now = new Date();
         int addCredit;
         if (userSignHistory == null) {
             //第一次签到
-            userSignHistory = new UserSignHistory();
-            userSignHistory.setUserId(userId);
-            userSignHistory.setDate(now);
-            userSignHistory.setDays(1);
-            addCredit = SIGN_COMMON_CREDIT;
-            userSignHistory.setAddCredit(addCredit);
-            userSignHistoryDao.save(userSignHistory);
-        }else if (DateUtils.isSameDay(userSignHistory.getDate(), now)) {
+            addCredit = addNewSignHIstory(userId, now);
+        } else if (DateUtils.isSameDay(userSignHistory.getDate(), now)) {
             //当天已签到
-            return 1;
-        }else if(DateUtils.isSameDay(userSignHistory.getDate(), DateUtils.addDays(now, -1))){
+            return false;
+        } else if (DateUtils.isSameDay(userSignHistory.getDate(), DateUtils.addDays(now, -1))) {
             //连续签到
-            UserSignHistory todaySign = new UserSignHistory();
-            todaySign.setUserId(userId);
-            todaySign.setDate(now);
-            todaySign.setDays(userSignHistory.getDays() + 1);
-            addCredit = caluclateCredit(userSignHistory.getDays() + 1);
-            todaySign.setAddCredit(addCredit);
-            userSignHistoryDao.save(todaySign);
-        }else{
+            addCredit = addContinuousSignHistory(userId, now, userSignHistory);
+        } else {
             //非连续签到
-            userSignHistory = new UserSignHistory();
-            userSignHistory.setUserId(userId);
-            userSignHistory.setDate(now);
-            userSignHistory.setDays(1);
-            addCredit = SIGN_COMMON_CREDIT;
-            userSignHistory.setAddCredit(addCredit);
-            userSignHistoryDao.save(userSignHistory);
+            addCredit = addNewSignHIstory(userId, now);
         }
         //积分增加
+        addUserCredit(userId, addCredit);
+        return true;
+    }
+
+    /**
+     * //增加用户积分
+     *
+     * @param userId
+     * @param addCredit
+     */
+    private void addUserCredit(String userId, int addCredit) {
         UserCredit userCredit = userCreditDao.findOne(userId);
-        if(userCredit == null){
-            userCredit = new UserCredit(userId,0,0,0,0);
+        if (userCredit == null) {
+            userCredit = new UserCredit(userId, 0, 0, 0, 0);
             userCreditDao.save(userCredit);
         }
         userCredit.setSignCredit(userCredit.getSignCredit() + addCredit);
         userCredit.setTotalCredit(userCredit.getTotalCredit() + addCredit);
         userCreditDao.save(userCredit);
-        return 0;
     }
 
-    //计算签到积分
+    /**
+     * 连续签到记录增加，依据上一条记录累计
+     *
+     * @param userId
+     * @param now
+     * @param userSignHistory
+     * @return
+     */
+    private int addContinuousSignHistory(String userId, Date now, UserSignHistory userSignHistory) {
+        UserSignHistory todaySign = new UserSignHistory();
+        todaySign.setUserId(userId);
+        todaySign.setDate(now);
+        todaySign.setDays(userSignHistory.getDays() + 1);
+        int addCredit = caluclateCredit(userSignHistory.getDays() + 1);
+        todaySign.setAddCredit(addCredit);
+        userSignHistoryDao.save(todaySign);
+        return addCredit;
+    }
+
+    /**
+     * 增加一条签到记录
+     *
+     * @param userId
+     * @param now
+     * @return addCredit
+     */
+    private int addNewSignHIstory(String userId, Date now) {
+        UserSignHistory userSignHistory = new UserSignHistory();
+        userSignHistory.setUserId(userId);
+        userSignHistory.setDate(now);
+        userSignHistory.setDays(1);
+        int addCredit = SIGN_COMMON_CREDIT;
+        userSignHistory.setAddCredit(addCredit);
+        userSignHistoryDao.save(userSignHistory);
+        return addCredit;
+    }
+
+    /**
+     * 计算签到积分,积分规则在此修改
+     *
+     * @param days
+     * @return credit
+     */
     private int caluclateCredit(int days) {
-        if(days >= CONTINUITY_SIGN_DAYS){
+        if (days >= CONTINUITY_SIGN_DAYS) {
             //连续签到X天，积分翻倍
-            return 2*SIGN_COMMON_CREDIT;
-        }else{
+            return 2 * SIGN_COMMON_CREDIT;
+        } else {
             return SIGN_COMMON_CREDIT;
         }
     }
 
+    /**
+     * 签到历史记录查询
+     *
+     * @param userId
+     * @param start  "yyyy-MM-dd"
+     * @param end    "yyyy-MM-dd"
+     * @return List<UserSignHistory>
+     * @throws ParseException
+     */
     public List<UserSignHistory> signHistory(String userId, String start, String end) throws ParseException {
         String dateFormat = "yyyy-MM-dd";
-        Date startDate = DateUtils.parseDate(start,dateFormat);
-        Date endDate = DateUtils.addDays(DateUtils.parseDate(end,dateFormat),1);
-        return userSignHistoryDao.findByUserIdAndDateBetween(userId,startDate,endDate);
+        Date startDate = DateUtils.parseDate(start, dateFormat);
+        Date endDate = DateUtils.addDays(DateUtils.parseDate(end, dateFormat), 1);
+        return userSignHistoryDao.findByUserIdAndDateBetween(userId, startDate, endDate);
 
     }
 
+    /**
+     * 用户积分总览和会员等级信息
+     *
+     * @param userId
+     * @return JSONObject
+     */
     public JSONObject overview(String userId) {
         JSONObject result = new JSONObject();
         UserCredit userCredit = userCreditDao.findOne(userId);
-        result.put("credit",userCredit);
+        result.put("credit", userCredit);
         VipLevel vipLevel = vipLevelDao.findVipLevelByRange(userCredit.getTotalCredit());
-        result.put("vipLevel",vipLevel);
+        result.put("vipLevel", vipLevel);
         return result;
     }
 
-    public Page<CreditHistory> getUserCreditHistory(String userId, int source,String start,String end, int pageNum, int pageSize) throws ParseException {
+    /**
+     * 查询用户历史积分，可按积分来源source查询
+     *
+     * @param userId
+     * @param source   积分来源 -1:all; 0,1,2
+     * @param start    "yyyy-MM-dd"
+     * @param end      "yyyy-MM-dd"
+     * @param pageNum
+     * @param pageSize
+     * @return
+     * @throws ParseException
+     */
+    public Page<CreditHistory> getUserCreditHistory(String userId, int source, String start, String end, int pageNum, int pageSize) throws ParseException {
         String dateFormat = "yyyy-MM-dd";
-        Date startDate = DateUtils.parseDate(start,dateFormat);
-        Date endDate = DateUtils.addDays(DateUtils.parseDate(end,dateFormat),1);
+        Date startDate = DateUtils.parseDate(start, dateFormat);
+        Date endDate = DateUtils.addDays(DateUtils.parseDate(end, dateFormat), 1);
 
         Sort sort = new Sort(Sort.Direction.DESC, "date");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        if(source != -1) {
-            return creditHistoryDao.findByUserIdAndSourceAndDateBetweenOrderByDateDesc(userId, source,startDate,endDate, pageable);
-        }else{
-            return creditHistoryDao.findByUserIdAndDateBetweenOrderByDateDesc(userId,startDate,endDate,pageable);
+        if (source != -1) {
+            return creditHistoryDao.findByUserIdAndSourceAndDateBetweenOrderByDateDesc(userId, source, startDate, endDate, pageable);
+        } else {
+            return creditHistoryDao.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate, pageable);
         }
     }
 }

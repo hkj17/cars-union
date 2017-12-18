@@ -47,12 +47,18 @@ public class OrderService {
     @Autowired
     private UserCreditDao userCreditDao;
 
-//    @Autowired
-//    @PersistenceContext
-//    private EntityManager em;
-
     private static Logger logger = LogManager.getLogger(OrderService.class);
 
+    /**
+     * 新增订单
+     *
+     * @param userId
+     * @param merchantId
+     * @param addressId
+     * @param productList
+     * @param isFromSc
+     * @return
+     */
     @Transactional
     public Order addOrder(String userId, String merchantId, String addressId, List<Map> productList, boolean isFromSc) {
         String orderId = generateOrderId();
@@ -69,8 +75,8 @@ public class OrderService {
             BigDecimal money = product.getPrice().multiply(BigDecimal.valueOf(count));
             totalMoney = totalMoney.add(money);
             orderDetailList.add(new OrderDetail(id, product, count, money));
-            //orderDetailDao.save(od);
         }
+
         String id = UUID.randomUUID().toString().replace("-", "");
         User user = userDao.findById(userId);
         Date date = new Date();
@@ -98,11 +104,21 @@ public class OrderService {
         return orderDao.findByOrderIdAndDelFlag(orderId, 0);
     }
 
+    /**
+     * 根据积分获取折扣
+     *
+     * @param credit
+     * @return
+     */
     private double getDiscount(int credit) {
         return vipLevelDao.findVipLevelByRange(credit).getDiscount();
     }
 
-    //生成20位订单号
+    /**
+     * 生成20位订单号
+     *
+     * @return
+     */
     private String generateOrderId() {
         Date curDate = new Date();
         String time = String.valueOf(curDate.getTime()).substring(3);
@@ -110,6 +126,18 @@ public class OrderService {
         return "0010" + time.substring(0, 5) + random + time.substring(5);
     }
 
+    /**
+     * 查询用户订单列表，按时间/订单状态查询，带分页
+     *
+     * @param userId
+     * @param startDate
+     * @param endDate
+     * @param status
+     * @param pageNum
+     * @param pageSize
+     * @return
+     * @throws ParseException
+     */
     public Page<Order> getOrderListByUserAndTimeWithPage(String userId, String startDate, String endDate, int status, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
@@ -125,26 +153,60 @@ public class OrderService {
         return lists;
     }
 
-    public Page<Order> getOrderListByMerchantAndTimeWithPage(String userId, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
+    /**
+     * 商家查看已付款订单，可按订单状态查询，带分页
+     *
+     * @param userId
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param pageNum
+     * @param pageSize
+     * @return
+     * @throws ParseException
+     */
+    public Page<Order> getOrderListByMerchantAndTimeWithPage(String userId, int status, String startDate, String endDate, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
         Date end = sdf.parse(endDate);
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<Order> lists = orderDao.findAllByMerchantAndDatetimeBetweenAndDelFlag(merchantDao.findById(userId), start, end, 0, pageable);
+        Page<Order> lists;
+        if (status <= 0) {
+            lists = orderDao.findAllByMerchantAndDatetimeBetweenAndStatusIsNotAndDelFlag(merchantDao.findById(userId), start, end, 0, 0, pageable);
+        } else {
+            lists = orderDao.findAllByMerchantAndDatetimeBetweenAndStatusAndDelFlag(merchantDao.findById(userId), start, end, status, 0, pageable);
+        }
         return lists;
     }
 
+    /**
+     * 删除订单，更新删除标记
+     *
+     * @param orderId
+     */
     public void deleteOrderById(String orderId) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
         order.setDelFlag(1);
         orderDao.save(order);
     }
 
+    /**
+     * 根据订单号查询
+     *
+     * @param orderId
+     * @return
+     */
     public Order getOrderByOrderId(String orderId) {
         return orderDao.findByOrderIdAndDelFlag(orderId, 0);
     }
 
+    /**
+     * 查询订单详情
+     *
+     * @param orderId
+     * @return
+     */
     public List<OrderDetail> getOrderDetailByOrderId(String orderId) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
         if (order == null) {
@@ -155,10 +217,17 @@ public class OrderService {
         return orderDetailDao.findByUserOrder(order);
     }
 
+    /**
+     * 支付完成后一系列操作
+     *
+     * @param orderId
+     * @return
+     */
     @Transactional
     public String finishPay(String orderId) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
         if (order == null) {
+            logger.info("-------- Order[" + orderId + "]  does not exist!");
             return "order does not exist!";
         }
         if (order.getStatus() == OrderStatus.NOT_PAYED.ordinal()) {
@@ -169,24 +238,24 @@ public class OrderService {
             String userId = order.getUser().getId();
             String recommendorId = order.getUser().getRecommend();
             int credit = order.getRealMoney().intValue();
-            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(), userId, orderId, credit, 0,new Date());
+            CreditHistory self = new CreditHistory(CommonUtil.generateUUID32(), userId, orderId, credit, 0, new Date());
             creditHistories.add(self);
 
             //用户积分更新
-            updateUserCredit(userId,credit);
+            updateUserCredit(userId, credit);
 
             if (!CommonUtil.isNullOrEmpty(recommendorId)) {
-                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendorId, orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 1,new Date());
+                CreditHistory firstRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendorId, orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 1, new Date());
                 creditHistories.add(firstRecommendor);
                 User recommendor = userDao.findById(recommendorId);
                 //用户积分更新
-                updateUserCredit(recommendorId,(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO));
+                updateUserCredit(recommendorId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO));
 
                 if (!CommonUtil.isNullOrEmpty(recommendor) && !CommonUtil.isNullOrEmpty(recommendor.getRecommend())) {
-                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(), orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 2,new Date());
+                    CreditHistory secondRecommendor = new CreditHistory(CommonUtil.generateUUID32(), recommendor.getRecommend(), orderId, (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO), 2, new Date());
                     creditHistories.add(secondRecommendor);
                     //用户积分更新
-                    updateUserCredit(recommendor.getRecommend(),(int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO));
+                    updateUserCredit(recommendor.getRecommend(), (int) (credit * ParameterValues.RECOMMENDOR_CREDIT_RATIO * ParameterValues.RECOMMENDOR_CREDIT_RATIO));
                 }
             }
 
@@ -203,21 +272,35 @@ public class OrderService {
             creditHistoryDao.save(creditHistories);
             orderDao.save(order);
         } else {
+            logger.info("-------- Order[" + orderId + "]  is not ready for payment!");
             return "order is not ready for payment!";
         }
         return "ok";
     }
 
-    //用户总积分和消费积分更新
+
+    /**
+     * 用户总积分和消费积分更新
+     *
+     * @param userId
+     * @param credit
+     */
     private void updateUserCredit(String userId, int credit) {
         UserCredit userCredit = userCreditDao.findByUserId(userId);
-        if(userCredit != null){
+        if (userCredit != null) {
             userCredit.setShoppingCredit(userCredit.getShoppingCredit() + credit);
             userCredit.setTotalCredit(userCredit.getTotalCredit() + credit);
             userCreditDao.save(userCredit);
         }
     }
 
+    /**
+     * 填写订单物流号
+     *
+     * @param orderId
+     * @param courierNumber
+     * @return
+     */
     public String deliverProducts(String orderId, String courierNumber) {
         Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
         if (order == null) {
@@ -234,7 +317,15 @@ public class OrderService {
         return "ok";
     }
 
-    @Transactional
+    /**
+     * 添加到购物车
+     *
+     * @param userId
+     * @param productId
+     * @param quantity
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
     public boolean addProductToShoppingCart(String userId, String productId, int quantity) {
         User user = userDao.findById(userId);
         Product product = productDao.findByIdAndDelFlag(productId, 0);
@@ -256,13 +347,27 @@ public class OrderService {
         return true;
     }
 
-    @Transactional
+    /**
+     * 从购物车删除商品
+     *
+     * @param userId
+     * @param productIdList
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteFromShoppingCart(String userId, List<String> productIdList) {
         List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUserAndProductIdIn(userId, productIdList);
         shoppingCartDao.deleteInBatch(shoppingCartList);
         return true;
     }
 
+    /**
+     * 修改购物车
+     *
+     * @param userId
+     * @param productMap
+     * @return
+     */
     public boolean modifyShoppingCart(String userId, Map productMap) {
         User user = userDao.findById(userId);
         List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUser(user);
@@ -286,12 +391,25 @@ public class OrderService {
         return true;
     }
 
+    /**
+     * 用户购物车列表
+     *
+     * @param userId
+     * @return
+     */
     public List<ShoppingCart> getShoppingCartList(String userId) {
         User user = userDao.findById(userId);
         List<ShoppingCart> shoppingCartList = shoppingCartDao.findByUser(user);
         return shoppingCartList;
     }
 
+    /**
+     * 设置订单服务时间
+     *
+     * @param orderId
+     * @param serviceTime
+     * @return
+     */
     public Order setServiceTime(String orderId, String serviceTime) {
         Date serviceDate;
         try {
@@ -310,6 +428,17 @@ public class OrderService {
         }
     }
 
+    /**
+     * 管理员查看所有订单，包括用户已删除的，按时间查询，可分页
+     *
+     * @param startDate
+     * @param endDate
+     * @param status
+     * @param pageNum
+     * @param pageSize
+     * @return
+     * @throws ParseException
+     */
     public Page<Order> getOrderListByTimeWithPage(String startDate, String endDate, int status, int pageNum, int pageSize) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date start = sdf.parse(startDate);
@@ -325,9 +454,16 @@ public class OrderService {
         return lists;
     }
 
-    public boolean checkOrderBelongToUser(String userId, String orderId){
-        Order order = orderDao.findByOrderIdAndDelFlag(orderId,0);
-        if(order == null){
+    /**
+     * 检查订单是否属于用户
+     *
+     * @param userId
+     * @param orderId
+     * @return
+     */
+    public boolean checkOrderBelongToUser(String userId, String orderId) {
+        Order order = orderDao.findByOrderIdAndDelFlag(orderId, 0);
+        if (order == null) {
             return false;
         }
         return userId.equals(order.getUser().getId());
