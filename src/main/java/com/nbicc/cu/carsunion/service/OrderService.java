@@ -173,9 +173,9 @@ public class OrderService {
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         Page<Order> lists;
         if (status <= 0) {
-            lists = orderDao.findAllByMerchantAndDatetimeBetweenAndStatusIsNotAndDelFlag(merchantDao.findById(userId), start, end, 0, 0, pageable);
+            lists = orderDao.findAllByMerchantAndDatetimeBetweenAndStatusIsNot(merchantDao.findById(userId), start, end, 0, pageable);
         } else {
-            lists = orderDao.findAllByMerchantAndDatetimeBetweenAndStatusAndDelFlag(merchantDao.findById(userId), start, end, status, 0, pageable);
+            lists = orderDao.findAllByMerchantAndDatetimeBetweenAndStatus(merchantDao.findById(userId), start, end, status, pageable);
         }
         return lists;
     }
