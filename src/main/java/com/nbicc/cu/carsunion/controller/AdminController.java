@@ -14,12 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -106,13 +102,11 @@ public class AdminController {
                                            @RequestParam(value = "status",defaultValue = "-1") int status,
                                            @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        Page<Order> orders = null;
-        try {
-            orders = orderService.getOrderListByTimeWithPage(startDate, endDate,status, pageNum - 1, pageSize);
-        } catch (ParseException e) {
-            logger.error("Date ParseException: " + e.getMessage());
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误!",null);
+        Page<Order> orders = orderService.getOrderListByTimeWithPage(startDate, endDate,status, pageNum - 1, pageSize);
+        if(CommonUtil.isNullOrEmpty(orders)){
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误，请输入 yyyy-MM-dd 格式",null);
+        }else {
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", orders);
         }
-        return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",orders);
     }
 }

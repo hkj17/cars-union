@@ -128,7 +128,7 @@ public class PresentService {
         if(present == null || quantity < 0){
             return false;
         }
-        int result = presentDao.updateStock(quantity,id,present.getTotalQuantity());
+        int result = presentDao.updateStockAdmin(quantity,id,present.getTotalQuantity());
         if(result == 1){
             return true;
         }else{

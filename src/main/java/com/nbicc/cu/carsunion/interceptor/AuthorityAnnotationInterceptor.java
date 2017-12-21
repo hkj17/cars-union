@@ -73,9 +73,9 @@ public class AuthorityAnnotationInterceptor extends HandlerInterceptorAdapter {
                             // 标记为不验证,放行
                             logger.info("---NoValidate---");
                             return true;
-                        } else if (AuthorityType.NoAuthority == authority.value()) {
+                        } else if (AuthorityType.LoginAthority == authority.value()) {
                             // 不验证权限，验证是否登录
-                            logger.info("---NoAuthority---");
+                            logger.info("---LoginAuthority---");
                             if(admin != null) {
                                 return true;
                             }

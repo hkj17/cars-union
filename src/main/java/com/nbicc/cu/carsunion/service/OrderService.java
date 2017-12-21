@@ -310,10 +310,20 @@ public class OrderService {
         }
     }
 
-    public Page<Order> getOrderListByTimeWithPage(String startDate, String endDate, int status, int pageNum, int pageSize) throws ParseException {
+    public Page<Order> getOrderListByTimeWithPage(String startDate, String endDate, int status, int pageNum, int pageSize) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date start = sdf.parse(startDate);
-        Date end = sdf.parse(endDate);
+        Date start = null, end = null;
+        try {
+            start = sdf.parse(startDate);
+        } catch (ParseException e) {
+            return null;
+        }
+        try {
+            end = sdf.parse(endDate);
+        } catch (ParseException e) {
+            return null;
+        }
+
         Sort sort = new Sort(Sort.Direction.DESC, "datetime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         Page<Order> lists = null;

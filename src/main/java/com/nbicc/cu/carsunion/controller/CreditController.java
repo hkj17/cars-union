@@ -43,10 +43,12 @@ public class CreditController {
      */
     @GetMapping("/signHistory")
     public JSONObject signHistory(@RequestParam("start") String start,
-                                  @RequestParam("end")String end){
-        List<UserSignHistory> result = null;
+                                  @RequestParam("end")String end,
+                                  @RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
+                                  @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+        Page<UserSignHistory> result = null;
         try {
-            result = creditService.signHistory(hostHolder.getAdmin().getId(),start,end);
+            result = creditService.signHistory(hostHolder.getAdmin().getId(),start,end,pageNum-1,pageSize);
         } catch (ParseException e) {
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误，请输入2017-01-01格式",null);
         }
@@ -67,17 +69,10 @@ public class CreditController {
      */
     @PostMapping("/shoppingCreditHistory")
     public JSONObject getCreditHistory(@RequestParam(value = "source",defaultValue = "-1") int source,
-                                       @RequestParam("start") String start,
-                                       @RequestParam("end")String end,
                                        @RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
                                        @RequestParam(value = "pageSize",defaultValue = "6")int pageSize){
         String userId = hostHolder.getAdmin().getId();
-        Page<CreditHistory> creditHistoryList = null;
-        try {
-            creditHistoryList = creditService.getUserCreditHistory(userId,source,start,end,pageNum-1,pageSize);
-        } catch (ParseException e) {
-            return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误，请输入2017-01-01格式",null);
-        }
+        Page<CreditHistory> creditHistoryList = creditService.getUserCreditHistory(userId,source,pageNum-1,pageSize);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",creditHistoryList);
     }
 

@@ -7,13 +7,16 @@ import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.model.Order;
+import com.nbicc.cu.carsunion.model.ResponseCode;
 import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.service.OrderService;
+import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,9 +37,13 @@ public class MerchantController {
     @Autowired
     MerchantService merchantService;
     @Autowired
+    UserService userService;
+    @Autowired
     HostHolder hostHolder;
+    @Autowired
+    RedisTemplate redisTemplate;
 
-    // todo 可能要做分页,按订单状态查询
+
     @Authority(value = AuthorityType.MerchantValidate)
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
@@ -53,6 +60,16 @@ public class MerchantController {
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"日期格式错误!",null);
         }
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", orders);
+    }
+
+    @Authority(value = AuthorityType.MerchantValidate)
+    @RequestMapping(value = "/updatePassword")
+    public JSONObject updatePassword(@RequestParam(value = "oldPassword") String oldPassword,
+                                     @RequestParam(value = "newPassword") String newPassword,
+                                     @RequestParam(value = "smsCode") String smsCode){
+        String merchantId = hostHolder.getAdmin().getId();
+        ResponseCode state = userService.updatePassword(redisTemplate,merchantId,oldPassword,newPassword,smsCode);
+        return CommonUtil.response(state,null);
     }
 
     @Authority(value = AuthorityType.UserValidate)

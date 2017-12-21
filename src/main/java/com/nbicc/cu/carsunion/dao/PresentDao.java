@@ -17,7 +17,11 @@ public interface PresentDao extends JpaRepository<Present,Long>,PagingAndSorting
 
     public Present findByIdAndOnSaleAndDelFlag(long id, boolean onSale, boolean delFlag);
 
-    @Query("update Present set totalQuantity = ?1 where id = ?2 and totalQuantity = ?3 and delFlag = 0 and onSale = true ")
+    @Query("update Present set totalQuantity = ?1 where id = ?2 and totalQuantity = ?3 and delFlag = false and onSale = true ")
     @Modifying
     public int updateStock(int newValue,long presentId, int oldValue);
+
+    @Query("update Present set totalQuantity = ?1 where id = ?2 and totalQuantity = ?3 and delFlag = false")
+    @Modifying
+    public int updateStockAdmin(int newValue,long presentId, int oldValue);
 }
