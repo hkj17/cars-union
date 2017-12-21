@@ -147,4 +147,20 @@ public class MHController {
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
         }
     }
+
+    @RequestMapping(value = "vehicleSetting", method = RequestMethod.POST)
+    public JSONObject vehicleSetting(@RequestParam(value = "key") String key,
+                                     @RequestParam(value = "value") String value){
+        UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
+        if(relationship == null || !relationship.getIsBindMh()){
+            return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
+        }
+        String hwId = relationship.getMhHwId();
+        JSONObject ret = mhService.vehicleSetting(hwId,key,value);
+        if(ret != null && "0".equals(ret.getString("errno"))){
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"控制命令下发成功",ret);
+        }else{
+            return CommonUtil.response(ResponseType.REQUEST_FAIL,"控制命令下发失败",null);
+        }
+    }
 }

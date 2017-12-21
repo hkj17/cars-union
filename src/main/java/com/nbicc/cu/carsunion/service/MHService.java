@@ -158,4 +158,13 @@ public class MHService {
     public UserVehicleRelationship getDefaultMHDevice(String userId) {
         return userVehicleRelationshipDao.findByUserAndIsDefault(userDao.findById(userId),true);
     }
+
+    public JSONObject vehicleSetting(String hwId, String key, String value){
+        String ret = MHUtil.MHVehicleSetting(hwId,key,value);
+        logger.info("vehicleSetting result : " + ret + " || hwId : " + hwId + " key:value : " + key + ":" + value);
+        if("".equals(ret)) {
+            return null;
+        }
+        return JSONObject.parseObject(ret);
+    }
 }

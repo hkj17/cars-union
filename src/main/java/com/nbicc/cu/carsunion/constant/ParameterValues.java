@@ -45,9 +45,11 @@ public class ParameterValues {
 
     public final static String ALIPAY_APPID = "2017103109635891";
 
-    public final static String MH_GROUPCODE = "2048073";
+    public final static String MH_GROUPCODE = "1331054";  //正式环境 2048073
 
-    public final static String MH_GATEWAY_URL = "http://www.car-waiter.com/web";
+//    public final static String MH_GATEWAY_URL = "http://www.car-waiter.com/web";
+
+    public final static String MH_GATEWAY_URL = "http://117.78.36.98/web";
 
     //普通每天签到积分
     public static int SIGN_COMMON_CREDIT = 1;
