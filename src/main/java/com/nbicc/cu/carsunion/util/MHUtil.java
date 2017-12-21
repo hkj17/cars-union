@@ -160,4 +160,19 @@ public class MHUtil {
         request.setParameter("params",sb.toString());
         return request.getResponseGET();
     }
+
+    //3.16
+    public static String MHVehicleSetting(String hwId,String key,String value){
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicles/settings");
+        JSONObject command = new JSONObject();
+        if(!"dialSwitch".equals(key)){
+            command.put(key,Integer.parseInt(value));
+        }else {
+            command.put(key, value);
+        }
+        request.setParameter("vehicleHwid",hwId);
+        request.setParameter("jsonStr",command.toString());
+        return request.getResponsePOST(command.toString());
+    }
+
 }

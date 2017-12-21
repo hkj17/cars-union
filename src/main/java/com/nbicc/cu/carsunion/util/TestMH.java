@@ -1,14 +1,12 @@
 package com.nbicc.cu.carsunion.util;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 public class TestMH {
     public static void main(String[] args){
-        System.out.println(MHUtil.getMHVBrandList());
-        //System.out.println(MHUtil.getMHVStyleList("130"));
+
+//        System.out.println(MHUtil.getMHVehicleTripList("3100","2014-12-02T14:01:46+08:00","2018-12-02T14:01:46+08:00"));
+
+//        System.out.println(MHUtil.MHVehicleSetting("3100","gpsFlag","1"));
+//        System.out.println(MHUtil.getMHVStyleList("130"));
         //System.out.println(MHUtil.getMHVModelList("680"));
         //String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         //System.out.println(MHUtil.addMHVehicle("粤B12345","122111112222222","130","189","1318","1331054","13411112222","868120157321461",now));

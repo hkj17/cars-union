@@ -91,6 +91,11 @@ public class HttpRequestUtil {
                 Map.Entry<String,Object> firstEntry = entryIterator.next();
                 urlNameString += "?" + firstEntry.getKey() + "=" + firstEntry.getValue();
             }
+            while (entryIterator.hasNext()){
+                Map.Entry<String,Object> entry = entryIterator.next();
+                urlNameString += "&" + entry.getKey() + "=" + entry.getValue();
+            }
+            System.out.println("urlNameString : " + urlNameString);
             URL realUrl = new URL(urlNameString);
             HttpURLConnection httpConn=(HttpURLConnection)realUrl.openConnection();
             httpConn.setDoOutput(true);   //需要输出

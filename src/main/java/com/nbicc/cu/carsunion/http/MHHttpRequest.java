@@ -20,6 +20,7 @@ public class MHHttpRequest extends HttpRequest{
     public MHHttpRequest(String url) {
         super(url);
         super.setHeader("X-WSSE", wsseHead());
+        System.out.println(wsseHead());
         super.setHeader("Authorization", AUTHORIZATION);
     }
 
