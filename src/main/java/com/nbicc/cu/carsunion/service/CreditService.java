@@ -94,12 +94,13 @@ public class CreditService {
         }
     }
 
-    public List<UserSignHistory> signHistory(String userId, String start, String end) throws ParseException {
+    public Page<UserSignHistory> signHistory(String userId, String start, String end,int pageNum, int pageSize) throws ParseException {
         String dateFormat = "yyyy-MM-dd";
         Date startDate = DateUtils.parseDate(start,dateFormat);
         Date endDate = DateUtils.addDays(DateUtils.parseDate(end,dateFormat),1);
-        return userSignHistoryDao.findByUserIdAndDateBetween(userId,startDate,endDate);
-
+        Sort sort = new Sort(Sort.Direction.DESC, "date");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        return userSignHistoryDao.findByUserIdAndDateBetweenOOrderByDateDesc(userId,startDate,endDate,pageable);
     }
 
     public JSONObject overview(String userId) {
@@ -111,17 +112,13 @@ public class CreditService {
         return result;
     }
 
-    public Page<CreditHistory> getUserCreditHistory(String userId, int source,String start,String end, int pageNum, int pageSize) throws ParseException {
-        String dateFormat = "yyyy-MM-dd";
-        Date startDate = DateUtils.parseDate(start,dateFormat);
-        Date endDate = DateUtils.addDays(DateUtils.parseDate(end,dateFormat),1);
-
+    public Page<CreditHistory> getUserCreditHistory(String userId, int source, int pageNum, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "date");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         if(source != -1) {
-            return creditHistoryDao.findByUserIdAndSourceAndDateBetweenOrderByDateDesc(userId, source,startDate,endDate, pageable);
+            return creditHistoryDao.findByUserIdAndSourceOrderByDateDesc(userId, source, pageable);
         }else{
-            return creditHistoryDao.findByUserIdAndDateBetweenOrderByDateDesc(userId,startDate,endDate,pageable);
+            return creditHistoryDao.findByUserIdOrderByDateDesc(userId,pageable);
         }
     }
 }

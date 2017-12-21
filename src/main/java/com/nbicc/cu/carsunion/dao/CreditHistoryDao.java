@@ -10,7 +10,7 @@ import java.util.Date;
 
 
 public interface CreditHistoryDao extends JpaRepository<CreditHistory,String>,PagingAndSortingRepository<CreditHistory,String> {
-    Page<CreditHistory> findByUserIdAndDateBetweenOrderByDateDesc(String userId, Date start, Date end, Pageable pageable);
+    Page<CreditHistory> findByUserIdOrderByDateDesc(String userId, Pageable pageable);
 
-    Page<CreditHistory> findByUserIdAndSourceAndDateBetweenOrderByDateDesc(String userId, int source,Date start,Date end, Pageable pageable);
+    Page<CreditHistory> findByUserIdAndSourceOrderByDateDesc(String userId, int source,Pageable pageable);
 }
