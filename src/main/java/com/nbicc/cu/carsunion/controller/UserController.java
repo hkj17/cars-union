@@ -8,9 +8,11 @@ import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -206,4 +208,26 @@ public class UserController {
         }
     }
 
+    @PostMapping("/queryProduct")
+    public JSONObject queryProduct(@RequestParam(value = "vehicleId") String vehicleId,
+                                   @RequestParam(value = "title") String queryTile,
+                                   @RequestParam(value = "name") String productName,
+                                   @RequestParam(value = "oemCode",required = false) String oemCode,
+                                   @RequestParam(value = "deliverBy") String deliverBy,
+                                   @RequestParam(value = "needRecipt") boolean needRecipt,
+                                   @RequestParam(value = "address") String address){
+        try {
+            boolean state = userService.queryProduct(hostHolder.getAdmin().getId(),vehicleId,queryTile,productName,oemCode,deliverBy,needRecipt,address);
+            return CommonUtil.response(state);
+        } catch (ParseException e) {
+            return CommonUtil.response(ResponseType.REQUEST_FAIL, "操作失败，时间格式错误",null);
+        }
+    }
+
+    @PostMapping("/getQueriedProducts")
+    public JSONObject getQueriedProducts(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        Page<UserQueryProduct> userQueryProducts = userService.getQueriedProducts(hostHolder.getAdmin().getId(),pageNum-1,pageSize);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",userQueryProducts);
+    }
 }

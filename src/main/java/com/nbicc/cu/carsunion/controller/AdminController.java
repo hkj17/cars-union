@@ -6,6 +6,8 @@ import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.model.Order;
+import com.nbicc.cu.carsunion.model.UserQueryProduct;
+import com.nbicc.cu.carsunion.service.AdminService;
 import com.nbicc.cu.carsunion.service.MerchantService;
 import com.nbicc.cu.carsunion.service.OrderService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -28,8 +30,12 @@ public class AdminController {
 
     @Autowired
     MerchantService merchantService;
+
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    AdminService adminService;
 
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/getRegInProcessList", method = RequestMethod.POST)
@@ -109,5 +115,13 @@ public class AdminController {
         }else {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功", orders);
         }
+    }
+
+    @Authority(value = AuthorityType.AdminValidate)
+    @PostMapping(value = "/getAllQueriedProducts")
+    public JSONObject getAllQueriedProducts(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        Page<UserQueryProduct> userQueryProducts = adminService.getAllQueriedProducts(pageNum-1,pageSize);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",userQueryProducts);
     }
 }

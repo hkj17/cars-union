@@ -7,45 +7,54 @@ import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class UserService {
 
     @Autowired
-    AdminDao adminDao;
+    private AdminDao adminDao;
 
     @Autowired
-    UserDao userDao;
+    private UserDao userDao;
 
     @Autowired
-    UserVehicleRelationshipDao userVehicleRelationshipDao;
+    private UserVehicleRelationshipDao userVehicleRelationshipDao;
 
     @Autowired
-    VehicleDao vehicleDao;
+    private VehicleDao vehicleDao;
 
     @Autowired
-    AddressDao addressDao;
+    private AddressDao addressDao;
 
     @Autowired
-    VipLevelDao vipLevelDao;
+    private VipLevelDao vipLevelDao;
 
     @Autowired
-    CreditHistoryDao creditHistoryDao;
+    private CreditHistoryDao creditHistoryDao;
 
     @Autowired
-    FavoriteDao favoriteDao;
+    private FavoriteDao favoriteDao;
 
     @Autowired
-    ProductDao productDao;
+    private ProductDao productDao;
 
     @Autowired
     private UserCreditDao userCreditDao;
+
+    @Autowired
+    private UserQueryProductDao userQueryProductDao;
 
     public String validateToken(RedisTemplate redisTemplate, String token) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
@@ -430,5 +439,38 @@ public class UserService {
         user.setShareCode(shareCode);
         userDao.save(user);
         return shareCode;
+    }
+
+    public boolean queryProduct(String userId, String vehicleId, String queryTitle, String productName, String oemCode, String deliverBy, boolean needReceipt,String address) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        UserQueryProduct userQueryProduct = new UserQueryProduct();
+        User user = userDao.findById(userId);
+        Vehicle vehicle = vehicleDao.findById(vehicleId);
+        if(user == null || vehicle == null){
+            return false;
+        }
+        userQueryProduct.setUser(user);
+        userQueryProduct.setVehicle(vehicle);
+        userQueryProduct.setQueryTitle(queryTitle);
+        userQueryProduct.setProductName(productName);
+        userQueryProduct.setOemCode(oemCode);
+        userQueryProduct.setDeliverBy(sdf.parse(deliverBy));
+        userQueryProduct.setNeedRecipt(needReceipt);
+        userQueryProduct.setAddress(address);
+        userQueryProduct.setQueryTime(new Date());
+        userQueryProductDao.save(userQueryProduct);
+        return true;
+    }
+
+    public Page<UserQueryProduct> getQueriedProducts(String userId, int pageNum, int pageSize){
+        User user = userDao.findById(userId);
+        Sort sort = new Sort(Sort.Direction.DESC, "queryTime");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<UserQueryProduct> userQueryProducts = userQueryProductDao.findByUser(user, pageable);
+        List<UserQueryProduct> userQueryProductList = userQueryProducts.getContent();
+        for(UserQueryProduct userQueryProduct : userQueryProductList){
+            userQueryProduct.setUser(null);
+        }
+        return userQueryProducts;
     }
 }
