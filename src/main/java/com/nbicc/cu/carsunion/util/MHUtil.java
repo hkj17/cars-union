@@ -1,6 +1,7 @@
 package com.nbicc.cu.carsunion.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.http.MHHttpRequest;
 
 import java.util.Iterator;
@@ -10,27 +11,27 @@ public class MHUtil {
 
     //3.1查询品牌
     public static String getMHVBrandList(){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/brands");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/brands");
         return request.getResponseGET();
     }
 
     //3.2查询车系
     public static String getMHVStyleList(String brandId){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/styles");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/styles");
         request.setParameter("brandId",brandId);
         return request.getResponseGET();
     }
 
     //3.3查询车型
     public static String getMHVModelList(String styleId){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/models");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/models");
         request.setParameter("styleId",styleId);
         return request.getResponseGET();
     }
 
     //3.4新增车辆
     public static String addMHVehicle(String plateNumber,String vin,String brandId,String styleId,String modelId,String groupCode,String engineNumber,String equipmentCode,String purchaseDate){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/add");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/add");
         JSONObject json = new JSONObject();
         if(!CommonUtil.isNullOrEmpty(plateNumber)) {
             json.put("plateNumber", plateNumber);
@@ -62,7 +63,7 @@ public class MHUtil {
 
     //3.5修改车辆
     public static String updateMHVehicle(String id, String plateNumber,String vin,String brandId,String styleId,String modelId,String engineNumber,String purchaseDate){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/update");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/update");
         JSONObject json = new JSONObject();
         request.setParameter("vehicleId",id);
         if(!CommonUtil.isNullOrEmpty(plateNumber)) {
@@ -91,21 +92,21 @@ public class MHUtil {
 
     //3.6查询车辆
     public static String getMHVehicleDetails(String id){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/searchForSingle");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/searchForSingle");
         request.setParameter("vehicleId",id);
         return request.getResponseGET();
     }
 
     //3.7删除车辆
     public static String deleteMHVehicle(String id){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/delete");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/delete");
         request.setParameter("vehicleId",id);
         return request.getResponseGET();
     }
 
     //3.8车辆控制
     public static String controlMHVehicle(String hwId,String key,int value){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/controls");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/controls");
         JSONObject json = new JSONObject();
         JSONObject command = new JSONObject();
         command.put(key,value);
@@ -116,14 +117,14 @@ public class MHUtil {
 
     //3.9车辆定位
     public static String getMHVehiclePosition(String hwId){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/positions");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/positions");
         request.setParameter("vehicleHwid",hwId);
         return request.getResponseGET();
     }
 
     //3.10查询车身状态
     public static String getMHVehicleStatus(String hwId){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/status");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/status");
         request.setParameter("vehicleHwid",hwId);
         return request.getResponseGET();
     }
@@ -131,7 +132,7 @@ public class MHUtil {
     //TODO: 报错
     //3.11行程查询
     public static String getMHVehicleTripList(String hwId,String start,String end){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/trips");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/trips");
         request.setParameter("vehicleHwid",hwId);
         request.setParameter("date_from",start);
         request.setParameter("date_to",end);
@@ -140,13 +141,13 @@ public class MHUtil {
 
     //3.13告警类型查询
     public static String getMHAlertTypeList(){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/alerts/types");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/alerts/types");
         return request.getResponseGET();
     }
 
     //3.15查询车辆参数
     public static String getMHVehicleSetting(String hwId, List<String> params){
-        MHHttpRequest request = new MHHttpRequest("http://117.78.36.98/web/tpc/api/vehicle/searchSetting");
+        MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/searchSetting");
         request.setParameter("vehicleHwid",hwId);
         StringBuilder sb = new StringBuilder();
         Iterator<String> iter = params.iterator();

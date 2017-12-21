@@ -1576,3 +1576,4 @@ Caused by: java.net.ConnectException: Connection refused: connect
 2017.12.21 at 09:21:45 CST INFO    - Using a shared selector for servlet write/read
 2017.12.21 at 09:21:45 CST INFO    - Tomcat started on port(s): 8080 (http)
 2017.12.21 at 09:21:45 CST INFO    - Started CarsUnionApplication in 5.845 seconds (JVM running for 6.571)
+2017.12.21 at 14:24:00 CST ERROR 66 sendGet - 发送GET请求出现异常！no protocol: www.car-waiter.com/web/tpc/api/brands

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class TestMH {
     public static void main(String[] args){
-        //System.out.println(MHUtil.getMHVBrandList());
+        System.out.println(MHUtil.getMHVBrandList());
         //System.out.println(MHUtil.getMHVStyleList("130"));
         //System.out.println(MHUtil.getMHVModelList("680"));
         //String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());

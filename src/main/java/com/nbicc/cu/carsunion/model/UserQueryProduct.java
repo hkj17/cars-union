@@ -1,5 +1,7 @@
 package com.nbicc.cu.carsunion.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -28,6 +30,7 @@ public class UserQueryProduct {
     private String oemCode;
 
     @Column(name = "deliver_by")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date deliverBy;
 
     @Column(name = "need_receipt")
@@ -37,6 +40,7 @@ public class UserQueryProduct {
     private String address;
 
     @Column(name = "query_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date queryTime;
 
     public long getId() {
