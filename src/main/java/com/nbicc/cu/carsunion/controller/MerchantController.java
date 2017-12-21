@@ -48,12 +48,13 @@ public class MerchantController {
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
     public JSONObject getOrderListByMerchantId(@RequestParam(value = "start", defaultValue = "2017-01-01 00:00:00") String startDate,
                                                @RequestParam(value = "end", defaultValue = "2050-01-01 00:00:00") String endDate,
+                                               @RequestParam(value = "status", defaultValue = "-1") int status,
                                                @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         String merchantId = hostHolder.getAdmin().getId();
         Page<Order> orders = null;
         try {
-            orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId, startDate, endDate,
+            orders = orderService.getOrderListByMerchantAndTimeWithPage(merchantId,status, startDate, endDate,
                     pageNum - 1, pageSize);
         } catch (ParseException e) {
             logger.error("Date ParseException: " + e.getMessage());

@@ -30,8 +30,8 @@ public class CreditController {
      */
     @GetMapping("/sign")
     public JSONObject UserSign(){
-        int result = creditService.userSign(hostHolder.getAdmin().getId());
-        if(result == 0){
+        boolean result = creditService.userSign(hostHolder.getAdmin().getId());
+        if(result){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"签到成功",null);
         }else{
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"今日已签到",null);

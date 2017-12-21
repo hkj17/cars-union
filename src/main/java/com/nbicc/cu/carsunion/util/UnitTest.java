@@ -10,5 +10,6 @@ public class UnitTest {
         Date date = new Date();
         System.out.println("calendar: " + calendar.getTime());
         System.out.println("date: " + date);
+        System.out.println("availableProcessors: " + Runtime. getRuntime().availableProcessors());
     }
 }

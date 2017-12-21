@@ -1,6 +1,8 @@
 package com.nbicc.cu.carsunion.aspect;
 
 
+import com.nbicc.cu.carsunion.model.Admin;
+import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,6 +11,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,6 +28,9 @@ public class WebLogAspect {
 
     private static Logger logger = LogManager.getLogger(WebLogAspect.class);
 
+    @Autowired
+    private HostHolder hostHolder;
+
     ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     @Pointcut("execution(public * com.nbicc.cu.carsunion.controller..*.*(..))")
@@ -33,24 +39,30 @@ public class WebLogAspect {
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) throws Throwable {
         startTime.set(System.currentTimeMillis());
-        //接收到请求，记录请求内容
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-
-        logger.info("URL : " + request.getRequestURL().toString());
-        logger.info("HTTP_METHOD : " + request.getMethod());
-        logger.info("IP : " + request.getRemoteAddr());
-        logger.info("CLASS_METHOD : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
-        logger.info("ARGS : " + CommonUtil.getKeyValueForMap(request.getParameterMap()));
-
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) throws Throwable {
-        // 处理完请求，返回内容
-        //影响响应速率，暂不记录
-//        logger.info("RESPONSE : " + ret);
-        logger.info("SPEND TIME : " + (System.currentTimeMillis() - startTime.get()) + "ms");
+        StringBuilder sb = new StringBuilder();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+
+        sb.append(request.getMethod()).append(" " + request.getRequestURL().toString()).append(" || ")
+                .append("IP : " + request.getRemoteAddr()).append(" || ")
+                .append("user : " + getUserId()).append(" || ")
+                .append("SPEND TIME : " + (System.currentTimeMillis() - startTime.get()) + "ms").append(" || ")
+                .append("ARGS : " + CommonUtil.getKeyValueForMap(request.getParameterMap()));
+//                .append("Response : " + ret);
+        logger.info(sb.toString());
+    }
+
+    private String getUserId() {
+        Admin admin = hostHolder.getAdmin();
+        if(admin == null){
+            return "unknow user";
+        }else{
+            return admin.getId();
+        }
     }
 
 }

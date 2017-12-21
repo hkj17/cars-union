@@ -1,14 +1,20 @@
 package com.nbicc.cu.carsunion.util;
 
-import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class HttpRequestUtil {
+
+    private static Logger logger = LogManager.getLogger(HttpRequestUtil.class);
     /**
      * 向指定URL发送GET方法的请求
      *
@@ -44,11 +50,11 @@ public class HttpRequestUtil {
             // 建立实际的连接
             connection.connect();
             // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
+//            Map<String, List<String>> map = connection.getHeaderFields();
             // 遍历所有的响应头字段
-            for (String key : map.keySet()) {
-                System.out.println(key + "--->" + map.get(key));
-            }
+//            for (String key : map.keySet()) {
+//                System.out.println(key + "--->" + map.get(key));
+//            }
             // 定义 BufferedReader输入流来读取URL的响应
             in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
@@ -57,7 +63,7 @@ public class HttpRequestUtil {
                 result += line + "\n";
             }
         } catch (Exception e) {
-            System.out.println("发送GET请求出现异常！" + e);
+            logger.error("发送GET请求出现异常！" + e.getMessage());
             e.printStackTrace();
         }
         // 使用finally块来关闭输入流
@@ -70,6 +76,7 @@ public class HttpRequestUtil {
                 e2.printStackTrace();
             }
         }
+//        logger.info("--sendGet result: " + result);
         return result;
     }
 
@@ -115,9 +122,10 @@ public class HttpRequestUtil {
             while ((line = in.readLine()) != null) {
                 result += line + "\n";
             }
+//            logger.info("--sendPost result: " + result);
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("发送POST请求出现异常！" + e.getMessage());
             return null;
         }
 

@@ -15,5 +15,5 @@ public interface UserSignHistoryDao extends JpaRepository<UserSignHistory,Long>,
 
     List<UserSignHistory> findByUserIdAndDateBetween(String userId, Date start, Date end);
 
-    Page<UserSignHistory> findByUserIdAndDateBetweenOOrderByDateDesc(String userId, Date start, Date end, Pageable pageable);
+    Page<UserSignHistory> findByUserIdAndDateBetweenOrderByDateDesc(String userId, Date start, Date end, Pageable pageable);
 }
