@@ -1,14 +1,8 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.nbicc.cu.carsunion.constant.ParameterValues;
-import com.nbicc.cu.carsunion.dao.AdminDao;
-import com.nbicc.cu.carsunion.dao.MerchantDao;
-import com.nbicc.cu.carsunion.dao.UserDao;
-import com.nbicc.cu.carsunion.dao.UserQueryProductDao;
-import com.nbicc.cu.carsunion.model.Admin;
-import com.nbicc.cu.carsunion.model.Merchant;
-import com.nbicc.cu.carsunion.model.User;
-import com.nbicc.cu.carsunion.model.UserQueryProduct;
+import com.nbicc.cu.carsunion.dao.*;
+import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +33,9 @@ public class AdminService {
 
     @Autowired
     private UserQueryProductDao userQueryProductDao;
+
+    @Autowired
+    private UserFeedbackDao userFeedbackDao;
 
     public Admin getAdminByUserNameAndAuthority(String userName, int authority) {
         return adminDao.findByUserNameAndAuthority(userName, authority);
@@ -101,5 +98,11 @@ public class AdminService {
         Sort sort = new Sort(Sort.Direction.DESC, "queryTime");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         return userQueryProductDao.findAll(pageable);
+    }
+
+    public Page<UserFeedback> getAllUserFeedback(int pageNum, int pageSize){
+        Sort sort = new Sort(Sort.Direction.DESC, "timestamp");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        return userFeedbackDao.findAll(pageable);
     }
 }

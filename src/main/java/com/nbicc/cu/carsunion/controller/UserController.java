@@ -230,4 +230,18 @@ public class UserController {
         Page<UserQueryProduct> userQueryProducts = userService.getQueriedProducts(hostHolder.getAdmin().getId(),pageNum-1,pageSize);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",userQueryProducts);
     }
+
+    @PostMapping("/addFeedback")
+    public JSONObject addFeedback(@RequestParam(value = "content") String content,
+                                   @RequestParam(value = "contact") String contact){
+        boolean state = userService.addFeedback(hostHolder.getAdmin().getId(),content,contact);
+        return CommonUtil.response(state);
+    }
+
+    @PostMapping("/getFeedbacks")
+    public JSONObject getFeedbacks(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        Page<UserFeedback> feedbacks = userService.getFeedbacks(hostHolder.getAdmin().getId(),pageNum-1,pageSize);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",feedbacks);
+    }
 }

@@ -56,6 +56,9 @@ public class UserService {
     @Autowired
     private UserQueryProductDao userQueryProductDao;
 
+    @Autowired
+    private UserFeedbackDao userFeedbackDao;
+
     public String validateToken(RedisTemplate redisTemplate, String token) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
         return (String) valueOperations.get("token" + token);
@@ -417,8 +420,6 @@ public class UserService {
         }
     }
 
-
-
     public String generateInviteCode(String userId, String shareCode) {
         User user = userDao.findById(userId);
         if(!CommonUtil.isNullOrEmpty(user.getShareCode())){
@@ -472,5 +473,33 @@ public class UserService {
             userQueryProduct.setUser(null);
         }
         return userQueryProducts;
+    }
+
+    public boolean addFeedback(String userId,String content,String contact){
+        UserFeedback feedback = new UserFeedback();
+        User user = userDao.findById(userId);
+        if(user==null){
+            return false;
+        }
+        feedback.setUser(user);
+        feedback.setContent(content);
+        if(!CommonUtil.isNullOrEmpty(contact)){
+            feedback.setContact(contact);
+        }
+        feedback.setTimestamp(new Date());
+        userFeedbackDao.save(feedback);
+        return true;
+    }
+
+    public Page<UserFeedback> getFeedbacks(String userId, int pageNum, int pageSize){
+        User user = userDao.findById(userId);
+        Sort sort = new Sort(Sort.Direction.DESC, "timestamp");
+        Pageable pageable = new PageRequest(pageNum, pageSize, sort);
+        Page<UserFeedback> userFeedbacks = userFeedbackDao.findByUser(user,pageable);
+        List<UserFeedback> feedbackList = userFeedbacks.getContent();
+        for(UserFeedback feedback : feedbackList){
+            feedback.setUser(null);
+        }
+        return userFeedbacks;
     }
 }

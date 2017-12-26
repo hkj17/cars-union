@@ -6,6 +6,7 @@ import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.Merchant;
 import com.nbicc.cu.carsunion.model.Order;
+import com.nbicc.cu.carsunion.model.UserFeedback;
 import com.nbicc.cu.carsunion.model.UserQueryProduct;
 import com.nbicc.cu.carsunion.service.AdminService;
 import com.nbicc.cu.carsunion.service.MerchantService;
@@ -123,5 +124,13 @@ public class AdminController {
                                             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
         Page<UserQueryProduct> userQueryProducts = adminService.getAllQueriedProducts(pageNum-1,pageSize);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",userQueryProducts);
+    }
+
+    @Authority(value = AuthorityType.AdminValidate)
+    @PostMapping(value = "/getAllUserFeedback")
+    public JSONObject getAllUserFeedback(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+                                            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        Page<UserFeedback> feedbacks = adminService.getAllUserFeedback(pageNum-1,pageSize);
+        return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",feedbacks);
     }
 }
