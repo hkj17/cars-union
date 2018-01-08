@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static com.nbicc.cu.carsunion.util.HttpRequestUtil.sendGet;
+
 public class HttpRequest {
     protected  String url = "";
     protected String response = "";
@@ -50,7 +52,7 @@ public class HttpRequest {
     }
 
     private String sendHttpRequestGet(){
-        return HttpRequestUtil.sendGet(url,paramMap,propertyMap);
+        return sendGet(url,paramMap,propertyMap);
     }
 
     private String sendHttpRequestPost(String postdata){

@@ -21,7 +21,7 @@ public class HttpRequestUtil {
      * @param url
      *            发送请求的URL
      * @param paramMap
-     *            请求参数。
+     *            请求参数。HttpRequestUtil
      * @return URL 所代表远程资源的响应结果
      */
     public static String sendGet(String url, Map<String, Object> paramMap, Map<String,String> propertyMap) {
@@ -150,6 +150,6 @@ public class HttpRequestUtil {
 //                "   <sign>0CB01533B8C1EF103065174F50BCA001</sign>\n" +
 //                "</xml>";
 //        String url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
-//        System.out.println(HttpRequestUtil.sendPost(url,postData));
+//        System.out.println(HttpRequestUtil.sendPost(url,postData,null,null));
 //    }
 }

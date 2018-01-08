@@ -50,11 +50,14 @@ public class MHController {
                                   @RequestParam(value = "brandId") String brandId,
                                   @RequestParam(value = "styleId") String styleId,
                                   @RequestParam(value = "modelId") String modelId,
+                                  @RequestParam(value = "brandStr") String brandStr,
+                                  @RequestParam(value = "styleStr") String styleStr,
+                                  @RequestParam(value = "modelStr") String modelStr,
                                   @RequestParam(value = "engineNum") String engineNum,
                                   @RequestParam(value = "equipmentCode") String equipmentCode,
                                   @RequestParam(value = "purchaseDate") String purchaseDate){
         String userId = hostHolder.getAdmin().getId();
-        JSONObject json = mhService.bindVehicle(userId, plateNum, vin, brandId, styleId, modelId, engineNum, equipmentCode, purchaseDate);
+        JSONObject json = mhService.bindVehicle(userId, plateNum, vin, brandId, styleId, modelId, engineNum, equipmentCode, purchaseDate,brandStr,styleStr,modelStr);
         if(json == null){
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"用户未选择默认车型",null);
         }else {
@@ -69,9 +72,12 @@ public class MHController {
                                   @RequestParam(value = "brandId") String brandId,
                                   @RequestParam(value = "styleId") String styleId,
                                   @RequestParam(value = "modelId") String modelId,
+                                    @RequestParam(value = "brandStr") String brandStr,
+                                    @RequestParam(value = "styleStr") String styleStr,
+                                    @RequestParam(value = "modelStr") String modelStr,
                                   @RequestParam(value = "engineNum") String engineNum,
                                   @RequestParam(value = "purchaseDate") String purchaseDate){
-        JSONObject result = mhService.updateVehicle(id,plateNum,vin,brandId,styleId,modelId,engineNum,purchaseDate);
+        JSONObject result = mhService.updateVehicle(id,plateNum,vin,brandId,styleId,modelId,engineNum,purchaseDate,brandStr,styleStr,modelStr);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",result);
     }
 
@@ -84,7 +90,11 @@ public class MHController {
         String id = relationship.getMhVehicleId();
         JSONObject ret = mhService.getMHVehicleDetails(id);
         if(ret != null && "0".equals(ret.getString("errno"))){
-            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret.getJSONObject("data"));
+            JSONObject result = ret.getJSONObject("data");
+            result.put("brandStr",relationship.getMhBrand());
+            result.put("styleStr",relationship.getMhStyle());
+            result.put("modelStr",relationship.getMhModel());
+            return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",result);
         }else{
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"请求失败:错误的设备信息或服务器错误",null);
         }

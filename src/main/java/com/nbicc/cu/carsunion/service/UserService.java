@@ -6,6 +6,12 @@ import com.nbicc.cu.carsunion.model.*;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.nbicc.cu.carsunion.util.MessageDigestUtil;
 import com.nbicc.cu.carsunion.util.SmsUtil;
+import com.taobao.api.DefaultTaobaoClient;
+import com.taobao.api.TaobaoClient;
+import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
+import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +26,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.nbicc.cu.carsunion.constant.ParameterValues.ALI_DAYU_APPKEY;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.ALI_DAYU_SECRET;
+import static com.nbicc.cu.carsunion.constant.ParameterValues.ALI_DAYU_URL;
+
 @Service
 public class UserService {
+
+    private static Logger logger = LogManager.getLogger(UserService.class);
 
     @Autowired
     private AdminDao adminDao;
@@ -460,6 +472,7 @@ public class UserService {
         userQueryProduct.setAddress(address);
         userQueryProduct.setQueryTime(new Date());
         userQueryProductDao.save(userQueryProduct);
+        sendQueriedGotSMS(user.getContact());
         return true;
     }
 
@@ -491,15 +504,37 @@ public class UserService {
         return true;
     }
 
-    public Page<UserFeedback> getFeedbacks(String userId, int pageNum, int pageSize){
+    public Page<UserFeedback> getFeedbacks(String userId, int pageNum, int pageSize) {
         User user = userDao.findById(userId);
         Sort sort = new Sort(Sort.Direction.DESC, "timestamp");
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
-        Page<UserFeedback> userFeedbacks = userFeedbackDao.findByUser(user,pageable);
+        Page<UserFeedback> userFeedbacks = userFeedbackDao.findByUser(user, pageable);
         List<UserFeedback> feedbackList = userFeedbacks.getContent();
-        for(UserFeedback feedback : feedbackList){
+        for (UserFeedback feedback : feedbackList) {
             feedback.setUser(null);
         }
         return userFeedbacks;
+    }
+
+    public void sendQueriedGotSMS(String phone){
+        TaobaoClient client = new DefaultTaobaoClient(ALI_DAYU_URL, ALI_DAYU_APPKEY, ALI_DAYU_SECRET);
+        AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
+        req.setExtend("123456");
+        req.setSmsType("normal");
+        req.setSmsFreeSignName("汽车联盟");
+        req.setRecNum(phone);
+        req.setSmsTemplateCode("SMS_118730065");
+        try {
+            AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
+            logger.info("----send result : " + rsp.getBody());
+            if (rsp == null || rsp.getResult() == null) {
+                 logger.error("sendQueriedGotSMS FAIL !");
+            }
+            if (!rsp.getResult().getSuccess()) {
+                logger.error("sendQueriedGotSMS FAIL !");
+            }
+        } catch (Exception e) {
+            logger.error("Send Message Exception: " + e.getMessage());
+        }
     }
 }
