@@ -15,6 +15,7 @@ import com.nbicc.cu.carsunion.http.RegionalInfoHttpRequest;
 import com.nbicc.cu.carsunion.model.Order;
 import com.nbicc.cu.carsunion.model.RegionalInfo;
 import com.nbicc.cu.carsunion.service.OrderService;
+import com.nbicc.cu.carsunion.service.UserService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import com.qiniu.util.Auth;
 import com.taobao.api.ApiException;
@@ -55,6 +56,8 @@ public class UtilController {
 
     @Autowired
     OrderService orderService;
+    @Autowired
+    private UserService userService;
 
     //给js提供七牛的uptoken，option为1表示私密上传。
     @RequestMapping(value = "getUptoken", method = RequestMethod.GET)
@@ -94,7 +97,7 @@ public class UtilController {
         AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
         req.setExtend("123456");
         req.setSmsType("normal");
-        req.setSmsFreeSignName("nbicc开发者中心");
+        req.setSmsFreeSignName("汽车联盟");
         String json = "{\"number\":\"" + message + "\"}";
         req.setSmsParamString(json);
         req.setRecNum(phone);
@@ -225,10 +228,11 @@ public class UtilController {
 //        return "ok";
 //    }
 //
-//    @PostMapping("/testLogs")
-//    public String testLogs(@RequestParam("id") String id){
-//        throw new RuntimeException(id + " is wrong!");
-//    }
+    @PostMapping("/testSMS")
+    public String testLogs(@RequestParam("phone") String phone){
+        userService.sendQueriedGotSMS(phone);
+        return "ok";
+    }
 //
 
 }

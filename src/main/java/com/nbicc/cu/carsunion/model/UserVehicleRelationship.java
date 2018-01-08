@@ -34,6 +34,15 @@ public class UserVehicleRelationship {
     @Column(name = "mh_hw_id")
     private String mhHwId;
 
+    @Column(name = "mh_brand")
+    private String mhBrand;
+
+    @Column(name = "mh_style")
+    private String mhStyle;
+
+    @Column(name = "mh_model")
+    private String mhModel;
+
     public Long getId() {
         return id;
     }
@@ -97,5 +106,29 @@ public class UserVehicleRelationship {
 
     public void setMhHwId(String mhHwId) {
         this.mhHwId = mhHwId;
+    }
+
+    public String getMhBrand() {
+        return mhBrand;
+    }
+
+    public void setMhBrand(String mhBrand) {
+        this.mhBrand = mhBrand;
+    }
+
+    public String getMhStyle() {
+        return mhStyle;
+    }
+
+    public void setMhStyle(String mhStyle) {
+        this.mhStyle = mhStyle;
+    }
+
+    public String getMhModel() {
+        return mhModel;
+    }
+
+    public void setMhModel(String mhModel) {
+        this.mhModel = mhModel;
     }
 }
