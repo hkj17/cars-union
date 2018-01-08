@@ -105,12 +105,13 @@ public class MHUtil {
     }
 
     //3.8车辆控制
-    public static String controlMHVehicle(String hwId,String key,int value){
+    public static String controlMHVehicle(String hwId,String unFireTime, String key,int value){
         MHHttpRequest request = new MHHttpRequest(ParameterValues.MH_GATEWAY_URL + "/tpc/api/vehicle/controls");
         JSONObject json = new JSONObject();
         JSONObject command = new JSONObject();
         command.put(key,value);
         json.put("vehicleHwid",hwId);
+        json.put("unFireTime",unFireTime);
         json.put("order",command);
         return request.getResponsePOST(json.toString());
     }

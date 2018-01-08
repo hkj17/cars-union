@@ -103,14 +103,15 @@ public class MHController {
     }
 
     @RequestMapping(value = "controlVehicle", method = RequestMethod.POST)
-    public JSONObject controlVehicle(@RequestParam(value = "key") String key,
+    public JSONObject controlVehicle(@RequestParam(value = "unFire") String unfire,
+                                     @RequestParam(value = "key") String key,
                                      @RequestParam(value = "value") int value){
         UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
         if(relationship == null || !relationship.getIsBindMh()){
             return CommonUtil.response(ResponseType.NOT_BIND_MH,"未绑定MH设备",null);
         }
         String hwId = relationship.getMhHwId();
-        JSONObject ret = mhService.controlMHVehicle(hwId,key,value);
+        JSONObject ret = mhService.controlMHVehicle(hwId,unfire,key,value);
         if(ret != null && "0".equals(ret.getString("errno"))){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS,"返回成功",ret.getJSONObject("data"));
         }else{

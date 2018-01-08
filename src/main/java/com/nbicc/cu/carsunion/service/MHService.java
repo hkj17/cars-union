@@ -146,8 +146,8 @@ public class MHService {
         return JSONObject.parseObject(ret);
     }
 
-    public JSONObject controlMHVehicle(String hwId, String key, int value) {
-        String ret = MHUtil.controlMHVehicle(hwId,key,value);
+    public JSONObject controlMHVehicle(String hwId, String unFireTime, String key, int value) {
+        String ret = MHUtil.controlMHVehicle(hwId,unFireTime,key,value);
         logger.info("controlMHVehicle result : " + ret + " || hwId : " + hwId + " key:value : " + key + ":" + value);
         if("".equals(ret)) {
             return null;
