@@ -113,7 +113,7 @@ public class MHController {
     }
 
     @RequestMapping(value = "controlVehicle", method = RequestMethod.POST)
-    public JSONObject controlVehicle(@RequestParam(value = "unFire") String unfire,
+    public JSONObject controlVehicle(@RequestParam(value = "unFire",defaultValue = "0") String unfire,
                                      @RequestParam(value = "key") String key,
                                      @RequestParam(value = "value") int value){
         UserVehicleRelationship relationship = mhService.getDefaultMHDevice(hostHolder.getAdmin().getId());
