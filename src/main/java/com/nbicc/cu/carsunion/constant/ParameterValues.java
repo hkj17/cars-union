@@ -49,6 +49,10 @@ public class ParameterValues {
 
     public final static String MH_GATEWAY_URL = "http://www.car-waiter.com/web";
 
+    public final static String SW_UPDATE_FILE_PATH = "/cloudweb/server/tomcat_carsunion/webapps/updates/";
+
+    public final static String SW_UPDATE_FILE_PATH_LOCAL_TEST = "D:\\";
+
 //    public final static String MH_GATEWAY_URL = "http://117.78.36.98/web";
 
     //普通每天签到积分
