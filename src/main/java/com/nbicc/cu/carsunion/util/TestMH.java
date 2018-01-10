@@ -12,7 +12,7 @@ public class TestMH {
         //System.out.println(MHUtil.addMHVehicle("粤B12345","122111112222222","130","189","1318","1331054","13411112222","868120157321461",now));
         //System.out.println(MHUtil.updateMHVehicle("133","粤B67890","122111112222222","130","189","1318","13411112222",now));
         //System.out.println(MHUtil.getMHVehicleDetails("616"));
-        //System.out.println(MHUtil.getMHVehicleStatus("16300"));
+        System.out.println(MHUtil.getMHVehicleStatus("16300"));
         //System.out.println(MHUtil.getMHVehiclePosition("16300"));
 //        System.out.println(MHUtil.getMHVehicleDetails("137"));
         //System.out.println(MHUtil.getMHVehicleStatus("3100"));

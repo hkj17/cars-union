@@ -1,6 +1,10 @@
 package com.nbicc.cu.carsunion.util;
 
 import java.security.MessageDigest;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * Created by bigmao on 2017/8/18.
@@ -36,10 +40,32 @@ public class MessageDigestUtil {
         return getMessageDigestString("MD5", origin, charsetname).toUpperCase();
     }
 
-    public static String SHA1Encode(String origin, String charsetname) {
-        return getMessageDigestString("SHA1", origin, charsetname).toUpperCase();
-    }
-
     private static final char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
             'f' };
+
+    public static String generateSignSHA1(SortedMap<String,String> paramMap){
+        if(paramMap==null){
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        Set<Map.Entry<String, String>> es = paramMap.entrySet();
+        Iterator<Map.Entry<String, String>> it = es.iterator();
+        if(it.hasNext()){
+            Map.Entry<String, String> entry = it.next();
+            String k = entry.getKey();
+            Object v = entry.getValue();
+            if (v != null && !"sign".equals(k)) {
+                sb.append(k + "=" + v);
+            }
+        }
+        while (it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
+            String k = entry.getKey();
+            Object v = entry.getValue();
+            if (v != null && !"sign".equals(k)) {
+                sb.append("&" + k + "=" + v);
+            }
+        }
+        return getMessageDigestString("SHA1",sb.toString(),"UTF-8");
+    }
 }
