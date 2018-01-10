@@ -7,7 +7,7 @@ public class SmsUtil {
 
     public static boolean verifySmsCode(RedisTemplate redisTemplate, String phone, String smsCode){
         ValueOperations valueOperations = redisTemplate.opsForValue();
-        String sms = (String) valueOperations.get("verify"+phone);
+        String sms = String.valueOf(valueOperations.get("verify"+phone));
         if(CommonUtil.isNullOrEmpty(sms) || !sms.equals(smsCode)){
             return false;
         }else{
