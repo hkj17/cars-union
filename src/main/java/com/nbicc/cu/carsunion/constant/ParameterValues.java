@@ -27,9 +27,15 @@ public class ParameterValues {
 
     public static final int UPDATETOKEN_EXPIRE_VALUE = 7;
 
-    public final static String WXPAY_APP_ID = "wxabe6785e709a35f1";
+    public final static String WX_APP_ID = "wx43870da61ef4bfc4";
 
-    public final static String WXPAY_APP_KEY = "b025e9edcd054c489af018ef6c8943a0";
+    public final static String WX_APP_SECRET = "93a05e7fb5863a387202bb34e906a5b7";
+
+    public final static String WXPAY_APP_KEY = "FAKE_KEY";
+
+    public static final String WX_ACCESS_TOKEN_URL= "https://api.weixin.qq.com/cgi-bin/token";
+
+    public static final String WX_JSAPI_TICKET_URL = "https://api.weixin.qq.com/cgi-bin/ticket/getticket";
 
     public final static double RECOMMENDOR_CREDIT_RATIO = 0.1;
 
