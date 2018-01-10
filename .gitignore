@@ -23,8 +23,5 @@ dist/
 nbdist/
 .nb-gradle/
 
-#qiniu
-ParameterKeys.java
-
 *.rdb
 *.log
