@@ -175,13 +175,15 @@ public class UserService {
     }
 
     @Transactional
-    public boolean addAddress(String userId, String addr, Boolean isDefault) {
+    public boolean addAddress(String userId, String name, String phone, String addr, Boolean isDefault) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {
             return false;
         }
         Address address = new Address();
         address.setUser(user);
+        address.setName(name);
+        address.setPhone(phone);
         address.setAddress(addr);
         address.setId(CommonUtil.generateUUID32());
         if (isDefault) {
@@ -210,12 +212,14 @@ public class UserService {
     }
 
     @Transactional
-    public boolean modifyAddress(String userId, String addressId, String name){
+    public boolean modifyAddress(String userId, String addressId, String name,String phone,String addr){
         Address address = addressDao.findById(addressId);
         if(address == null || !userId.equals(address.getUser().getId())){
             return false;
         }else{
-            address.setAddress(name);
+            address.setName(name);
+            address.setPhone(phone);
+            address.setAddress(addr);
             addressDao.save(address);
             return true;
         }
@@ -244,16 +248,16 @@ public class UserService {
     public List<Address> getAddressList(String userId) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {
-            return new ArrayList<Address>();
+            return new ArrayList<>();
         } else {
-            return user.getAddressList();
+            return addressDao.findByUser(user);
         }
     }
 
     public List<UserVehicleRelationship> getVehicleList(String userId) {
         User user = userDao.findById(userId);
         if (CommonUtil.isNullOrEmpty(user)) {
-            return new ArrayList<UserVehicleRelationship>();
+            return new ArrayList<>();
         } else {
             return userVehicleRelationshipDao.findByUser(user);
         }

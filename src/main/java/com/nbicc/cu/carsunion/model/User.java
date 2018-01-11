@@ -34,10 +34,6 @@ public class User {
     @Column
     private String shareCode;
 
-
-    @OneToMany(mappedBy = "user")
-    private List<Address> addressList;
-
     @ManyToMany
     @JoinTable(name = "user_vehicle_relationship", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
     private Set<Vehicle> vehicles;
@@ -96,14 +92,6 @@ public class User {
 
     public void setRecommend(String recommend){
         this.recommend = recommend;
-    }
-
-    public List<Address> getAddressList(){
-        return addressList;
-    }
-
-    public void setAddressList(List<Address> addressList){
-        this.addressList = addressList;
     }
 
     @JsonIgnore
