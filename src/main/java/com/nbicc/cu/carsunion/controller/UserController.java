@@ -57,10 +57,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/addAddress", method = RequestMethod.POST)
-    public JSONObject addAddress(@RequestParam(value = "address") String address,
+    public JSONObject addAddress(@RequestParam(value = "name") String name,
+                                 @RequestParam(value = "phone") String phone,
+                                 @RequestParam(value = "address") String address,
                                  @RequestParam(value = "default") Boolean isDefault) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = userService.addAddress(userId,address,isDefault);
+        boolean state = userService.addAddress(userId,name,phone,address,isDefault);
         if(state){
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
@@ -81,9 +83,11 @@ public class UserController {
 
     @RequestMapping(value = "/modifyAddress", method = RequestMethod.POST)
     public JSONObject modifyAddress(@RequestParam(value = "addressId") String addressId,
-                                    @RequestParam(value = "name") String name) {
+                                    @RequestParam(value = "name") String name,
+                                    @RequestParam(value = "phone") String phone,
+                                    @RequestParam(value = "address") String address) {
         String userId = hostHolder.getAdmin().getId();
-        boolean state = userService.modifyAddress(userId,addressId,name);
+        boolean state = userService.modifyAddress(userId,addressId,name,phone,address);
         if (state) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
