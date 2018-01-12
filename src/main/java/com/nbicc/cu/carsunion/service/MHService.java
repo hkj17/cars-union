@@ -5,6 +5,7 @@ import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
 import com.nbicc.cu.carsunion.model.HostHolder;
+import com.nbicc.cu.carsunion.model.MHNotifyModel;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -188,5 +189,14 @@ public class MHService {
             return null;
         }
         return JSONObject.parseObject(ret);
+    }
+
+    public void handlerNotify(MHNotifyModel model) {
+        logger.info("Receive MH notify : " + model.toString());
+
+    }
+
+    private void sendNotify2App(){
+
     }
 }

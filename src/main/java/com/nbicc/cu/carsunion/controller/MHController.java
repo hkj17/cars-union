@@ -5,14 +5,12 @@ import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
+import com.nbicc.cu.carsunion.model.MHNotifyModel;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.service.MHService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -173,5 +171,15 @@ public class MHController {
         }else{
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"控制命令下发失败",null);
         }
+    }
+
+
+    @PostMapping("/notify")
+    public JSONObject vehicleNotify(@RequestBody MHNotifyModel model){
+        mhService.handlerNotify(model);
+        JSONObject ret = new JSONObject();
+        ret.put("errno",0);
+        ret.put("error","success");
+        return ret;
     }
 }
