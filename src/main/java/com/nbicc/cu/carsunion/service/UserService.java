@@ -212,14 +212,24 @@ public class UserService {
     }
 
     @Transactional
-    public boolean modifyAddress(String userId, String addressId, String name,String phone,String addr){
+    public boolean modifyAddress(String userId, String addressId, String name,String phone,String addr,boolean isDefault){
         Address address = addressDao.findById(addressId);
-        if(address == null || !userId.equals(address.getUser().getId())){
+        if(address == null || address.getUser() == null || !userId.equals(address.getUser().getId())){
             return false;
         }else{
             address.setName(name);
             address.setPhone(phone);
             address.setAddress(addr);
+            if(isDefault){
+                Address defaultAddr = addressDao.findByUserAndIsDefault(address.getUser(), true);
+                if (!CommonUtil.isNullOrEmpty(defaultAddr)) {
+                    defaultAddr.setIsDefault(false);
+                    addressDao.save(defaultAddr);
+                }
+                address.setIsDefault(true);
+            }else{
+                address.setIsDefault(false);
+            }
             addressDao.save(address);
             return true;
         }
