@@ -1,11 +1,19 @@
 package com.nbicc.cu.carsunion.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gexin.rp.sdk.base.IPushResult;
+import com.gexin.rp.sdk.base.impl.SingleMessage;
+import com.gexin.rp.sdk.base.impl.Target;
+import com.gexin.rp.sdk.exceptions.RequestException;
+import com.gexin.rp.sdk.http.IGtPush;
+import com.gexin.rp.sdk.template.LinkTemplate;
+import com.gexin.rp.sdk.template.style.Style0;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
+import com.nbicc.cu.carsunion.dao.MHNotifyInfosDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
 import com.nbicc.cu.carsunion.model.HostHolder;
-import com.nbicc.cu.carsunion.model.MHNotifyModel;
+import com.nbicc.cu.carsunion.model.MHNotifyInfos;
 import com.nbicc.cu.carsunion.model.User;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.util.CommonUtil;
@@ -19,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nbicc.cu.carsunion.constant.ParameterValues.*;
+
 @Service
 public class MHService {
 
@@ -30,6 +40,8 @@ public class MHService {
     private UserDao userDao;
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private MHNotifyInfosDao mhNotifyInfosDao;
 
     public List<JSONObject> getVBrand(){
         String vBrandStr = MHUtil.getMHVBrandList();
@@ -191,12 +203,65 @@ public class MHService {
         return JSONObject.parseObject(ret);
     }
 
-    public void handlerNotify(MHNotifyModel model) {
-        logger.info("Receive MH notify : " + model.toString());
+    public void handlerNotify(MHNotifyInfos info) {
+        logger.info("Receive MH notify : " + info.toString());
+        mhNotifyInfosDao.save(info);
+    }
+
+    public boolean sendNotify2App(String cid){
+        IGtPush push = new IGtPush(GETUI_URL, GETUI_APP_KEY_DEV, GETUI_MASTER_SECRET_DEV);
+        LinkTemplate template = linkTemplateDemo();
+        SingleMessage message = new SingleMessage();
+        message.setOffline(true);
+        // 离线有效时间，单位为毫秒，可选
+        message.setOfflineExpireTime(24 * 3600 * 1000);
+        message.setData(template);
+        // 可选，1为wifi，0为不限制网络环境。根据手机处于的网络情况，决定是否下发
+        message.setPushNetWorkType(0);
+        Target target = new Target();
+        target.setAppId(GETUI_APP_ID_DEV);
+        target.setClientId(cid);
+        //target.setAlias(Alias);
+        IPushResult ret = null;
+        try {
+            ret = push.pushMessageToSingle(message, target);
+        } catch (RequestException e) {
+            logger.error("GETUI PUSH ERROR : " + e.getMessage());
+            ret = push.pushMessageToSingle(message, target, e.getRequestId());
+        }
+        if (ret != null) {
+            logger.info("GETUI PUSH RESULT : " + ret.getResponse().toString());
+            return true;
+        } else {
+            logger.error("服务器响应异常");
+            return false;
+        }
+
 
     }
 
-    private void sendNotify2App(){
+    private LinkTemplate linkTemplateDemo() {
+        LinkTemplate template = new LinkTemplate();
+        // 设置APPID与APPKEY
+        template.setAppId(GETUI_APP_ID_DEV);
+        template.setAppkey(GETUI_APP_KEY_DEV);
 
+        Style0 style = new Style0();
+        // 设置通知栏标题与内容
+        style.setTitle("汽车联盟通知栏标题");
+        style.setText("汽车联盟通知栏内容");
+        // 配置通知栏图标
+        style.setLogo("icon.png");
+        // 配置通知栏网络图标
+        style.setLogoUrl("");
+        // 设置通知是否响铃，震动，或者可清除
+        style.setRing(true);
+        style.setVibrate(true);
+        style.setClearable(true);
+        template.setStyle(style);
+
+        // 设置打开的网址地址
+        template.setUrl("http://www.iot-jd.com/");
+        return template;
     }
 }

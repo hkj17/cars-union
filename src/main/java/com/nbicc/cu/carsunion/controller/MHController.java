@@ -5,6 +5,7 @@ import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
+import com.nbicc.cu.carsunion.model.MHNotifyInfos;
 import com.nbicc.cu.carsunion.model.MHNotifyModel;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.service.MHService;
@@ -175,11 +176,24 @@ public class MHController {
 
 
     @PostMapping("/notify")
-    public JSONObject vehicleNotify(@RequestBody MHNotifyModel model){
-        mhService.handlerNotify(model);
+    @Authority
+    public JSONObject vehicleNotify(@RequestBody MHNotifyInfos info){
+        mhService.handlerNotify(info);
         JSONObject ret = new JSONObject();
         ret.put("errno",0);
         ret.put("error","success");
         return ret;
     }
+
+    @GetMapping("/sendNotify")
+    @Authority
+    public String sendNotify(@RequestParam("cid")String cid){
+        boolean ret = mhService.sendNotify2App(cid);
+        if(ret){
+            return "ok";
+        }else{
+            return "fail";
+        }
+    }
+
 }

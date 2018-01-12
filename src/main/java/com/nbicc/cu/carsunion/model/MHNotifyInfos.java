@@ -1,15 +1,52 @@
 package com.nbicc.cu.carsunion.model;
 
-public class MHNotifyModel {
+import javax.persistence.*;
+import java.util.Date;
 
-    private long id;
-    private String type;
-    private String subType;
+@Entity
+@Table(name = "mh_notify_infos")
+public class MHNotifyInfos {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column(name = "hw_id")
     private String object;
+
+    @Column
+    private String type;
+
+    @Column(name = "sub_type")
+    private String subType;
+
+    @Column
     private String content;
-    private String time;
+
+    @Column
+    private Date time;
+
+    @Column
     private String lon;
+
+    @Column
     private String lat;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getObject() {
+        return object;
+    }
+
+    public void setObject(String object) {
+        this.object = object;
+    }
 
     public String getType() {
         return type;
@@ -27,14 +64,6 @@ public class MHNotifyModel {
         this.subType = subType;
     }
 
-    public String getObject() {
-        return object;
-    }
-
-    public void setObject(String object) {
-        this.object = object;
-    }
-
     public String getContent() {
         return content;
     }
@@ -43,11 +72,11 @@ public class MHNotifyModel {
         this.content = content;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
@@ -69,12 +98,13 @@ public class MHNotifyModel {
 
     @Override
     public String toString() {
-        return "MHNotifyModel{" +
-                "type='" + type + '\'' +
+        return "MHNotifyInfos{" +
+                "id=" + id +
+                ", hwId='" + object + '\'' +
+                ", type='" + type + '\'' +
                 ", subType='" + subType + '\'' +
-                ", object='" + object + '\'' +
                 ", content='" + content + '\'' +
-                ", time='" + time + '\'' +
+                ", time=" + time +
                 ", lon='" + lon + '\'' +
                 ", lat='" + lat + '\'' +
                 '}';

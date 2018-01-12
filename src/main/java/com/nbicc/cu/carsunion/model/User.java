@@ -3,7 +3,6 @@ package com.nbicc.cu.carsunion.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -33,6 +32,15 @@ public class User {
 
     @Column
     private String shareCode;
+
+    @Column
+    private String pushCid;
+
+    @Column
+    private Integer appType;
+
+    @Column
+    private String appVersion;
 
     @ManyToMany
     @JoinTable(name = "user_vehicle_relationship", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
@@ -109,5 +117,29 @@ public class User {
 
     public void setShareCode(String shareCode) {
         this.shareCode = shareCode;
+    }
+
+    public String getPushCid() {
+        return pushCid;
+    }
+
+    public void setPushCid(String pushCid) {
+        this.pushCid = pushCid;
+    }
+
+    public Integer getAppType() {
+        return appType;
+    }
+
+    public void setAppType(Integer appType) {
+        this.appType = appType;
+    }
+
+    public String getAppVersion() {
+        return appVersion;
+    }
+
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
     }
 }
