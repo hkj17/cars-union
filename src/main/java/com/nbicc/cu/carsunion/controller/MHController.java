@@ -1,16 +1,17 @@
 package com.nbicc.cu.carsunion.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.MHNotifyInfos;
-import com.nbicc.cu.carsunion.model.MHNotifyModel;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.service.MHService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -175,10 +176,11 @@ public class MHController {
     }
 
 
-    @PostMapping("/notify")
+    @PostMapping(value = "/notify",consumes = MediaType.TEXT_PLAIN_VALUE)
     @Authority
-    public JSONObject vehicleNotify(@RequestBody MHNotifyInfos info){
-        mhService.handlerNotify(info);
+    public JSONObject vehicleNotify(@RequestBody String info){
+        MHNotifyInfos infos = JSON.parseObject(info,MHNotifyInfos.class);
+        mhService.handlerNotify(infos);
         JSONObject ret = new JSONObject();
         ret.put("errno",0);
         ret.put("error","success");
