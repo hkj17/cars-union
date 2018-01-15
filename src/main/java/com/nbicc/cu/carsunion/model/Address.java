@@ -27,6 +27,10 @@ public class Address {
     @Column(name = "is_default")
     private Boolean isDefault;
 
+    //删除标记，0未删除，1已删除
+    @Column(name = "del_flag")
+    private int delFlag;
+
     public String getId(){
         return id;
     }
@@ -73,5 +77,13 @@ public class Address {
 
     public void setIsDefault(Boolean isDefault){
         this.isDefault = isDefault;
+    }
+
+    public int getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(int delFlag) {
+        this.delFlag = delFlag;
     }
 }

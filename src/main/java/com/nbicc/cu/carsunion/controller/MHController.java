@@ -11,6 +11,7 @@ import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.service.MHService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -187,15 +188,24 @@ public class MHController {
         return ret;
     }
 
-    @GetMapping("/sendNotify")
-    @Authority
-    public String sendNotify(@RequestParam("cid")String cid){
-        boolean ret = mhService.sendNotify2App(cid);
-        if(ret){
-            return "ok";
-        }else{
-            return "fail";
-        }
+//    @GetMapping("/sendNotify")
+//    @Authority
+//    public String sendNotify(@RequestParam("cid")String cid,
+//                             @RequestParam("title")String title,
+//                             @RequestParam("body")String body){
+//        boolean ret = mhService.sendNotify2App(cid,title,body);
+//        if(ret){
+//            return "ok";
+//        }else{
+//            return "fail";
+//        }
+//    }
+
+    @GetMapping("/lastestNotify")
+    @Authority(AuthorityType.UserValidate)
+    public Page<MHNotifyInfos> getMhNotifyInfos(@RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
+                                                @RequestParam(value = "pageSize",defaultValue = "6")int pageSize){
+        return mhService.getMHNotifyInfosList(hostHolder.getAdmin().getId(),pageNum-1,pageSize);
     }
 
 }

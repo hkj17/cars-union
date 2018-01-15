@@ -187,7 +187,7 @@ public class UserService {
         address.setAddress(addr);
         address.setId(CommonUtil.generateUUID32());
         if (isDefault) {
-            Address defaultAddr = addressDao.findByUserAndIsDefault(user, true);
+            Address defaultAddr = addressDao.findByUserAndIsDefaultAndDelFlag(user, true,0);
             if (!CommonUtil.isNullOrEmpty(defaultAddr)) {
                 defaultAddr.setIsDefault(false);
                 addressDao.save(defaultAddr);
@@ -196,24 +196,26 @@ public class UserService {
         } else {
             address.setIsDefault(false);
         }
+        address.setDelFlag(0);
         addressDao.save(address);
         return true;
     }
 
     @Transactional
     public boolean deleteAddress(String userId, String addressId) {
-        Address address = addressDao.findById(addressId);
+        Address address = addressDao.findByIdAndDelFlag(addressId,0);
         if (address == null || !userId.equals(address.getUser().getId())) {
             return false;
         } else {
-            addressDao.delete(address);
+            address.setDelFlag(1);
+            addressDao.save(address);
             return true;
         }
     }
 
     @Transactional
     public boolean modifyAddress(String userId, String addressId, String name,String phone,String addr,boolean isDefault){
-        Address address = addressDao.findById(addressId);
+        Address address = addressDao.findByIdAndDelFlag(addressId,0);
         if(address == null || address.getUser() == null || !userId.equals(address.getUser().getId())){
             return false;
         }else{
@@ -221,7 +223,7 @@ public class UserService {
             address.setPhone(phone);
             address.setAddress(addr);
             if(isDefault){
-                Address defaultAddr = addressDao.findByUserAndIsDefault(address.getUser(), true);
+                Address defaultAddr = addressDao.findByUserAndIsDefaultAndDelFlag(address.getUser(), true,0);
                 if (!CommonUtil.isNullOrEmpty(defaultAddr)) {
                     defaultAddr.setIsDefault(false);
                     addressDao.save(defaultAddr);
@@ -241,11 +243,11 @@ public class UserService {
         if (CommonUtil.isNullOrEmpty(user)) {
             return false;
         }
-        Address address = addressDao.findById(addressId);
+        Address address = addressDao.findByIdAndDelFlag(addressId,0);
         if (CommonUtil.isNullOrEmpty(address)) {
             return false;
         }
-        Address defaultAddr = addressDao.findByUserAndIsDefault(user, true);
+        Address defaultAddr = addressDao.findByUserAndIsDefaultAndDelFlag(user, true,0);
         if (!CommonUtil.isNullOrEmpty(defaultAddr)) {
             defaultAddr.setIsDefault(false);
             addressDao.save(defaultAddr);
@@ -260,7 +262,7 @@ public class UserService {
         if (CommonUtil.isNullOrEmpty(user)) {
             return new ArrayList<>();
         } else {
-            return addressDao.findByUser(user);
+            return addressDao.findByUserAndDelFlag(user,0);
         }
     }
 
