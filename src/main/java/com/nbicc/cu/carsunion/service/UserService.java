@@ -129,6 +129,8 @@ public class UserService {
                 user.setRecommend(recommendor.getId());
             }
         }
+        //生成分享码
+        generateShareCodeForUser(null,user);
         userDao.save(user);
         Admin admin = new Admin();
         admin.setUserName(contact);
@@ -453,6 +455,14 @@ public class UserService {
         if(!CommonUtil.isNullOrEmpty(user.getShareCode())){
             return "已经存在分享码";
         }
+        if (!generateShareCodeForUser(shareCode, user)) {
+            return "分享码重复，请更换";
+        }
+        userDao.save(user);
+        return user.getShareCode();
+    }
+
+    private boolean generateShareCodeForUser(String shareCode, User user) {
         List<String> shareCodes = userDao.findAllShareCode();
         if(CommonUtil.isNullOrEmpty(shareCode)){
             //生成8位邀请码
@@ -462,12 +472,11 @@ public class UserService {
             }
         }else{
             if(shareCodes.contains(shareCode)){
-                return "分享码重复，请更换";
+                return false;
             }
         }
         user.setShareCode(shareCode);
-        userDao.save(user);
-        return shareCode;
+        return true;
     }
 
     public boolean queryProduct(String userId, String vehicleId, String queryTitle, String productName, String oemCode, String deliverBy, boolean needReceipt,String address) throws ParseException {
