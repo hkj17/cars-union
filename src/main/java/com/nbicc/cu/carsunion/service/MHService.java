@@ -4,14 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.gexin.rp.sdk.base.IPushResult;
 import com.gexin.rp.sdk.base.impl.SingleMessage;
 import com.gexin.rp.sdk.base.impl.Target;
+import com.gexin.rp.sdk.base.payload.APNPayload;
 import com.gexin.rp.sdk.exceptions.RequestException;
 import com.gexin.rp.sdk.http.IGtPush;
-import com.gexin.rp.sdk.template.LinkTemplate;
-import com.gexin.rp.sdk.template.style.Style0;
+import com.gexin.rp.sdk.template.TransmissionTemplate;
 import com.nbicc.cu.carsunion.constant.ParameterValues;
 import com.nbicc.cu.carsunion.dao.MHNotifyInfosDao;
 import com.nbicc.cu.carsunion.dao.UserDao;
 import com.nbicc.cu.carsunion.dao.UserVehicleRelationshipDao;
+import com.nbicc.cu.carsunion.dao.VehicleDao;
 import com.nbicc.cu.carsunion.model.HostHolder;
 import com.nbicc.cu.carsunion.model.MHNotifyInfos;
 import com.nbicc.cu.carsunion.model.User;
@@ -21,6 +22,10 @@ import com.nbicc.cu.carsunion.util.MHUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +43,8 @@ public class MHService {
     private UserVehicleRelationshipDao userVehicleRelationshipDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private VehicleDao vehicleDao;
     @Autowired
     private HostHolder hostHolder;
     @Autowired
@@ -203,14 +210,42 @@ public class MHService {
         return JSONObject.parseObject(ret);
     }
 
-    public void handlerNotify(MHNotifyInfos info) {
-        logger.info("Receive MH notify : " + info.toString());
-        mhNotifyInfosDao.save(info);
+    public Page<MHNotifyInfos> getMHNotifyInfosList(String userId, int pageNum, int pageSize){
+        Sort sort = new Sort(Sort.Direction.DESC,"time");
+        Pageable pageable = new PageRequest(pageNum,pageSize,sort);
+        Page<MHNotifyInfos> list = mhNotifyInfosDao.findByUserId(userId,pageable);
+        list.getContent().stream().forEach(MHNotifyInfos::fillContent);
+        return list;
     }
 
-    public boolean sendNotify2App(String cid){
+
+    public void handlerNotify(MHNotifyInfos info) {
+        logger.info("Receive MH notify : " + info.toString());
+        UserVehicleRelationship uvr = userVehicleRelationshipDao.findByMhVehicleId(info.getObject());
+        if(uvr == null){
+            logger.info("mh_id in notify can not find ! receive mh_id is " + info.getObject());
+            mhNotifyInfosDao.save(info);
+            return;
+        }
+        info.setUserId(uvr.getUser().getId());
+        info.setPlateNum(uvr.getPlateNum());
+        mhNotifyInfosDao.save(info);
+        String cid = uvr.getUser().getPushCid();
+        // todo 先写死，所有通知推到我的app上
+//        cid = "1ce80dd956763442d97f797e1f7b1006";
+        info.fillContent();
+        String plateNum = info.getPlateNum();
+        if("1".equals(info.getType())){
+            //告警消息
+            String title = "告警通知";
+            String body = "您的汽车（" + plateNum + ")有告警：" + info.getSubTypeContent();
+            sendNotify2App(cid,title,body,info);
+        }
+    }
+
+    public boolean sendNotify2App(String cid, String title, String body, MHNotifyInfos info){
         IGtPush push = new IGtPush(GETUI_URL, GETUI_APP_KEY_DEV, GETUI_MASTER_SECRET_DEV);
-        LinkTemplate template = linkTemplateDemo();
+        TransmissionTemplate template = getTemplate(title,body,info);
         SingleMessage message = new SingleMessage();
         message.setOffline(true);
         // 离线有效时间，单位为毫秒，可选
@@ -230,7 +265,7 @@ public class MHService {
             ret = push.pushMessageToSingle(message, target, e.getRequestId());
         }
         if (ret != null) {
-            logger.info("GETUI PUSH RESULT : " + ret.getResponse().toString());
+//            logger.info("GETUI PUSH RESULT : " + ret.getResponse().toString());
             return true;
         } else {
             logger.error("服务器响应异常");
@@ -240,28 +275,38 @@ public class MHService {
 
     }
 
-    private LinkTemplate linkTemplateDemo() {
-        LinkTemplate template = new LinkTemplate();
-        // 设置APPID与APPKEY
+    public TransmissionTemplate getTemplate(String title, String body,MHNotifyInfos info) {
+        TransmissionTemplate template = new TransmissionTemplate();
         template.setAppId(GETUI_APP_ID_DEV);
         template.setAppkey(GETUI_APP_KEY_DEV);
+        template.setTransmissionContent(info.toString());
+//        System.out.println(info.toString());
+        template.setTransmissionType(2);
+        APNPayload payload = new APNPayload();
+        //在已有数字基础上加1显示，设置为-1时，在已有数字上减1显示，设置为数字时，显示指定数字
+        payload.setAutoBadge("+1");
+        payload.setContentAvailable(1);
+//        payload.setSound("default");
+//        payload.setCategory("$category");
+        payload.addCustomMsg("myTransmissionContent",info);
 
-        Style0 style = new Style0();
-        // 设置通知栏标题与内容
-        style.setTitle("汽车联盟通知栏标题");
-        style.setText("汽车联盟通知栏内容");
-        // 配置通知栏图标
-        style.setLogo("icon.png");
-        // 配置通知栏网络图标
-        style.setLogoUrl("");
-        // 设置通知是否响铃，震动，或者可清除
-        style.setRing(true);
-        style.setVibrate(true);
-        style.setClearable(true);
-        template.setStyle(style);
-
-        // 设置打开的网址地址
-        template.setUrl("http://www.iot-jd.com/");
+        //字典模式使用APNPayload.DictionaryAlertMsg
+        payload.setAlertMsg(getDictionaryAlertMsg(title,body));
+        template.setAPNInfo(payload);
         return template;
+    }
+
+    private static APNPayload.DictionaryAlertMsg getDictionaryAlertMsg(String title, String body){
+        APNPayload.DictionaryAlertMsg alertMsg = new APNPayload.DictionaryAlertMsg();
+        alertMsg.setBody(body);
+//        alertMsg.setActionLocKey("ActionLockey");
+//        alertMsg.setLocKey("LocKey");
+//        alertMsg.addLocArg("loc-args");
+//        alertMsg.setLaunchImage("launch-image");
+        // iOS8.2以上版本支持
+        alertMsg.setTitle(title);
+//        alertMsg.setTitleLocKey("TitleLocKey");
+//        alertMsg.addTitleLocArg("TitleLocArg");
+        return alertMsg;
     }
 }
