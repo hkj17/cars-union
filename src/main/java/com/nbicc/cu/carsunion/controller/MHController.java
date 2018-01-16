@@ -188,19 +188,6 @@ public class MHController {
         return ret;
     }
 
-//    @GetMapping("/sendNotify")
-//    @Authority
-//    public String sendNotify(@RequestParam("cid")String cid,
-//                             @RequestParam("title")String title,
-//                             @RequestParam("body")String body){
-//        boolean ret = mhService.sendNotify2App(cid,title,body);
-//        if(ret){
-//            return "ok";
-//        }else{
-//            return "fail";
-//        }
-//    }
-
     @GetMapping("/lastestNotify")
     @Authority(AuthorityType.UserValidate)
     public Page<MHNotifyInfos> getMhNotifyInfos(@RequestParam(value = "pageNum",defaultValue = "1")int pageNum,

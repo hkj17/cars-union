@@ -42,7 +42,7 @@ public class MerchantService {
     private EntityManager em;
 
     public ResponseCode merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
-                                         String longitude, String latitude, String idcardFront, String idcardBack, String license, String logo, String smsCode) {
+                                         String longitude, String latitude, String idcardFront, String idcardBack, String license, String logo, String phone, String smsCode) {
         Merchant m = merchantDao.findByContact(contact);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == RegisterStatus.PASSED_REVIEW.ordinal()){
             //已通过注册，请登录
@@ -54,7 +54,7 @@ public class MerchantService {
             m.setId(CommonUtil.generateUUID32());
             m.setContact(contact);
         }
-        if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
+        if (!SmsUtil.verifySmsCode(redisTemplate, phone, smsCode)) {
             return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
         m.setName(name);

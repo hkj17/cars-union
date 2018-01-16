@@ -120,9 +120,10 @@ public class LoginController {
                                        @RequestParam(value = "idcardBack") String idcardBack,
                                        @RequestParam(value = "license") String license,
                                        @RequestParam(value = "logo") String logo,
+                                       @RequestParam(value = "phone") String phone,
                                        @RequestParam(value = "smsCode") String smsCode) {
         ResponseCode state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude,
-                idcardFront, idcardBack, license, logo, smsCode);
+                idcardFront, idcardBack, license, logo, phone, smsCode);
         return CommonUtil.response(state,null);
     }
 
