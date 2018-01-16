@@ -105,4 +105,18 @@ public class AdminService {
         Pageable pageable = new PageRequest(pageNum, pageSize, sort);
         return userFeedbackDao.findAll(pageable);
     }
+
+    /**
+     * 保存用户登录时 app信息
+     * @param user
+     * @param pushCid
+     * @param appType
+     * @param appVersion
+     */
+    public void saveUserAppInfo(User user, String pushCid, Integer appType, String appVersion) {
+        user.setAppType(appType);
+        user.setAppVersion(appVersion);
+        user.setPushCid(pushCid);
+        userDao.save(user);
+    }
 }

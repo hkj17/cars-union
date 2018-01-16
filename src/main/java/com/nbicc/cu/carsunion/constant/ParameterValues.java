@@ -66,4 +66,26 @@ public class ParameterValues {
 
     //连续签到X天翻倍
     public static int CONTINUITY_SIGN_DAYS = 7;
+
+    /**
+     * 个推 应用参数
+     */
+    public final static String GETUI_APP_ID = "tHllV556oN6UGNRvsBGFBA";
+
+    public final static String GETUI_APP_SECRET = "zogdzR17Qz5peXYLJibhc5";
+
+    public final static String GETUI_APP_KEY = "riLhOaBlvV6KRuSuaAKML6";
+
+    public final static String GETUI_MASTER_SECRET = "L6BD99Ih1d5iI1R50KiEy5";
+
+    public final static String GETUI_APP_ID_DEV = "jnuA5z3sDI9TieZESWxrI1";
+
+    public final static String GETUI_APP_SECRET_DEV = "IS93Qpua318XNGonSUD8e1";
+
+    public final static String GETUI_APP_KEY_DEV = "jN2swF5RhDAJKs3LxlY5w6";
+
+    public final static String GETUI_MASTER_SECRET_DEV = "YKtrgE4sCz9FNmaQKWfb92";
+
+    public final static String GETUI_URL = "http://sdk.open.api.igexin.com/apiex.htm";
+
 }

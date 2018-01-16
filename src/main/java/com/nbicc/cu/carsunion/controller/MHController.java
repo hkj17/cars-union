@@ -1,18 +1,19 @@
 package com.nbicc.cu.carsunion.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.cu.carsunion.constant.Authority;
 import com.nbicc.cu.carsunion.constant.AuthorityType;
 import com.nbicc.cu.carsunion.enumtype.ResponseType;
 import com.nbicc.cu.carsunion.model.HostHolder;
+import com.nbicc.cu.carsunion.model.MHNotifyInfos;
 import com.nbicc.cu.carsunion.model.UserVehicleRelationship;
 import com.nbicc.cu.carsunion.service.MHService;
 import com.nbicc.cu.carsunion.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -174,4 +175,37 @@ public class MHController {
             return CommonUtil.response(ResponseType.REQUEST_FAIL,"控制命令下发失败",null);
         }
     }
+
+
+    @PostMapping(value = "/notify",consumes = MediaType.TEXT_PLAIN_VALUE)
+    @Authority
+    public JSONObject vehicleNotify(@RequestBody String info){
+        MHNotifyInfos infos = JSON.parseObject(info,MHNotifyInfos.class);
+        mhService.handlerNotify(infos);
+        JSONObject ret = new JSONObject();
+        ret.put("errno",0);
+        ret.put("error","success");
+        return ret;
+    }
+
+//    @GetMapping("/sendNotify")
+//    @Authority
+//    public String sendNotify(@RequestParam("cid")String cid,
+//                             @RequestParam("title")String title,
+//                             @RequestParam("body")String body){
+//        boolean ret = mhService.sendNotify2App(cid,title,body);
+//        if(ret){
+//            return "ok";
+//        }else{
+//            return "fail";
+//        }
+//    }
+
+    @GetMapping("/lastestNotify")
+    @Authority(AuthorityType.UserValidate)
+    public Page<MHNotifyInfos> getMhNotifyInfos(@RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
+                                                @RequestParam(value = "pageSize",defaultValue = "6")int pageSize){
+        return mhService.getMHNotifyInfosList(hostHolder.getAdmin().getId(),pageNum-1,pageSize);
+    }
+
 }

@@ -76,7 +76,10 @@ public class LoginController {
 
     @RequestMapping(value = "/userLogin", method = RequestMethod.POST)
     public JSONObject userLogin(@RequestParam(value = "username") String username,
-                                @RequestParam(value = "password") String password) {
+                                @RequestParam(value = "password") String password,
+                                @RequestParam(value = "pushCid",required = false)String pushCid,
+                                @RequestParam(value = "appType",required = false)Integer appType,
+                                @RequestParam(value = "appVersion",required = false)String appVersion) {
         Map<String, Object> res = new HashMap<String, Object>();
         Admin admin = adminService.getAdminByUserNameAndAuthority(username, 2);
         Admin validatedAdmin = adminService.validatePassword(admin, password);
@@ -85,6 +88,7 @@ public class LoginController {
         }
 
         User user = adminService.getUserById(admin.getId());
+        adminService.saveUserAppInfo(user,pushCid,appType,appVersion);
         res.put("user", user);
         String token = adminService.getToken(redisTemplate,admin.getId());
         res.put("token", token);
