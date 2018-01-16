@@ -13,7 +13,7 @@ public interface MerchantDao extends JpaRepository<Merchant,String>,PagingAndSor
 
     Merchant findById(String id);
 
-    Merchant findByContact(String contact);
+    Merchant findByPhone(String phone);
 
     Page<Merchant> findByRegStatus(int status, Pageable pageable);
 }
