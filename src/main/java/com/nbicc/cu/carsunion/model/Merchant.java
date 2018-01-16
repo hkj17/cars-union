@@ -25,6 +25,9 @@ public class Merchant {
     @Column(name = "region")
     private String region;
 
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "contact")
     private String contact;
 
@@ -83,6 +86,14 @@ public class Merchant {
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getContact() {

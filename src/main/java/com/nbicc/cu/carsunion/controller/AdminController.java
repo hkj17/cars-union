@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -64,8 +63,8 @@ public class AdminController {
 
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/passRegistration", method = RequestMethod.POST)
-    public JSONObject passRegistration(@RequestParam(value = "contact") String contact) {
-        boolean state = merchantService.passRegistration(contact);
+    public JSONObject passRegistration(@RequestParam(value = "phone") String phone) {
+        boolean state = merchantService.passRegistration(phone);
         if (state) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {
@@ -75,8 +74,8 @@ public class AdminController {
 
     @Authority(value = AuthorityType.AdminValidate)
     @RequestMapping(value = "/failRegistration", method = RequestMethod.POST)
-    public JSONObject failRegistration(@RequestParam(value = "contact") String contact) {
-        boolean state = merchantService.failRegistration(contact);
+    public JSONObject failRegistration(@RequestParam(value = "phone") String phone) {
+        boolean state = merchantService.failRegistration(phone);
         if (state) {
             return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "操作成功",null);
         } else {

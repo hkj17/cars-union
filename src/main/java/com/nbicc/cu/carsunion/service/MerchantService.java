@@ -43,7 +43,7 @@ public class MerchantService {
 
     public ResponseCode merchantRegister(RedisTemplate redisTemplate, String name, String address, String region, String contact,
                                          String longitude, String latitude, String idcardFront, String idcardBack, String license, String logo, String phone, String smsCode) {
-        Merchant m = merchantDao.findByContact(contact);
+        Merchant m = merchantDao.findByPhone(phone);
         if(!CommonUtil.isNullOrEmpty(m) && m.getRegStatus() == RegisterStatus.PASSED_REVIEW.ordinal()){
             //已通过注册，请登录
             return new ResponseCode(ResponseType.PHONE_ALREADY_REGISTER,"商家手机已注册");
@@ -52,7 +52,7 @@ public class MerchantService {
         if (CommonUtil.isNullOrEmpty(m)) {
             m = new Merchant();
             m.setId(CommonUtil.generateUUID32());
-            m.setContact(contact);
+            m.setPhone(phone);
         }
         if (!SmsUtil.verifySmsCode(redisTemplate, phone, smsCode)) {
             return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
@@ -60,6 +60,7 @@ public class MerchantService {
         m.setName(name);
         m.setAddress(address);
         m.setRegion(region);
+        m.setContact(contact);
         m.setLongitude(longitude);
         m.setLatitude(latitude);
         m.setRegStatus(RegisterStatus.UNDER_REVIEW.ordinal());
@@ -72,8 +73,8 @@ public class MerchantService {
     }
 
     @Transactional
-    public boolean passRegistration(String contact) {
-        Merchant m = merchantDao.findByContact(contact);
+    public boolean passRegistration(String phone) {
+        Merchant m = merchantDao.findByPhone(phone);
         if (CommonUtil.isNullOrEmpty(m)) {
             return false;
         }
@@ -84,15 +85,15 @@ public class MerchantService {
 
         Admin a = new Admin();
         a.setId(m.getId());
-        a.setUserName(contact);
+        a.setUserName(phone);
         a.setUserPasswd(MessageDigestUtil.MD5Encode(ParameterValues.DEFAULT_PASSWD, null));
         a.setAuthority(1);
         adminDao.save(a);
         return true;
     }
 
-    public boolean failRegistration(String contact) {
-        Merchant m = merchantDao.findByContact(contact);
+    public boolean failRegistration(String phone) {
+        Merchant m = merchantDao.findByPhone(phone);
         if (CommonUtil.isNullOrEmpty(m)) {
             return false;
         }
@@ -147,8 +148,8 @@ public class MerchantService {
         return true;
     }
 
-    public Merchant getMerchantByContact(String contact) {
-        return merchantDao.findByContact(contact);
+    public Merchant getMerchantByPhone(String phone) {
+        return merchantDao.findByPhone(phone);
     }
 
     public List<Merchant> getMerchantList(String region, String keyword) {

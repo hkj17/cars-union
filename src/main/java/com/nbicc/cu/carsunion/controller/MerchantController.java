@@ -74,9 +74,9 @@ public class MerchantController {
     }
 
     @Authority(value = AuthorityType.UserValidate)
-    @RequestMapping(value = "/getMerchantByContact", method = RequestMethod.POST)
-    public JSONObject getMerchantByContact(@RequestParam(value = "contact") String contact) {
-        Merchant merchant = merchantService.getMerchantByContact(contact);
+    @RequestMapping(value = "/getMerchantByPhone", method = RequestMethod.POST)
+    public JSONObject getMerchantByContact(@RequestParam(value = "phone") String phone) {
+        Merchant merchant = merchantService.getMerchantByPhone(phone);
         return CommonUtil.response(ResponseType.REQUEST_SUCCESS, "返回成功",merchant);
     }
 
