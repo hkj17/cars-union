@@ -116,9 +116,10 @@ public class LoginController {
                                        @RequestParam(value = "idcardBack") String idcardBack,
                                        @RequestParam(value = "license") String license,
                                        @RequestParam(value = "logo") String logo,
+                                       @RequestParam(value = "phone") String phone,
                                        @RequestParam(value = "smsCode") String smsCode) {
         ResponseCode state = merchantService.merchantRegister(redisTemplate, name, address, region, contact, longitude, latitude,
-                idcardFront, idcardBack, license, logo, smsCode);
+                idcardFront, idcardBack, license, logo, phone, smsCode);
         return CommonUtil.response(state,null);
     }
 
@@ -129,10 +130,11 @@ public class LoginController {
                                      @RequestParam(value = "contact") String contact,
                                      @RequestParam(value = "region",required = false) String region,
                                      @RequestParam(value = "password") String password,
+                                     @RequestParam(value = "phone") String phone,
                                      @RequestParam(value = "smsCode") String smsCode,
                                      @RequestParam(value = "shareCode", required = false) String shareCode) {
         ResponseCode state = userService.userRegister(redisTemplate, name, nickname, contact, region, portrait, shareCode,
-                password, smsCode);
+                password, phone, smsCode);
         return CommonUtil.response(state, null);
     }
 

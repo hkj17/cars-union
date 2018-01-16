@@ -93,8 +93,8 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String region, String portrait, String shareCode, String password, String smsCode) {
-        if (!SmsUtil.verifySmsCode(redisTemplate, contact, smsCode)) {
+    public ResponseCode userRegister(RedisTemplate redisTemplate, String name, String nickName, String contact, String region, String portrait, String shareCode, String password, String phone, String smsCode) {
+        if (!SmsUtil.verifySmsCode(redisTemplate, phone, smsCode)) {
             return new ResponseCode(ResponseType.FAIL_SMS_VERIFICATION,"手机验证码错误");
         }
         User user = userDao.findByContact(contact);
