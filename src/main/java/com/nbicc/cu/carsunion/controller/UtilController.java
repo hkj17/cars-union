@@ -97,7 +97,7 @@ public class UtilController {
         AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
         req.setExtend("123456");
         req.setSmsType("normal");
-        req.setSmsFreeSignName("汽车联盟");
+//        req.setSmsFreeSignName("汽车联盟");
         String json = "{\"number\":\"" + message + "\"}";
         req.setSmsParamString(json);
         req.setRecNum(phone);

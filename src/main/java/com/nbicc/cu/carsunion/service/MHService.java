@@ -279,7 +279,8 @@ public class MHService {
         TransmissionTemplate template = new TransmissionTemplate();
         template.setAppId(GETUI_APP_ID_DEV);
         template.setAppkey(GETUI_APP_KEY_DEV);
-        template.setTransmissionContent(info.toString());
+        String content = JSONObject.toJSONString(info);
+        template.setTransmissionContent(content);
 //        System.out.println(info.toString());
         template.setTransmissionType(2);
         APNPayload payload = new APNPayload();
@@ -288,7 +289,7 @@ public class MHService {
         payload.setContentAvailable(1);
 //        payload.setSound("default");
 //        payload.setCategory("$category");
-        payload.addCustomMsg("myTransmissionContent",info);
+        payload.addCustomMsg("myTransmissionContent",content);
 
         //字典模式使用APNPayload.DictionaryAlertMsg
         payload.setAlertMsg(getDictionaryAlertMsg(title,body));
